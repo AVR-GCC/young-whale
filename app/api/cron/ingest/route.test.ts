@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { POST } from './route'
+import { GET } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 
 // 1. Setup Hoisted Mocks cleanly below imports
@@ -86,7 +86,7 @@ function setupMockFetch() {
   })
 }
 
-describe('POST /api/cron/ingest', () => {
+describe('GET /api/cron/ingest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,7 +103,7 @@ describe('POST /api/cron/ingest', () => {
 
   it('returns 401 when Authorization header is missing', async () => {
     const request = new Request('http://localhost/api/cron/ingest')
-    const response = await POST(request)
+    const response = await GET(request)
     const json = await response.json()
 
     expect(response.status).toBe(401)
@@ -113,7 +113,7 @@ describe('POST /api/cron/ingest', () => {
   it('returns 500 when COINMARKETCAP_API_KEY is not set', async () => {
     vi.stubEnv('COINMARKETCAP_API_KEY', '') // Safely empty it out for just this test
 
-    const response = await POST(createRequest())
+    const response = await GET(createRequest())
     const json = await response.json()
 
     expect(response.status).toBe(500)
@@ -132,7 +132,7 @@ describe('POST /api/cron/ingest', () => {
 
     setupMockFetch()
 
-    const response = await POST(createRequest())
+    const response = await GET(createRequest())
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -152,7 +152,7 @@ describe('POST /api/cron/ingest', () => {
 
     setupMockFetch()
 
-    const response = await POST(createRequest())
+    const response = await GET(createRequest())
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -162,7 +162,7 @@ describe('POST /api/cron/ingest', () => {
   it('handles CMC API errors gracefully', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
-    const response = await POST(createRequest())
+    const response = await GET(createRequest())
     const json = await response.json()
 
     expect(response.status).toBe(500)

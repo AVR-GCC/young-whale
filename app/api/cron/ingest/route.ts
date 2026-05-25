@@ -155,7 +155,7 @@ async function isRawTokensTableEmpty(): Promise<boolean> {
   return !data
 }
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   if (!verifyCronRequest(request)) {
     return NextResponse.json(
       { error: 'Unauthorized' },
