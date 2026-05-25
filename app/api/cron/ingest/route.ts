@@ -3,7 +3,6 @@ import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
 
 const CMC_BASE_URL = 'https://pro-api.coinmarketcap.com'
-const CMC_API_KEY = process.env.COINMARKETCAP_API_KEY
 
 async function getLatestListings(limit = 10, start = 1) {
   const url = new URL(`${CMC_BASE_URL}/v1/cryptocurrency/listings/latest`)
@@ -15,7 +14,7 @@ async function getLatestListings(limit = 10, start = 1) {
 
   const response = await fetch(url.toString(), {
     headers: {
-      'X-CMC_PRO_API_KEY': CMC_API_KEY!,
+      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
       Accept: 'application/json',
     },
   })
@@ -40,7 +39,7 @@ async function getTokenDetails(cmcId: number) {
 
   const response = await fetch(url.toString(), {
     headers: {
-      'X-CMC_PRO_API_KEY': CMC_API_KEY!,
+      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
       Accept: 'application/json',
     },
   })
@@ -164,7 +163,7 @@ export async function POST(request: Request) {
     )
   }
 
-  if (!CMC_API_KEY) {
+  if (!process.env.COINMARKETCAP_API_KEY) {
     return NextResponse.json(
       { error: 'COINMARKETCAP_API_KEY is not set' },
       { status: 500 }
