@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { verifyCronRequest } from '@/lib/cron/verify'
 
 const CMC_BASE_URL = 'https://pro-api.coinmarketcap.com'
 const CMC_API_KEY = process.env.COINMARKETCAP_API_KEY
@@ -155,7 +156,14 @@ async function isRawTokensTableEmpty(): Promise<boolean> {
   return !data
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+  if (!verifyCronRequest(request)) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      { status: 401 }
+    )
+  }
+
   if (!CMC_API_KEY) {
     return NextResponse.json(
       { error: 'COINMARKETCAP_API_KEY is not set' },
