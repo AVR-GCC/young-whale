@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { GET } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 
-// 1. Setup Hoisted Mocks cleanly below imports
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
     from: vi.fn(() => ({
@@ -16,7 +15,6 @@ vi.mock('@/lib/supabase/service', () => ({
   },
 }))
 
-// 2. Share reusable mock data at the top
 const mockListings = Array.from({ length: 50 }, (_, i) => ({
   id: i + 1,
   name: `Token ${i + 1}`,
@@ -35,11 +33,9 @@ const mockDetails = {
   tags: [],
 }
 
-// 3. Mock Global Fetch
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
-// 4. Query Builder Mock Helper
 interface MockQueryBuilder {
   select: () => MockQueryBuilder
   insert: () => MockQueryBuilder
@@ -67,7 +63,6 @@ function createRequest(): Request {
   })
 }
 
-// 5. Reusable Fetch implementation helper to keep individual tests short
 function setupMockFetch() {
   mockFetch.mockImplementation((url: string) => {
     if (url.includes('/listings/latest')) {
@@ -92,7 +87,6 @@ describe('GET /api/cron/ingest', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(supabaseService.from).mockImplementation(() => createMockQueryBuilder() as any)
     
-    // Use Vitest's environment stubbing features
     vi.stubEnv('COINMARKETCAP_API_KEY', 'test-cmc-key')
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
   })
@@ -111,7 +105,7 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('returns 500 when COINMARKETCAP_API_KEY is not set', async () => {
-    vi.stubEnv('COINMARKETCAP_API_KEY', '') // Safely empty it out for just this test
+    vi.stubEnv('COINMARKETCAP_API_KEY', '')
 
     const response = await GET(createRequest())
     const json = await response.json()
