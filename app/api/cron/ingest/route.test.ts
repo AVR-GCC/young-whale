@@ -153,6 +153,42 @@ describe('GET /api/cron/ingest', () => {
     expect(json.imported).toBe(1)
   })
 
+  it('adds jobs to processing_queue after ingesting tokens', async () => {
+    const mockMaybeSingle = vi.fn()
+      .mockResolvedValueOnce({ data: null, error: null }) // isRawTokensTableEmpty check
+      .mockResolvedValue({ data: null, error: null })     // individual token checks
+
+    const processingQueueInsert = vi.fn().mockResolvedValue({ error: null })
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_queue') {
+        return {
+          select: vi.fn().mockReturnThis(),
+          insert: processingQueueInsert,
+          limit: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+          single: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return createMockQueryBuilder({ maybeSingle: mockMaybeSingle }) as any
+    })
+
+    setupMockFetch()
+
+    const response = await GET(createRequest())
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.imported).toBe(10)
+    expect(processingQueueInsert).toHaveBeenCalledTimes(1)
+    expect(processingQueueInsert).toHaveBeenCalledWith(
+      Array.from({ length: 10 }, () => ({ raw_token_id: 'test-id' }))
+    )
+  })
+
   it('handles CMC API errors gracefully', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
