@@ -173,6 +173,7 @@ export async function GET(request: Request) {
   try {
     const isEmpty = await isRawTokensTableEmpty()
     const results = []
+    const rawTokenIds: string[] = []
 
     if (isEmpty) {
       // Table is empty: ingest exactly 10 tokens
@@ -193,6 +194,7 @@ export async function GET(request: Request) {
           results.push({ symbol: listing.symbol, success: false, error: error.message })
         } else {
           results.push({ symbol: listing.symbol, success: true, data })
+          rawTokenIds.push(data.id)
         }
       }
     } else {
@@ -230,10 +232,22 @@ export async function GET(request: Request) {
             results.push({ symbol: listing.symbol, success: false, error: error.message })
           } else {
             results.push({ symbol: listing.symbol, success: true, data })
+            rawTokenIds.push(data.id)
           }
         }
 
         start += batchSize
+      }
+    }
+
+    if (rawTokenIds.length > 0) {
+      const queueJobs = rawTokenIds.map((id) => ({ raw_token_id: id }))
+      const { error: queueError } = await supabaseService
+        .from('processing_queue')
+        .insert(queueJobs)
+
+      if (queueError) {
+        console.error('Failed to insert processing_queue jobs:', queueError.message)
       }
     }
 
