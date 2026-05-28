@@ -156,11 +156,10 @@ async function isRawTokensTableEmpty(): Promise<boolean> {
 }
 
 export async function GET(request: Request) {
-  if (!verifyCronRequest(request)) {
-    return NextResponse.json(
-      { error: 'Unauthorized' },
-      { status: 401 }
-    )
+  if (process.env.NODE_ENV !== 'development') {
+    if (!verifyCronRequest(request)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
 
   if (!process.env.COINMARKETCAP_API_KEY) {
