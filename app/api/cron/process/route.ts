@@ -21,19 +21,6 @@ const fireworks = createOpenAI({
 const model = fireworks.chat('accounts/fireworks/models/gpt-oss-120b')
 
 const ALLOWED_CATEGORIES: TokenCategory[] = ['Presale', 'Tech', 'Meme', 'RWA']
-const ALLOWED_HASHTAGS = [
-  'defi',
-  'gamefi',
-  'ai',
-  'nft',
-  'meme',
-  'rwa',
-  'infrastructure',
-  'platform',
-  'exchange',
-  'utility',
-  'stablecoin',
-]
 const ALLOWED_CONFIDENCES: Confidence[] = ['low', 'medium', 'high']
 
 interface AIResult {
@@ -55,6 +42,21 @@ export async function GET(request: Request) {
   let failed = 0
 
   try {
+    const { data: hashtagRows, error: hashtagError } = await supabaseService
+      .from('hashtags')
+      .select('slug')
+      .eq('is_active', true)
+
+    if (hashtagError) {
+      console.error('Failed to fetch hashtags:', hashtagError.message)
+      return NextResponse.json(
+        { error: 'Database error fetching hashtags' },
+        { status: 500 }
+      )
+    }
+
+    const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
+
     while (true) {
       const now = new Date().toISOString()
       const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
@@ -86,7 +88,7 @@ export async function GET(request: Request) {
 
       for (const job of jobs as ProcessingQueueJob[]) {
         try {
-          const result = await processJob(job)
+          const result = await processJob(job, allowedHashtags)
           if (result === 'success') {
             processed++
           } else {
@@ -117,7 +119,10 @@ export async function GET(request: Request) {
   }
 }
 
-async function processJob(job: ProcessingQueueJob): Promise<'success' | 'failed'> {
+async function processJob(
+  job: ProcessingQueueJob,
+  allowedHashtags: string[]
+): Promise<'success' | 'failed'> {
   const { data: rawToken, error: rawError } = await supabaseService
     .from('raw_tokens')
     .select('*')
@@ -139,14 +144,14 @@ async function processJob(job: ProcessingQueueJob): Promise<'success' | 'failed'
 
   let aiResult: AIResult
   try {
-    aiResult = await callFireworks(raw)
+    aiResult = await callFireworks(raw, allowedHashtags)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
     return 'failed'
   }
 
-  const validation = validateAIResult(aiResult)
+  const validation = validateAIResult(aiResult, allowedHashtags)
   if (!validation.valid) {
     await markJobFailed(job, validation.error)
     return 'failed'
@@ -204,7 +209,7 @@ async function processJob(job: ProcessingQueueJob): Promise<'success' | 'failed'
   }
 
   const validHashtags = (aiResult.hashtags as string[]).filter((h) =>
-    ALLOWED_HASHTAGS.includes(h.toLowerCase())
+    allowedHashtags.includes(h.toLowerCase())
   )
 
   if (validHashtags.length > 0) {
@@ -251,7 +256,10 @@ async function processJob(job: ProcessingQueueJob): Promise<'success' | 'failed'
   return 'success'
 }
 
-async function callFireworks(raw: RawToken): Promise<AIResult> {
+async function callFireworks(
+  raw: RawToken,
+  allowedHashtags: string[]
+): Promise<AIResult> {
   const system =
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
 
@@ -266,7 +274,7 @@ async function callFireworks(raw: RawToken): Promise<AIResult> {
   "confidence": "low | medium | high"
 }
 
-Allowed hashtags: defi, gamefi, ai, nft, meme, rwa, infrastructure, platform, exchange, utility, stablecoin
+Allowed hashtags: ${allowedHashtags.join(', ')}
 
 Token data:
 ${rawStr}`
@@ -285,13 +293,26 @@ ${rawStr}`
   return parsed as AIResult
 }
 
-function validateAIResult(result: AIResult): { valid: true } | { valid: false; error: string } {
+function validateAIResult(
+  result: AIResult,
+  allowedHashtags: string[]
+): { valid: true } | { valid: false; error: string } {
   if (!ALLOWED_CATEGORIES.includes(result.category as TokenCategory)) {
     return { valid: false, error: `Invalid category: ${result.category}` }
   }
 
   if (!Array.isArray(result.hashtags)) {
     return { valid: false, error: 'hashtags must be an array' }
+  }
+
+  const invalidHashtags = result.hashtags.filter(
+    (h) => !allowedHashtags.includes(h.toLowerCase())
+  )
+  if (invalidHashtags.length > 0) {
+    return {
+      valid: false,
+      error: `Invalid hashtags: ${invalidHashtags.join(', ')}`,
+    }
   }
 
   if (!result.short_description || result.short_description.trim().length === 0) {
