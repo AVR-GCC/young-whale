@@ -1,44 +1,354 @@
-import { createOpenAI } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { NextResponse } from 'next/server'
+import { createOpenAI } from '@ai-sdk/openai'
+import { generateText } from 'ai'
+import { supabaseService } from '@/lib/supabase/service'
+import { verifyCronRequest } from '@/lib/cron/verify'
+import type {
+  ProcessingQueueJob,
+  RawToken,
+  TokenCategory,
+  Confidence,
+} from '@/shared/types'
 
-const apiKey = process.env.FIREWORKS_API_KEY ?? '';
+export const maxDuration = 60
+
+const apiKey = process.env.FIREWORKS_API_KEY ?? ''
 const fireworks = createOpenAI({
   apiKey,
   baseURL: 'https://api.fireworks.ai/inference/v1',
-});
+})
 
-export const maxDuration = 30;
+const model = fireworks.chat('accounts/fireworks/models/gpt-oss-120b')
 
-/*
-kimi-k2p5
-kimi-k2p6
-glm-5p1
-gpt-oss-120b
-flux-1-dev-fp8
-flux-1-schnell-fp8
-flux-kontext-pro
-deepseek-v4-pro
-flux-kontext-max
-*/
-const model = fireworks.chat('accounts/fireworks/models/gpt-oss-120b');
+const ALLOWED_CATEGORIES: TokenCategory[] = ['Presale', 'Tech', 'Meme', 'RWA']
+const ALLOWED_HASHTAGS = [
+  'defi',
+  'gamefi',
+  'ai',
+  'nft',
+  'meme',
+  'rwa',
+  'infrastructure',
+  'platform',
+  'exchange',
+  'utility',
+  'stablecoin',
+]
+const ALLOWED_CONFIDENCES: Confidence[] = ['low', 'medium', 'high']
 
-export async function GET() {
-  try {
-    const messages = [
-      { role: 'user' as const, content: 'What is the second highest peak in the world?' }
-    ];
-    const result = streamText({
-      model,
-      messages,
-      allowSystemInMessages: true, 
-      onFinish(res) {
-        console.log(res.text);
-      },
-    });
+interface AIResult {
+  category: string
+  hashtags: string[]
+  short_description: string
+  full_description: string
+  confidence: string
+}
 
-    return result.toTextStreamResponse();
-  } catch (error) {
-    console.error('Error generating response:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+export async function GET(request: Request) {
+  if (process.env.NODE_ENV !== 'development') {
+    if (!verifyCronRequest(request)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
   }
+
+  let processed = 0
+  let failed = 0
+
+  try {
+    while (true) {
+      const now = new Date().toISOString()
+      const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
+
+      const { data: jobs, error: pickError } = await supabaseService
+        .from('processing_queue')
+        .select('*')
+        .eq('status', 'queued')
+        .or('locked_until.is.null,locked_until.lt.' + now)
+        .limit(5)
+
+      if (pickError) {
+        console.error('Failed to pick up jobs:', pickError.message)
+        return NextResponse.json(
+          { error: 'Database error picking up jobs' },
+          { status: 500 }
+        )
+      }
+
+      if (!jobs || jobs.length === 0) {
+        break
+      }
+
+      const jobIds = jobs.map((j) => j.id)
+      await supabaseService
+        .from('processing_queue')
+        .update({ status: 'processing', locked_until: lockUntil })
+        .in('id', jobIds)
+
+      for (const job of jobs as ProcessingQueueJob[]) {
+        try {
+          const result = await processJob(job)
+          if (result === 'success') {
+            processed++
+          } else {
+            failed++
+          }
+        } catch (jobError) {
+          console.error(`Unhandled error processing job ${job.id}:`, jobError)
+          await markJobFailed(
+            job,
+            jobError instanceof Error ? jobError.message : 'Unhandled error'
+          )
+          failed++
+        }
+      }
+    }
+
+    return NextResponse.json({
+      processed,
+      failed,
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Cron process error:', message)
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    )
+  }
+}
+
+async function processJob(job: ProcessingQueueJob): Promise<'success' | 'failed'> {
+  const { data: rawToken, error: rawError } = await supabaseService
+    .from('raw_tokens')
+    .select('*')
+    .eq('id', job.raw_token_id)
+    .single()
+
+  if (rawError || !rawToken) {
+    const msg = rawError?.message ?? 'Raw token not found'
+    await markJobFailed(job, msg)
+    return 'failed'
+  }
+
+  const raw = rawToken as RawToken
+
+  if (!raw.name || !raw.symbol || !raw.chain) {
+    await markJobFailed(job, 'Missing required fields: name, symbol, or chain')
+    return 'failed'
+  }
+
+  let aiResult: AIResult
+  try {
+    aiResult = await callFireworks(raw)
+  } catch (aiError) {
+    const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
+    await markJobFailed(job, msg)
+    return 'failed'
+  }
+
+  const validation = validateAIResult(aiResult)
+  if (!validation.valid) {
+    await markJobFailed(job, validation.error)
+    return 'failed'
+  }
+
+  const uniqueKey = raw.contract_address
+    ? `${raw.chain}_${raw.contract_address}`.toLowerCase()
+    : `${raw.website_url ?? ''}_${raw.name}`.toLowerCase().replace(/[^a-z0-9]/g, '_')
+
+  let slug = `${raw.name}-${raw.symbol}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+  slug = await ensureUniqueSlug(slug)
+
+  const tokenData = {
+    name: raw.name,
+    symbol: raw.symbol,
+    chain: raw.chain,
+    contract_address: raw.contract_address,
+    unique_key: uniqueKey,
+    slug,
+    category: aiResult.category as TokenCategory,
+    short_description: aiResult.short_description,
+    full_description: aiResult.full_description,
+    logo_url: raw.logo_url,
+    logo_storage_path: null,
+    website_url: raw.website_url,
+    social_links: raw.social_links ?? {},
+    exchange_links: raw.exchange_links ?? [],
+    start_date: null,
+    end_date: null,
+    source_type: raw.source_type,
+    source_url: raw.source_url,
+    confidence: aiResult.confidence as Confidence,
+    raw_token_id: raw.id,
+    status: 'pending_review' as const,
+    is_promoted: false,
+    is_verified: false,
+  }
+
+  const { data: upserted, error: upsertError } = await supabaseService
+    .from('tokens')
+    .upsert(tokenData, { onConflict: 'unique_key' })
+    .select()
+    .single()
+
+  if (upsertError || !upserted) {
+    await markJobFailed(
+      job,
+      upsertError?.message ?? 'Failed to upsert token'
+    )
+    return 'failed'
+  }
+
+  const validHashtags = (aiResult.hashtags as string[]).filter((h) =>
+    ALLOWED_HASHTAGS.includes(h.toLowerCase())
+  )
+
+  if (validHashtags.length > 0) {
+    const { data: hashtagRows } = await supabaseService
+      .from('hashtags')
+      .select('id, slug')
+      .in('slug', validHashtags)
+
+    const hashtagMap = new Map(
+      (hashtagRows ?? []).map((h: { id: string; slug: string }) => [h.slug, h.id])
+    )
+
+    const tokenHashtagRows = validHashtags
+      .map((slug) => {
+        const id = hashtagMap.get(slug.toLowerCase())
+        if (!id) return null
+        return { token_id: upserted.id, hashtag_id: id }
+      })
+      .filter(Boolean) as { token_id: string; hashtag_id: string }[]
+
+    if (tokenHashtagRows.length > 0) {
+      const { error: hashtagError } = await supabaseService
+        .from('token_hashtags')
+        .upsert(tokenHashtagRows, {
+          onConflict: 'token_id,hashtag_id',
+        })
+
+      if (hashtagError) {
+        console.error('Failed to insert hashtags:', hashtagError.message)
+      }
+    }
+  }
+
+  await supabaseService
+    .from('processing_queue')
+    .update({ status: 'completed', locked_until: null, error_message: null })
+    .eq('id', job.id)
+
+  await supabaseService
+    .from('raw_tokens')
+    .update({ status: 'processed', error_message: null })
+    .eq('id', job.raw_token_id)
+
+  return 'success'
+}
+
+async function callFireworks(raw: RawToken): Promise<AIResult> {
+  const system =
+    'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
+
+  const rawStr = JSON.stringify(raw, null, 2);
+  console.log('rawStr', rawStr);
+  const user = `Analyze this token and return ONLY a JSON object with these exact keys:
+{
+  "category": "one of: Presale, Tech, Meme, RWA",
+  "hashtags": ["array of slugs from allowed list only"],
+  "short_description": "max 6 words, beginner friendly, no jargon",
+  "full_description": "2-3 sentences explaining what the token does",
+  "confidence": "low | medium | high"
+}
+
+Allowed hashtags: defi, gamefi, ai, nft, meme, rwa, infrastructure, platform, exchange, utility, stablecoin
+
+Token data:
+${rawStr}`
+
+  const { text } = await generateText({
+    model,
+    system,
+    prompt: user,
+    temperature: 0.2,
+  })
+
+  const cleaned = text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '')
+  const parsed = JSON.parse(cleaned)
+  console.log('parsed', parsed);
+
+  return parsed as AIResult
+}
+
+function validateAIResult(result: AIResult): { valid: true } | { valid: false; error: string } {
+  if (!ALLOWED_CATEGORIES.includes(result.category as TokenCategory)) {
+    return { valid: false, error: `Invalid category: ${result.category}` }
+  }
+
+  if (!Array.isArray(result.hashtags)) {
+    return { valid: false, error: 'hashtags must be an array' }
+  }
+
+  if (!result.short_description || result.short_description.trim().length === 0) {
+    return { valid: false, error: 'short_description is required' }
+  }
+
+  if (!ALLOWED_CONFIDENCES.includes(result.confidence as Confidence)) {
+    return { valid: false, error: `Invalid confidence: ${result.confidence}` }
+  }
+
+  return { valid: true }
+}
+
+async function ensureUniqueSlug(baseSlug: string): Promise<string> {
+  let slug = baseSlug
+  let suffix = 2
+
+  while (true) {
+    const { data, error } = await supabaseService
+      .from('tokens')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error checking slug collision:', error.message)
+      break
+    }
+
+    if (!data) break
+
+    slug = `${baseSlug}-${suffix}`
+    suffix++
+  }
+
+  return slug
+}
+
+async function markJobFailed(job: ProcessingQueueJob, errorMessage: string) {
+  const newRetry = job.retry_count + 1
+  const shouldRetry = newRetry < job.max_retries
+
+  await supabaseService
+    .from('processing_queue')
+    .update({
+      status: shouldRetry ? 'queued' : 'failed',
+      retry_count: newRetry,
+      locked_until: shouldRetry ? null : job.locked_until,
+      error_message: errorMessage,
+    })
+    .eq('id', job.id)
+
+  await supabaseService
+    .from('raw_tokens')
+    .update({
+      status: 'failed',
+      error_message: errorMessage,
+    })
+    .eq('id', job.raw_token_id)
 }
