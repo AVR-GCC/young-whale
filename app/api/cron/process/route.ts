@@ -56,6 +56,7 @@ export async function GET(request: Request) {
     }
 
     const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
+    const processedJobIds = new Set<string>()
 
     while (true) {
       const now = new Date().toISOString()
@@ -80,13 +81,19 @@ export async function GET(request: Request) {
         break
       }
 
-      const jobIds = jobs.map((j) => j.id)
+      const newJobs = jobs.filter((j) => !processedJobIds.has(j.id))
+      if (newJobs.length === 0) {
+        break
+      }
+
+      const jobIds = newJobs.map((j) => j.id)
       await supabaseService
         .from('processing_queue')
         .update({ status: 'processing', locked_until: lockUntil })
         .in('id', jobIds)
 
-      for (const job of jobs as ProcessingQueueJob[]) {
+      for (const job of newJobs as ProcessingQueueJob[]) {
+        processedJobIds.add(job.id)
         try {
           const result = await processJob(job, allowedHashtags)
           if (result === 'success') {

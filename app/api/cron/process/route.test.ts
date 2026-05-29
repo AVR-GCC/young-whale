@@ -463,7 +463,7 @@ describe('GET /api/cron/process', () => {
       text: JSON.stringify(mockAIResult),
     } as unknown as Awaited<ReturnType<typeof generateText>>)
 
-    let queueCallCount = 0
+    let selectCallCount = 0
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'hashtags') {
@@ -474,17 +474,21 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        queueCallCount++
-        if (queueCallCount <= 2) {
+        const builder = createMockQueryBuilder({}, { data: null, error: null })
+        builder.select = vi.fn(() => {
+          selectCallCount++
+          if (selectCallCount <= 2) {
+            return createMockQueryBuilder(
+              {},
+              { data: [{ ...mockJob, id: `job-${selectCallCount}` }], error: null }
+            )
+          }
           return createMockQueryBuilder(
             {},
-            { data: [{ ...mockJob, id: `job-${queueCallCount}` }], error: null }
-          ) as unknown as ReturnType<typeof supabaseService.from>
-        }
-        return createMockQueryBuilder(
-          {},
-          { data: [], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+            { data: [], error: null }
+          )
+        })
+        return builder as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
