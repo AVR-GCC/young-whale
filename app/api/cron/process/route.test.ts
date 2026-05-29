@@ -77,6 +77,21 @@ function createRequest(authHeader?: string): Request {
   return new Request('http://localhost/api/cron/process', { headers })
 }
 
+function createQueueMock(jobs: typeof mockJob[] = [mockJob]) {
+  const builder = createMockQueryBuilder({}, { data: [], error: null })
+  builder.select = vi.fn(() => {
+    createQueueMock.selectCallCount++
+    if (createQueueMock.selectCallCount === 1) {
+      return createMockQueryBuilder({}, { data: jobs, error: null })
+    }
+    return createMockQueryBuilder({}, { data: [], error: null })
+  })
+  return builder
+}
+
+// @ts-ignore - adding static property for tracking across mock instances
+createQueueMock.selectCallCount = 0
+
 const mockJob = {
   id: 'job-1',
   raw_token_id: 'raw-1',
@@ -122,6 +137,8 @@ describe('GET /api/cron/process', () => {
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('FIREWORKS_API_KEY', 'test-fireworks-key')
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
+    // @ts-ignore
+    createQueueMock.selectCallCount = 0
   })
 
   afterEach(() => {
@@ -310,10 +327,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [mockJob], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -354,10 +368,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [mockJob], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -393,10 +404,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [mockJob], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -431,10 +439,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [mockJob], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -547,10 +552,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: jobs, error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock(jobs) as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -592,10 +594,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [jobWithRetries], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock([jobWithRetries]) as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
@@ -636,10 +635,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        return createMockQueryBuilder(
-          {},
-          { data: [jobMaxRetries], error: null }
-        ) as unknown as ReturnType<typeof supabaseService.from>
+        return createQueueMock([jobMaxRetries]) as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'raw_tokens') {
