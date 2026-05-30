@@ -189,7 +189,7 @@ async function processJob(
     source_url: raw.source_url,
     confidence: aiResult.confidence as Confidence,
     raw_token_id: raw.id,
-    status: 'pending_review' as const,
+    status: aiResult.confidence === 'low' ? 'pending_review' : 'approved' as const,
     is_promoted: false,
     is_verified: false,
   }
@@ -264,7 +264,6 @@ async function callFireworks(
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
 
   const rawStr = JSON.stringify(raw, null, 2);
-  console.log('rawStr', rawStr);
   const user = `Analyze this token and return ONLY a JSON object with these exact keys:
 {
   "category": "one of: Presale, Tech, Meme, RWA",
@@ -288,7 +287,6 @@ ${rawStr}`
 
   const cleaned = text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '')
   const parsed = JSON.parse(cleaned)
-  console.log('parsed', parsed);
 
   return parsed as AIResult
 }
