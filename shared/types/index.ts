@@ -99,6 +99,7 @@ export interface Token {
   status: TokenStatus
   is_promoted: boolean
   is_verified: boolean
+  main_hashtag: string | null
   created_at: string
   updated_at: string
 }
@@ -211,7 +212,7 @@ export interface AIProcessingPayload {
   chain: string
   contract_address: string
   category: TokenCategory
-  hashtags: string[]                  // matched against hashtags table by slug
+  main_hashtag: string                // AI-selected primary hashtag from CMC tags
   short_description: string           // max 6 words
   full_description: string
   logo_url: string

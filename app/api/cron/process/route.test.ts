@@ -89,7 +89,6 @@ function createQueueMock(jobs: typeof mockJob[] = [mockJob]) {
   return builder
 }
 
-// @ts-ignore - adding static property for tracking across mock instances
 createQueueMock.selectCallCount = 0
 
 const mockJob = {
@@ -125,7 +124,7 @@ const mockRawToken = {
 
 const mockAIResult = {
   category: 'Tech',
-  hashtags: ['defi', 'ai'],
+  main_hashtag: 'defi',
   short_description: 'A test token',
   full_description: 'This is a test token for testing purposes.',
   confidence: 'high',
@@ -137,7 +136,6 @@ describe('GET /api/cron/process', () => {
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('FIREWORKS_API_KEY', 'test-fireworks-key')
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
-    // @ts-ignore
     createQueueMock.selectCallCount = 0
   })
 

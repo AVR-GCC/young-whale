@@ -25,7 +25,7 @@ const ALLOWED_CONFIDENCES: Confidence[] = ['low', 'medium', 'high']
 
 interface AIResult {
   category: string
-  hashtags: string[]
+  main_hashtag: string
   short_description: string
   full_description: string
   confidence: string
@@ -142,9 +142,17 @@ async function processJob(
     return 'failed'
   }
 
+  // Extract CMC tags from raw payload
+  const cmcDetails = raw.raw_payload?.cmc_details as Record<string, unknown> | undefined
+  const cmcTags = Array.isArray(cmcDetails?.tags)
+    ? (cmcDetails.tags as string[]).map((t: string) => t.toLowerCase().trim())
+    : []
+
+  const validCmcTags = cmcTags.filter((tag: string) => allowedHashtags.includes(tag))
+
   let aiResult: AIResult
   try {
-    aiResult = await callFireworks(raw, allowedHashtags)
+    aiResult = await callFireworks(raw, allowedHashtags, validCmcTags)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
@@ -192,6 +200,7 @@ async function processJob(
     status: aiResult.confidence === 'low' ? 'pending_review' : 'approved' as const,
     is_promoted: false,
     is_verified: false,
+    main_hashtag: aiResult.main_hashtag,
   }
 
   const { data: upserted, error: upsertError } = await supabaseService
@@ -208,21 +217,17 @@ async function processJob(
     return 'failed'
   }
 
-  const validHashtags = (aiResult.hashtags as string[]).filter((h) =>
-    allowedHashtags.includes(h.toLowerCase())
-  )
-
-  if (validHashtags.length > 0) {
+  if (validCmcTags.length > 0) {
     const { data: hashtagRows } = await supabaseService
       .from('hashtags')
       .select('id, slug')
-      .in('slug', validHashtags)
+      .in('slug', validCmcTags)
 
     const hashtagMap = new Map(
       (hashtagRows ?? []).map((h: { id: string; slug: string }) => [h.slug, h.id])
     )
 
-    const tokenHashtagRows = validHashtags
+    const tokenHashtagRows = validCmcTags
       .map((slug) => {
         const id = hashtagMap.get(slug.toLowerCase())
         if (!id) return null
@@ -258,7 +263,8 @@ async function processJob(
 
 async function callFireworks(
   raw: RawToken,
-  allowedHashtags: string[]
+  allowedHashtags: string[],
+  cmcTags: string[]
 ): Promise<AIResult> {
   const system =
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
@@ -267,13 +273,13 @@ async function callFireworks(
   const user = `Analyze this token and return ONLY a JSON object with these exact keys:
 {
   "category": "one of: Presale, Tech, Meme, RWA",
-  "hashtags": ["array of slugs from allowed list only"],
+  "main_hashtag": "single slug from the CMC tags list below, preferably NOT one that corresponds to the main category. For example, if category is 'Tech', avoid 'technology' or 'infrastructure' tags. Choose something more specific or distinctive.",
   "short_description": "max 6 words, beginner friendly, no jargon",
   "full_description": "2-3 sentences explaining what the token does",
   "confidence": "low | medium | high"
 }
 
-Allowed hashtags: ${allowedHashtags.join(', ')}
+Available CMC tags for this token: ${cmcTags.join(', ')}
 
 Token data:
 ${rawStr}`
@@ -299,17 +305,14 @@ function validateAIResult(
     return { valid: false, error: `Invalid category: ${result.category}` }
   }
 
-  if (!Array.isArray(result.hashtags)) {
-    return { valid: false, error: 'hashtags must be an array' }
+  if (!result.main_hashtag || typeof result.main_hashtag !== 'string') {
+    return { valid: false, error: 'main_hashtag must be a non-empty string' }
   }
 
-  const invalidHashtags = result.hashtags.filter(
-    (h) => !allowedHashtags.includes(h.toLowerCase())
-  )
-  if (invalidHashtags.length > 0) {
+  if (!allowedHashtags.includes(result.main_hashtag.toLowerCase())) {
     return {
       valid: false,
-      error: `Invalid hashtags: ${invalidHashtags.join(', ')}`,
+      error: `Invalid main_hashtag: ${result.main_hashtag}`,
     }
   }
 
