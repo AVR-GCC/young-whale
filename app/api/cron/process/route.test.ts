@@ -313,6 +313,113 @@ describe('GET /api/cron/process', () => {
     expect(json.failed).toBe(0)
   })
 
+  it('uses CMC tags for hashtags and stores AI-selected main hashtag', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+    vi.mocked(generateText).mockResolvedValue({
+      text: JSON.stringify({
+        category: 'Tech',
+        main_hashtag: 'defi',
+        short_description: 'A DeFi token',
+        full_description: 'This is a DeFi token.',
+        confidence: 'high',
+      }),
+    } as unknown as Awaited<ReturnType<typeof generateText>>)
+
+    const rawTokenWithCmc = {
+      ...mockRawToken,
+      raw_payload: {
+        cmc_details: {
+          tags: ['defi', 'ai', 'infrastructure'],
+        },
+      },
+    }
+
+    let tokenUpsertData: unknown
+    let tokenHashtagsUpsertData: unknown
+    let callCount = 0
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      callCount++
+
+      if (table === 'hashtags') {
+        return createMockQueryBuilder(
+          {},
+          {
+            data: [
+              { slug: 'defi', id: 'hashtag-1' },
+              { slug: 'ai', id: 'hashtag-2' },
+              { slug: 'infrastructure', id: 'hashtag-3' },
+            ],
+            error: null,
+          }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        if (callCount === 2) {
+          return createMockQueryBuilder(
+            {},
+            { data: [mockJob], error: null }
+          ) as unknown as ReturnType<typeof supabaseService.from>
+        }
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'raw_tokens') {
+        return createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: rawTokenWithCmc,
+            error: null,
+          }),
+        }) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'tokens') {
+        const builder = createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'token-1' },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: null,
+            error: null,
+          }),
+        })
+        builder.upsert = vi.fn((data: unknown) => {
+          tokenUpsertData = data
+          return builder
+        }) as unknown as MockQueryBuilder['upsert']
+        return builder as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'token_hashtags') {
+        const builder = createMockQueryBuilder()
+        builder.upsert = vi.fn((data: unknown) => {
+          tokenHashtagsUpsertData = data
+          return builder
+        }) as unknown as MockQueryBuilder['upsert']
+        return builder as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.processed).toBe(1)
+    expect(json.failed).toBe(0)
+    expect(tokenUpsertData).toMatchObject({ main_hashtag: 'defi' })
+    expect(tokenHashtagsUpsertData).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-1' }),
+        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-2' }),
+        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-3' }),
+      ])
+    )
+  })
+
   it('marks job as failed when raw token is not found', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
