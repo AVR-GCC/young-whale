@@ -152,7 +152,7 @@ async function processJob(
 
   let aiResult: AIResult
   try {
-    aiResult = await callFireworks(raw, allowedHashtags, validCmcTags)
+    aiResult = await callFireworks(raw, validCmcTags)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
@@ -263,7 +263,6 @@ async function processJob(
 
 async function callFireworks(
   raw: RawToken,
-  allowedHashtags: string[],
   cmcTags: string[]
 ): Promise<AIResult> {
   const system =
