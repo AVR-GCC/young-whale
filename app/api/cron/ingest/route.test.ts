@@ -31,6 +31,7 @@ const mockDetails = {
   contract_address: [],
   category: 'token',
   tags: [],
+  'tag-names': [],
 }
 
 const mockFetch = vi.fn()
@@ -41,20 +42,28 @@ interface MockQueryBuilder {
   insert: () => MockQueryBuilder
   limit: () => MockQueryBuilder
   eq: () => MockQueryBuilder
+  in: () => MockQueryBuilder
   maybeSingle: () => Promise<{ data: unknown; error: null }>
   single: () => Promise<{ data: unknown; error: null }>
 }
 
-function createMockQueryBuilder(overrides: Partial<MockQueryBuilder> = {}): MockQueryBuilder {
-  const builder: MockQueryBuilder = {
+function createMockQueryBuilder(
+  overrides: Partial<MockQueryBuilder> = {},
+  finalResolution: { data: unknown; error: unknown } = { data: null, error: null }
+): MockQueryBuilder & PromiseLike<{ data: unknown; error: unknown }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const builder: any = {
     select: vi.fn(() => builder),
-    insert: vi.fn(() => builder),
+    insert: overrides.insert ?? vi.fn(() => builder),
     limit: vi.fn(() => builder),
     eq: vi.fn(() => builder),
+    in: vi.fn(() => builder),
     maybeSingle: overrides.maybeSingle ?? vi.fn().mockResolvedValue({ data: null, error: null }),
     single: overrides.single ?? vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+    then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
+      Promise.resolve(finalResolution).then(onfulfilled),
   }
-  return builder
+  return builder as MockQueryBuilder & PromiseLike<{ data: unknown; error: unknown }>
 }
 
 function createRequest(): Request {
@@ -197,5 +206,62 @@ describe('GET /api/cron/ingest', () => {
 
     expect(response.status).toBe(500)
     expect(json.error).toContain('Network error')
+  })
+
+  it('bulk inserts new hashtags after ingesting tokens', async () => {
+    const detailsWithTags = {
+      ...mockDetails,
+      tags: ['defi', 'ai', 'meme'],
+      'tag-names': ['DeFi', 'AI', 'Meme'],
+    }
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/listings/latest')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ data: mockListings.slice(0, 3) }),
+        })
+      }
+      const idMatch = url.match(/id=(\d+)/)
+      const id = idMatch ? idMatch[1] : '1'
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          data: {
+            [id]: { ...detailsWithTags, name: `Token ${id}`, symbol: `TKN${id}` },
+          },
+        }),
+      })
+    })
+
+    const hashtagsInsert = vi.fn().mockResolvedValue({ error: null })
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'hashtags') {
+        return createMockQueryBuilder(
+          { insert: hashtagsInsert },
+          { data: [{ slug: 'defi' }], error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder({
+        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      }) as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest())
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.imported).toBe(3)
+    expect(hashtagsInsert).toHaveBeenCalledTimes(1)
+    expect(hashtagsInsert).toHaveBeenCalledWith([
+      { slug: 'ai', name: 'AI' },
+      { slug: 'meme', name: 'Meme' },
+    ])
   })
 })
