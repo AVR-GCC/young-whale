@@ -69,6 +69,7 @@ async function getTokenDetails(cmcId: number) {
     }>
     category: string
     tags: string[]
+    'tag-names': string[]
   }
 }
 
@@ -90,14 +91,15 @@ function mapCmcToRawToken(listing: {
     [key: string]: string[] | undefined
   }
   contract_address?: Array<{
-    contract_address: string
-    platform: {
-      name: string
-      coin: { id: string; name: string; symbol: string; slug: string }
-    }
-  }>
+      contract_address: string
+      platform: {
+        name: string
+        coin: { id: string; name: string; symbol: string; slug: string }
+      }
+    }>
   category: string
   tags: string[]
+  'tag-names': string[]
 }) {
   const primaryContract = details.contract_address?.[0]
 
@@ -155,6 +157,56 @@ async function isRawTokensTableEmpty(): Promise<boolean> {
   return !data
 }
 
+function collectHashtags(
+  details: {
+    tags: string[]
+    'tag-names': string[]
+  },
+  hashtagMap: Map<string, string>
+) {
+  if (
+    !details.tags ||
+    !details['tag-names'] ||
+    details.tags.length !== details['tag-names'].length
+  ) {
+    return
+  }
+
+  for (let i = 0; i < details.tags.length; i++) {
+    const slug = details.tags[i].toLowerCase().trim()
+    const name = details['tag-names'][i]
+    if (slug && name) {
+      hashtagMap.set(slug, name)
+    }
+  }
+}
+
+async function syncHashtags(hashtagMap: Map<string, string>) {
+  if (hashtagMap.size === 0) return
+
+  const slugs = Array.from(hashtagMap.keys())
+
+  const { data: existingRows } = await supabaseService
+    .from('hashtags')
+    .select('slug')
+    .in('slug', slugs)
+
+  const existingSlugs = new Set(
+    (existingRows ?? []).map((r: { slug: string }) => r.slug)
+  )
+
+  const newHashtags = slugs
+    .filter((slug) => !existingSlugs.has(slug))
+    .map((slug) => ({ slug, name: hashtagMap.get(slug)! }))
+
+  if (newHashtags.length > 0) {
+    const { error } = await supabaseService.from('hashtags').insert(newHashtags)
+    if (error) {
+      console.error('Failed to bulk insert hashtags:', error.message)
+    }
+  }
+}
+
 export async function GET(request: Request) {
   if (process.env.NODE_ENV !== 'development') {
     if (!verifyCronRequest(request)) {
@@ -173,13 +225,15 @@ export async function GET(request: Request) {
     const isEmpty = await isRawTokensTableEmpty()
     const results = []
     const rawTokenIds: string[] = []
+    const hashtagMap = new Map<string, string>()
 
     if (isEmpty) {
       // Table is empty: ingest exactly 10 tokens
-      const listings = await getLatestListings(10)
+      const listings = await getLatestListings(20)
 
       for (const listing of listings) {
         const details = await getTokenDetails(listing.id)
+        collectHashtags(details, hashtagMap)
         const tokenData = mapCmcToRawToken(listing, details)
 
         const { data, error } = await supabaseService
@@ -218,6 +272,7 @@ export async function GET(request: Request) {
           }
 
           const details = await getTokenDetails(listing.id)
+          collectHashtags(details, hashtagMap)
           const tokenData = mapCmcToRawToken(listing, details)
 
           const { data, error } = await supabaseService
@@ -238,6 +293,8 @@ export async function GET(request: Request) {
         start += batchSize
       }
     }
+
+    await syncHashtags(hashtagMap)
 
     if (rawTokenIds.length > 0) {
       const queueJobs = rawTokenIds.map((id) => ({ raw_token_id: id }))
