@@ -114,7 +114,7 @@ describe('GET /api/cron/ingest', () => {
     expect(json.error).toBe('COINMARKETCAP_API_KEY is not set')
   })
 
-  it('ingests 10 tokens when raw_tokens table is empty', async () => {
+  it('ingests 20 tokens when raw_tokens table is empty', async () => {
     const mockMaybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: null, error: null }) // isRawTokensTableEmpty check
       .mockResolvedValue({ data: null, error: null })     // individual token checks
@@ -130,7 +130,7 @@ describe('GET /api/cron/ingest', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.imported).toBe(10)
+    expect(json.imported).toBe(20)
   })
 
   it('stops ingesting when it finds an existing token', async () => {
@@ -182,10 +182,10 @@ describe('GET /api/cron/ingest', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.imported).toBe(10)
+    expect(json.imported).toBe(20)
     expect(processingQueueInsert).toHaveBeenCalledTimes(1)
     expect(processingQueueInsert).toHaveBeenCalledWith(
-      Array.from({ length: 10 }, () => ({ raw_token_id: 'test-id' }))
+      Array.from({ length: 20 }, () => ({ raw_token_id: 'test-id' }))
     )
   })
 
