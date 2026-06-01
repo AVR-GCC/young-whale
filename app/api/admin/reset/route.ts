@@ -36,6 +36,7 @@ export async function GET(request: Request) {
     const { error: tokenHashtagsError, count: tokenHashtagsCount } = await supabaseService
       .from('token_hashtags')
       .delete()
+      .neq('token_id', '00000000-0000-0000-0000-000000000000')
 
     if (tokenHashtagsError) {
       results.token_hashtags = { success: false, error: tokenHashtagsError.message }
