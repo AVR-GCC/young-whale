@@ -1,14 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
-import { verifyCronRequest } from '@/lib/cron/verify'
 
 export const maxDuration = 60
 
-export async function GET(request: Request) {
+export async function GET() {
   if (process.env.NODE_ENV !== 'development') {
-    if (!verifyCronRequest(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   try {
