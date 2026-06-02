@@ -85,6 +85,8 @@ function mapCmcToRawToken(listing: {
   logo: string
   description: string
   urls: {
+    facebook?: string[]
+    reddit?: string[]
     website?: string[]
     twitter?: string[]
     telegram?: string[]
@@ -104,6 +106,8 @@ function mapCmcToRawToken(listing: {
   const primaryContract = details.contract_address?.[0]
 
   const socialLinks: Record<string, string[]> = {}
+  if (details.urls.facebook?.length) socialLinks.facebook = details.urls.facebook
+  if (details.urls.reddit?.length) socialLinks.reddit = details.urls.reddit
   if (details.urls.twitter?.length) socialLinks.twitter = details.urls.twitter
   if (details.urls.telegram?.length) socialLinks.telegram = details.urls.telegram
 
