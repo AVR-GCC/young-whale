@@ -3,6 +3,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
+import { getConfigString } from '@/lib/config'
 import type {
   ProcessingQueueJob,
   RawToken,
@@ -17,8 +18,6 @@ const fireworks = createOpenAI({
   apiKey,
   baseURL: 'https://api.fireworks.ai/inference/v1',
 })
-
-const model = fireworks.chat('accounts/fireworks/models/gpt-oss-120b')
 
 const ALLOWED_CATEGORIES: TokenCategory[] = ['Presale', 'Tech', 'Meme', 'RWA']
 const ALLOWED_CONFIDENCES: Confidence[] = ['low', 'medium', 'high']
@@ -295,7 +294,11 @@ async function callFireworks(
   raw: RawToken,
   cmcTags: string[]
 ): Promise<AIResult> {
+  const modelName = (await getConfigString('ai_model')) ?? 'accounts/fireworks/models/gpt-oss-120b'
+  const model = fireworks.chat(modelName)
+
   const system =
+    (await getConfigString('ai_prompt_system')) ??
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
 
   const rawStr = JSON.stringify(raw, null, 2);
