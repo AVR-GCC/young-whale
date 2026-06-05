@@ -248,6 +248,89 @@ describe('GET /api/cron/process', () => {
     expect(json.failed).toBe(0)
   })
 
+  it('fetches exchange links from DexScreener when raw.exchange_links is empty', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+    vi.mocked(generateText).mockResolvedValue({
+      text: JSON.stringify(mockAIResult),
+    } as unknown as Awaited<ReturnType<typeof generateText>>)
+
+    const dexScreenerResponse = {
+      pairs: [
+        { url: 'https://dexscreener.com/ethereum/0xabc' },
+        { url: 'https://dexscreener.com/ethereum/0xdef' },
+      ],
+    }
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue(dexScreenerResponse),
+    } as unknown as Response)
+
+    let tokenUpsertData: unknown
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'hashtags') {
+        return createMockQueryBuilder(
+          {},
+          { data: [{ slug: 'defi' }, { slug: 'ai' }], error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'raw_tokens') {
+        return createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { ...mockRawToken, exchange_links: [] },
+            error: null,
+          }),
+        }) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'tokens') {
+        const builder = createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'token-1' },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: null,
+            error: null,
+          }),
+        })
+        builder.upsert = vi.fn((data: unknown) => {
+          tokenUpsertData = data
+          return builder
+        }) as unknown as MockQueryBuilder['upsert']
+        return builder as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'token_hashtags') {
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.processed).toBe(1)
+    expect(json.failed).toBe(0)
+    expect(tokenUpsertData).toMatchObject({
+      exchange_links: [
+        'https://dexscreener.com/ethereum/0xabc',
+        'https://dexscreener.com/ethereum/0xdef',
+      ],
+    })
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('https://api.dexscreener.com/latest/dex/search?q=')
+    )
+  })
+
   it('processes a job successfully end-to-end', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
     vi.mocked(generateText).mockResolvedValue({

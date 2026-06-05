@@ -55,6 +55,8 @@ async function getTokenDetails(cmcId: number) {
     logo: string
     description: string
     urls: {
+      facebook?: string[]
+      reddit?: string[]
       website?: string[]
       twitter?: string[]
       telegram?: string[]

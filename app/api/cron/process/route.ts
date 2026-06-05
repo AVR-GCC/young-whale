@@ -190,7 +190,10 @@ async function processJob(
     logo_storage_path: null,
     website_url: raw.website_url,
     social_links: raw.social_links ?? {},
-    exchange_links: raw.exchange_links ?? [],
+    exchange_links:
+      raw.exchange_links && raw.exchange_links.length > 0
+        ? raw.exchange_links
+        : await fetchDexScreenerLinks(raw),
     start_date: null,
     end_date: null,
     source_type: raw.source_type,
@@ -259,6 +262,33 @@ async function processJob(
     .eq('id', job.raw_token_id)
 
   return 'success'
+}
+
+async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
+  try {
+    const query = raw.contract_address
+      ? raw.contract_address
+      : `${raw.name} ${raw.symbol}`.trim()
+
+    if (!query) return []
+
+    const response = await fetch(
+      `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(query)}`
+    )
+
+    if (!response.ok) return []
+
+    const data = (await response.json()) as {
+      pairs?: Array<{ url: string }>
+    }
+
+    if (!data.pairs || data.pairs.length === 0) return []
+
+    const urls = data.pairs.map((pair) => pair.url)
+    return [...new Set(urls)]
+  } catch {
+    return []
+  }
 }
 
 async function callFireworks(
