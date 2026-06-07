@@ -366,30 +366,30 @@ export default function TokensSection() {
     }
   }
 
-  const handleInlineToggle = async (
-    id: string,
-    field: 'is_promoted' | 'is_verified',
-    value: boolean
-  ) => {
-    setTokens((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
-    )
-    try {
-      const res = await fetch(`/api/admin/tokens/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [field]: value }),
-      })
-      if (!res.ok) {
-        const data = await res.json()
-        showToast(data.error || 'Failed to update', 'error')
-        fetchTokens()
-      }
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Failed to update', 'error')
-      fetchTokens()
-    }
-  }
+  // const handleInlineToggle = async (
+  //   id: string,
+  //   field: 'is_promoted' | 'is_verified',
+  //   value: boolean
+  // ) => {
+  //   setTokens((prev) =>
+  //     prev.map((t) => (t.id === id ? { ...t, [field]: value } : t))
+  //   )
+  //   try {
+  //     const res = await fetch(`/api/admin/tokens/${id}`, {
+  //       method: 'PATCH',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ [field]: value }),
+  //     })
+  //     if (!res.ok) {
+  //       const data = await res.json()
+  //       showToast(data.error || 'Failed to update', 'error')
+  //       fetchTokens()
+  //     }
+  //   } catch (err) {
+  //     showToast(err instanceof Error ? err.message : 'Failed to update', 'error')
+  //     fetchTokens()
+  //   }
+  // }
 
   const openEditDrawer = (tokenId: string, mode: 'edit' | 'review' = 'edit') => {
     setEditingTokenId(tokenId)
@@ -436,10 +436,10 @@ export default function TokensSection() {
     fetchStats()
   }
 
-  const formatDate = (date: string | null) => {
-    if (!date) return '-'
-    return new Date(date).toLocaleDateString()
-  }
+  // const formatDate = (date: string | null) => {
+  //   if (!date) return '-'
+  //   return new Date(date).toLocaleDateString()
+  // }
 
   return (
     <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
