@@ -225,7 +225,7 @@ async function callFireworks(
 
   const promptFields = {
     category: categoryDesc ?? 'one of: Presale, Tech, Meme, RWA',
-    main_hashtag: mainHashtagDesc ?? "single slug from the CMC tags list below, preferably NOT one that corresponds to the main category. For example, if category is 'Tech', avoid 'technology' or 'infrastructure' tags. Choose something more specific or distinctive.",
+    main_hashtag: mainHashtagDesc ?? "single slug from the tags list below, preferably NOT one that corresponds to the main category. For example, if category is 'Tech', avoid 'technology' or 'infrastructure' tags. Choose something more specific or distinctive.",
     short_description: shortDescDesc ?? 'max 6 words, beginner friendly, no jargon',
     full_description: fullDescDesc ?? '2-3 sentences explaining what the token does',
     confidence: confidenceDesc ?? 'low | medium | high',
