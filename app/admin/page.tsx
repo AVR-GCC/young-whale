@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import AdminActions from './components/AdminActions'
 import AIConfigSection from './components/AIConfigSection'
+import TokensSection from './components/TokensSection'
 
 export default function Admin() {
   return (
@@ -14,6 +16,14 @@ export default function Admin() {
         </div>
 
         <AIConfigSection />
+        <Suspense fallback={
+          <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-8 animate-pulse">
+            <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4 mb-4" />
+            <div className="h-32 bg-zinc-200 dark:bg-zinc-800 rounded" />
+          </div>
+        }>
+          <TokensSection />
+        </Suspense>
       </main>
     </div>
   )

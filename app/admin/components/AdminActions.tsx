@@ -99,7 +99,7 @@ export default function AdminActions() {
 
   return (
     <div className="flex gap-4">
-      <div className="flex flex-col items-center gap-1 w-80">
+      <div className="flex flex-col items-center gap-1 w-80 h-20">
         <button
           onClick={runReset}
           disabled={resetLoading}
@@ -114,7 +114,7 @@ export default function AdminActions() {
         )}
       </div>
 
-      <div className="flex flex-col items-center gap-1 w-80">
+      <div className="flex flex-col items-center gap-1 w-80 h-20">
         <button
           onClick={runProcess}
           disabled={processLoading}

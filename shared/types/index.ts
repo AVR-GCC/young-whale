@@ -90,6 +90,7 @@ export interface Token {
   website_url: string | null
   social_links: SocialLinks
   exchange_links: string[]
+  preferred_exchange: string | null
   start_date: string | null
   end_date: string | null
   source_type: SourceType | null

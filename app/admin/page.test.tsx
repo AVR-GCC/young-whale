@@ -5,6 +5,21 @@ import Admin from './page'
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => '/admin',
+  useSearchParams: () => new URLSearchParams(),
+}))
+
+// Mock tokens API calls to prevent unhandled fetch requests in tests
+vi.mock('./components/TokensSection', () => ({
+  default: () => null,
+}))
+
 describe('Admin page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
