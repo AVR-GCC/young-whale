@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import AdminActions from './components/AdminActions'
 import AIConfigSection from './components/AIConfigSection'
+import FailedTokensSection from './components/FailedTokensSection'
 import TokensSection from './components/TokensSection'
 
 export default function Admin() {
@@ -16,6 +17,7 @@ export default function Admin() {
         </div>
 
         <AIConfigSection />
+        <FailedTokensSection />
         <Suspense fallback={
           <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-8 animate-pulse">
             <div className="h-8 bg-zinc-200 dark:bg-zinc-800 rounded w-1/4 mb-4" />
