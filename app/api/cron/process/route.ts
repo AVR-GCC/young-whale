@@ -215,16 +215,26 @@ async function callFireworks(
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
 
   const rawStr = JSON.stringify(raw, null, 2);
-  const user = `Analyze this token and return ONLY a JSON object with these exact keys:
-{
-  "category": "one of: Presale, Tech, Meme, RWA",
-  "main_hashtag": "single slug from the CMC tags list below, preferably NOT one that corresponds to the main category. For example, if category is 'Tech', avoid 'technology' or 'infrastructure' tags. Choose something more specific or distinctive.",
-  "short_description": "max 6 words, beginner friendly, no jargon",
-  "full_description": "2-3 sentences explaining what the token does",
-  "confidence": "low | medium | high"
-}
+  const [categoryDesc, mainHashtagDesc, shortDescDesc, fullDescDesc, confidenceDesc] = await Promise.all([
+    getConfigString('ai_prompt_category'),
+    getConfigString('ai_prompt_main_hashtag'),
+    getConfigString('ai_prompt_short_description'),
+    getConfigString('ai_prompt_full_description'),
+    getConfigString('ai_prompt_confidence'),
+  ])
 
-Available CMC tags for this token: ${cmcTags.join(', ')}
+  const promptFields = {
+    category: categoryDesc ?? 'one of: Presale, Tech, Meme, RWA',
+    main_hashtag: mainHashtagDesc ?? "single slug from the CMC tags list below, preferably NOT one that corresponds to the main category. For example, if category is 'Tech', avoid 'technology' or 'infrastructure' tags. Choose something more specific or distinctive.",
+    short_description: shortDescDesc ?? 'max 6 words, beginner friendly, no jargon',
+    full_description: fullDescDesc ?? '2-3 sentences explaining what the token does',
+    confidence: confidenceDesc ?? 'low | medium | high',
+  }
+
+  const prompt = `Analyze this token and return ONLY a JSON object with these exact keys:
+${JSON.stringify(promptFields, null, 2)}
+
+Available tags for this token: ${cmcTags.join(', ')}
 
 Token data:
 ${rawStr}`
@@ -232,7 +242,7 @@ ${rawStr}`
   const { text } = await generateText({
     model,
     system,
-    prompt: user,
+    prompt,
     temperature: 0.2,
   })
 
