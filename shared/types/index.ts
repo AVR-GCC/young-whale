@@ -126,6 +126,16 @@ export interface ProcessingQueueJob {
   updated_at: string
 }
 
+export interface ProcessingRun {
+  id: string
+  status: 'running' | 'completed' | 'failed'
+  processed_count: number
+  failed_count: number
+  error_message: string | null
+  started_at: string
+  completed_at: string | null
+}
+
 export interface AdminUser {
   id: string
   email: string

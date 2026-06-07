@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Admin from './page'
 
@@ -8,6 +8,12 @@ global.fetch = mockFetch
 describe('Admin page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockFetch.mockReset()
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it('renders title and buttons', () => {
@@ -53,10 +59,15 @@ describe('Admin page', () => {
   })
 
   it('calls process API and shows success', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ processed: 5, failed: 1 }),
-    })
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ runId: 'test-run', status: 'running' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 'completed', processed: 5, failed: 1 }),
+      })
 
     render(<Admin />)
     const button = screen.getByRole('button', { name: 'Run Process' })
@@ -66,8 +77,14 @@ describe('Admin page', () => {
       expect(mockFetch).toHaveBeenCalledWith('/api/cron/process')
     })
 
+    vi.advanceTimersByTime(2500)
+
     await waitFor(() => {
-      expect(screen.getByText('Processed: 5, Failed: 1')).toBeDefined()
+      expect(mockFetch).toHaveBeenCalledWith('/api/cron/process/status?runId=test-run')
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Completed! Processed: 5, Failed: 1')).toBeDefined()
     })
   })
 
@@ -112,11 +129,19 @@ describe('Admin page', () => {
   })
 
   it('shows loading state while process is running', async () => {
-    let resolveResponse: (value: Response) => void
-    const promise = new Promise<Response>((resolve) => {
-      resolveResponse = resolve
-    })
-    mockFetch.mockReturnValueOnce(promise)
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ runId: 'test-run', status: 'running' }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 'running', processed: 0, failed: 0 }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: 'completed', processed: 3, failed: 0 }),
+      })
 
     render(<Admin />)
     const button = screen.getByRole('button', { name: 'Run Process' })
@@ -126,10 +151,13 @@ describe('Admin page', () => {
       expect(screen.getByRole('button', { name: 'Running Process...' }).hasAttribute('disabled')).toBe(true)
     })
 
-    resolveResponse!({
-      ok: true,
-      json: async () => ({ processed: 0, failed: 0 }),
-    } as Response)
+    vi.advanceTimersByTime(2500)
+
+    await waitFor(() => {
+      expect(screen.getByText('Processing...')).toBeDefined()
+    })
+
+    vi.advanceTimersByTime(2500)
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Run Process' }).hasAttribute('disabled')).toBe(false)

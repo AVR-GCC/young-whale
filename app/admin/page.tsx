@@ -1,12 +1,24 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 export default function Admin() {
   const [resetStatus, setResetStatus] = useState<string>('')
   const [processStatus, setProcessStatus] = useState<string>('')
   const [resetLoading, setResetLoading] = useState(false)
   const [processLoading, setProcessLoading] = useState(false)
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const clearPollInterval = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+    }
+  }, [])
+
+  useEffect(() => {
+    return clearPollInterval
+  }, [clearPollInterval])
 
   const runReset = useCallback(async () => {
     setResetLoading(true)
@@ -26,23 +38,64 @@ export default function Admin() {
     }
   }, [])
 
+  const pollStatus = useCallback((runId: string) => {
+    clearPollInterval()
+
+    pollIntervalRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/cron/process/status?runId=${runId}`)
+        const data = await res.json()
+
+        if (!res.ok) {
+          setProcessStatus(`Error checking status: ${data.error || 'Unknown error'}`)
+          setProcessLoading(false)
+          clearPollInterval()
+          return
+        }
+
+        if (data.status === 'completed') {
+          setProcessStatus(`Completed! Processed: ${data.processed}, Failed: ${data.failed}`)
+          setProcessLoading(false)
+          clearPollInterval()
+        } else if (data.status === 'failed') {
+          setProcessStatus(`Failed: ${data.errorMessage || 'Unknown error'}`)
+          setProcessLoading(false)
+          clearPollInterval()
+        } else {
+          setProcessStatus('Processing...')
+        }
+      } catch (err) {
+        setProcessStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
+        setProcessLoading(false)
+        clearPollInterval()
+      }
+    }, 2000)
+  }, [clearPollInterval])
+
   const runProcess = useCallback(async () => {
     setProcessLoading(true)
-    setProcessStatus('')
+    setProcessStatus('Starting...')
     try {
       const res = await fetch('/api/cron/process')
       const data = await res.json()
-      if (res.ok) {
-        setProcessStatus(`Processed: ${data.processed}, Failed: ${data.failed}`)
-      } else {
+
+      if (!res.ok) {
         setProcessStatus(`Error: ${data.error || 'Unknown error'}`)
+        setProcessLoading(false)
+        return
+      }
+
+      if (data.runId) {
+        pollStatus(data.runId)
+      } else {
+        setProcessStatus('Started but no run ID received')
+        setProcessLoading(false)
       }
     } catch (err) {
       setProcessStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
-    } finally {
       setProcessLoading(false)
     }
-  }, [])
+  }, [pollStatus])
 
   return (
     <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">

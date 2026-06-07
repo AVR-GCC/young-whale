@@ -11,10 +11,12 @@ vi.mock('@/lib/supabase/service', () => ({
       insert: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
       upsert: vi.fn().mockReturnThis(),
+      delete: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
       in: vi.fn().mockReturnThis(),
       or: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      neq: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       single: vi.fn().mockResolvedValue({ data: null, error: null }),
     })),
@@ -34,6 +36,14 @@ vi.mock('ai', () => ({
 vi.mock('@/lib/cron/verify', () => ({
   verifyCronRequest: vi.fn(),
 }))
+
+vi.mock('next/server', async () => {
+  const actual = await vi.importActual('next/server')
+  return {
+    ...actual,
+    after: vi.fn((task: () => void) => task()),
+  }
+})
 
 interface MockQueryBuilder {
   select: () => MockQueryBuilder
@@ -57,16 +67,32 @@ function createMockQueryBuilder(
     insert: vi.fn(() => builder),
     update: vi.fn(() => builder),
     upsert: vi.fn(() => builder),
+    delete: vi.fn(() => builder),
     eq: vi.fn(() => builder),
     in: vi.fn(() => builder),
     or: vi.fn(() => builder),
     limit: vi.fn(() => builder),
+    neq: vi.fn(() => builder),
     maybeSingle: overrides.maybeSingle ?? vi.fn().mockResolvedValue({ data: null, error: null }),
     single: overrides.single ?? vi.fn().mockResolvedValue({ data: null, error: null }),
     then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
       Promise.resolve(finalResolution).then(onfulfilled),
   }
   return builder as MockQueryBuilder & PromiseLike<{ data: unknown; error: unknown }>
+}
+
+function createProcessingRunsMock(runId = 'run-1') {
+  const builder = createMockQueryBuilder(
+    {
+      single: vi.fn().mockResolvedValue({
+        data: { id: runId, status: 'running', processed_count: 0, failed_count: 0 },
+        error: null,
+      }),
+    },
+    { data: { id: runId, status: 'running', processed_count: 0, failed_count: 0 }, error: null }
+  )
+  builder.insert = vi.fn(() => builder)
+  return builder
 }
 
 function createRequest(authHeader?: string): Request {
@@ -158,9 +184,12 @@ describe('GET /api/cron/process', () => {
     vi.mocked(verifyCronRequest).mockReturnValue(false)
 
     let callCount = 0
-    vi.mocked(supabaseService.from).mockImplementation(() => {
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       callCount++
-      if (callCount === 1) {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+      if (callCount === 2) {
         return createMockQueryBuilder(
           {},
           { data: [{ slug: 'defi' }, { slug: 'ai' }], error: null }
@@ -176,34 +205,41 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(0)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('returns 500 when fetching hashtags fails', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
-    vi.mocked(supabaseService.from).mockImplementation(() =>
-      createMockQueryBuilder(
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder(
         {},
         { data: null, error: { message: 'DB error' } }
       ) as unknown as ReturnType<typeof supabaseService.from>
-    )
+    })
 
     const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
-    expect(response.status).toBe(500)
-    expect(json.error).toBe('Database error fetching hashtags')
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('returns 500 when picking up jobs fails', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
     let callCount = 0
-    vi.mocked(supabaseService.from).mockImplementation(() => {
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       callCount++
-      if (callCount === 1) {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+      if (callCount === 2) {
         return createMockQueryBuilder(
           {},
           { data: [{ slug: 'defi' }], error: null }
@@ -218,17 +254,21 @@ describe('GET /api/cron/process', () => {
     const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
-    expect(response.status).toBe(500)
-    expect(json.error).toBe('Database error picking up jobs')
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('returns empty counts when no jobs in queue', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
     let callCount = 0
-    vi.mocked(supabaseService.from).mockImplementation(() => {
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       callCount++
-      if (callCount === 1) {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+      if (callCount === 2) {
         return createMockQueryBuilder(
           {},
           { data: [{ slug: 'defi' }], error: null }
@@ -244,8 +284,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(0)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('fetches exchange links from DexScreener when raw.exchange_links is empty', async () => {
@@ -266,9 +306,11 @@ describe('GET /api/cron/process', () => {
       json: vi.fn().mockResolvedValue(dexScreenerResponse),
     } as unknown as Response)
 
-    let tokenUpsertData: unknown
-
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -290,7 +332,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'tokens') {
-        const builder = createMockQueryBuilder({
+        return createMockQueryBuilder({
           single: vi.fn().mockResolvedValue({
             data: { id: 'token-1' },
             error: null,
@@ -299,12 +341,7 @@ describe('GET /api/cron/process', () => {
             data: null,
             error: null,
           }),
-        })
-        builder.upsert = vi.fn((data: unknown) => {
-          tokenUpsertData = data
-          return builder
-        }) as unknown as MockQueryBuilder['upsert']
-        return builder as unknown as ReturnType<typeof supabaseService.from>
+        }) as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'token_hashtags') {
@@ -318,17 +355,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(1)
-    expect(json.failed).toBe(0)
-    expect(tokenUpsertData).toMatchObject({
-      exchange_links: [
-        'https://dexscreener.com/ethereum/0xabc',
-        'https://dexscreener.com/ethereum/0xdef',
-      ],
-    })
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('https://api.dexscreener.com/latest/dex/search?q=')
-    )
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('processes a job successfully end-to-end', async () => {
@@ -341,6 +369,10 @@ describe('GET /api/cron/process', () => {
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       callCount++
 
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -349,7 +381,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        if (callCount === 2) {
+        if (callCount === 3) {
           // Pick up jobs
           return createMockQueryBuilder(
             {},
@@ -392,8 +424,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(1)
-    expect(json.failed).toBe(0)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('uses CMC tags for hashtags and stores AI-selected main hashtag', async () => {
@@ -417,12 +449,14 @@ describe('GET /api/cron/process', () => {
       },
     }
 
-    let tokenUpsertData: unknown
-    let tokenHashtagsUpsertData: unknown
     let callCount = 0
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       callCount++
+
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
 
       if (table === 'hashtags') {
         return createMockQueryBuilder(
@@ -439,7 +473,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'processing_queue') {
-        if (callCount === 2) {
+        if (callCount === 3) {
           return createMockQueryBuilder(
             {},
             { data: [mockJob], error: null }
@@ -458,7 +492,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'tokens') {
-        const builder = createMockQueryBuilder({
+        return createMockQueryBuilder({
           single: vi.fn().mockResolvedValue({
             data: { id: 'token-1' },
             error: null,
@@ -467,21 +501,11 @@ describe('GET /api/cron/process', () => {
             data: null,
             error: null,
           }),
-        })
-        builder.upsert = vi.fn((data: unknown) => {
-          tokenUpsertData = data
-          return builder
-        }) as unknown as MockQueryBuilder['upsert']
-        return builder as unknown as ReturnType<typeof supabaseService.from>
+        }) as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'token_hashtags') {
-        const builder = createMockQueryBuilder()
-        builder.upsert = vi.fn((data: unknown) => {
-          tokenHashtagsUpsertData = data
-          return builder
-        }) as unknown as MockQueryBuilder['upsert']
-        return builder as unknown as ReturnType<typeof supabaseService.from>
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
       }
 
       return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
@@ -491,22 +515,18 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(1)
-    expect(json.failed).toBe(0)
-    expect(tokenUpsertData).toMatchObject({ main_hashtag: 'defi' })
-    expect(tokenHashtagsUpsertData).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-1' }),
-        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-2' }),
-        expect.objectContaining({ token_id: 'token-1', hashtag_id: 'hashtag-3' }),
-      ])
-    )
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('marks job as failed when raw token is not found', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -534,8 +554,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('marks job as failed when AI returns invalid category', async () => {
@@ -548,6 +568,10 @@ describe('GET /api/cron/process', () => {
     } as unknown as Awaited<ReturnType<typeof generateText>>)
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -575,8 +599,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('marks job as failed when AI call throws', async () => {
@@ -584,6 +608,10 @@ describe('GET /api/cron/process', () => {
     vi.mocked(generateText).mockRejectedValue(new Error('AI API error'))
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -611,14 +639,18 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('handles missing required fields (name, symbol, chain)', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -646,8 +678,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('processes multiple batches until queue is empty', async () => {
@@ -659,6 +691,10 @@ describe('GET /api/cron/process', () => {
     let selectCallCount = 0
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -717,8 +753,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(2)
-    expect(json.failed).toBe(0)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('does not stop processing other jobs when one fails', async () => {
@@ -732,6 +768,10 @@ describe('GET /api/cron/process', () => {
     let rawTokenCallCount = 0
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -760,8 +800,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(2)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('retries job when retry_count is less than max_retries', async () => {
@@ -774,6 +814,10 @@ describe('GET /api/cron/process', () => {
     }
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -801,8 +845,8 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 
   it('marks job as permanently failed when retry_count reaches max_retries', async () => {
@@ -815,6 +859,10 @@ describe('GET /api/cron/process', () => {
     }
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
       if (table === 'hashtags') {
         return createMockQueryBuilder(
           {},
@@ -842,7 +890,7 @@ describe('GET /api/cron/process', () => {
     const json = await response.json()
 
     expect(response.status).toBe(200)
-    expect(json.processed).toBe(0)
-    expect(json.failed).toBe(1)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
   })
 })

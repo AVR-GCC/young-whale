@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 import { supabaseService } from '@/lib/supabase/service'
@@ -9,6 +9,7 @@ import type {
   RawToken,
   TokenCategory,
   Confidence,
+  ProcessingRun,
 } from '@/shared/types'
 
 export const maxDuration = 60
@@ -319,14 +320,7 @@ async function markJobFailed(job: ProcessingQueueJob, errorMessage: string) {
     .eq('id', job.raw_token_id)
 }
 
-export async function GET(request: Request) {
-  // if (process.env.NODE_ENV !== 'development') {
-  if (false) {
-    if (!verifyCronRequest(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
-
+async function runProcessing(runId: string) {
   let processed = 0
   let failed = 0
 
@@ -338,10 +332,15 @@ export async function GET(request: Request) {
 
     if (hashtagError) {
       console.error('Failed to fetch hashtags:', hashtagError.message)
-      return NextResponse.json(
-        { error: 'Database error fetching hashtags' },
-        { status: 500 }
-      )
+      await supabaseService
+        .from('processing_runs')
+        .update({
+          status: 'failed',
+          error_message: 'Database error fetching hashtags',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', runId)
+      return
     }
 
     const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
@@ -359,10 +358,15 @@ export async function GET(request: Request) {
 
       if (pickError) {
         console.error('Failed to pick up jobs:', pickError.message)
-        return NextResponse.json(
-          { error: 'Database error picking up jobs' },
-          { status: 500 }
-        )
+        await supabaseService
+          .from('processing_runs')
+          .update({
+            status: 'failed',
+            error_message: 'Database error picking up jobs',
+            completed_at: new Date().toISOString(),
+          })
+          .eq('id', runId)
+        return
       }
 
       if (!jobs || jobs.length === 0) {
@@ -394,9 +398,62 @@ export async function GET(request: Request) {
       }
     }
 
+    await supabaseService
+      .from('processing_runs')
+      .update({
+        status: 'completed',
+        processed_count: processed,
+        failed_count: failed,
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', runId)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Cron process error:', message)
+    await supabaseService
+      .from('processing_runs')
+      .update({
+        status: 'failed',
+        error_message: message,
+        processed_count: processed,
+        failed_count: failed,
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', runId)
+  }
+}
+
+export async function GET(request: Request) {
+  // if (process.env.NODE_ENV !== 'development') {
+  if (false) {
+    if (!verifyCronRequest(request)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
+  try {
+    const { data: run, error: insertError } = await supabaseService
+      .from('processing_runs')
+      .insert({ status: 'running' })
+      .select()
+      .single()
+
+    if (insertError || !run) {
+      console.error('Failed to create processing run:', insertError?.message)
+      return NextResponse.json(
+        { error: 'Failed to create processing run' },
+        { status: 500 }
+      )
+    }
+
+    const runId = (run as ProcessingRun).id
+
+    after(() => runProcessing(runId))
+
     return NextResponse.json({
-      processed,
-      failed,
+      runId,
+      status: 'running',
+      message: 'Processing started',
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
