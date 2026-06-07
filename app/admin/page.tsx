@@ -57,7 +57,7 @@ export default function Admin() {
               <button
                 onClick={runReset}
                 disabled={resetLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed w-[50%]"
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80%]"
               >
                 {resetLoading ? 'Running Reset...' : 'Run Reset'}
               </button>
@@ -72,7 +72,7 @@ export default function Admin() {
               <button
                 onClick={runProcess}
                 disabled={processLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-[50%]"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80%]"
               >
                 {processLoading ? 'Running Process...' : 'Run Process'}
               </button>

@@ -4,9 +4,9 @@ import { supabaseService } from '@/lib/supabase/service'
 export const maxDuration = 60
 
 export async function GET() {
-  if (process.env.NODE_ENV !== 'development') {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // if (process.env.NODE_ENV !== 'development') {
+  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // }
 
   try {
     const results: Record<string, { success: boolean; error?: string; count?: number }> = {}
