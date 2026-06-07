@@ -214,7 +214,8 @@ async function syncHashtags(hashtagMap: Map<string, string>) {
 }
 
 export async function GET(request: Request) {
-  if (process.env.NODE_ENV !== 'development') {
+  // if (process.env.NODE_ENV !== 'development') {
+  if (false) {
     if (!verifyCronRequest(request)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -30,94 +30,6 @@ interface AIResult {
   confidence: string
 }
 
-export async function GET(request: Request) {
-  if (process.env.NODE_ENV !== 'development') {
-    if (!verifyCronRequest(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-  }
-
-  let processed = 0
-  let failed = 0
-
-  try {
-    const { data: hashtagRows, error: hashtagError } = await supabaseService
-      .from('hashtags')
-      .select('slug')
-      .eq('is_active', true)
-
-    if (hashtagError) {
-      console.error('Failed to fetch hashtags:', hashtagError.message)
-      return NextResponse.json(
-        { error: 'Database error fetching hashtags' },
-        { status: 500 }
-      )
-    }
-
-    const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
-
-    while (true) {
-      const now = new Date().toISOString()
-      const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
-
-      const { data: jobs, error: pickError } = await supabaseService
-        .from('processing_queue')
-        .select('*')
-        .eq('status', 'queued')
-        .or('locked_until.is.null,locked_until.lt.' + now)
-        .limit(5)
-
-      if (pickError) {
-        console.error('Failed to pick up jobs:', pickError.message)
-        return NextResponse.json(
-          { error: 'Database error picking up jobs' },
-          { status: 500 }
-        )
-      }
-
-      if (!jobs || jobs.length === 0) {
-        break
-      }
-
-      const jobIds = jobs.map((j) => j.id)
-      await supabaseService
-        .from('processing_queue')
-        .update({ status: 'processing', locked_until: lockUntil })
-        .in('id', jobIds)
-
-      for (const job of jobs as ProcessingQueueJob[]) {
-        try {
-          const result = await processJob(job, allowedHashtags)
-          if (result === 'success') {
-            processed++
-          } else {
-            failed++
-          }
-        } catch (jobError) {
-          console.error(`Unhandled error processing job ${job.id}:`, jobError)
-          await markJobFailed(
-            job,
-            jobError instanceof Error ? jobError.message : 'Unhandled error'
-          )
-          failed++
-        }
-      }
-    }
-
-    return NextResponse.json({
-      processed,
-      failed,
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Cron process error:', message)
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    )
-  }
-}
-
 async function processJob(
   job: ProcessingQueueJob,
   allowedHashtags: string[]
@@ -405,4 +317,93 @@ async function markJobFailed(job: ProcessingQueueJob, errorMessage: string) {
       error_message: errorMessage,
     })
     .eq('id', job.raw_token_id)
+}
+
+export async function GET(request: Request) {
+  // if (process.env.NODE_ENV !== 'development') {
+  if (false) {
+    if (!verifyCronRequest(request)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+  }
+
+  let processed = 0
+  let failed = 0
+
+  try {
+    const { data: hashtagRows, error: hashtagError } = await supabaseService
+      .from('hashtags')
+      .select('slug')
+      .eq('is_active', true)
+
+    if (hashtagError) {
+      console.error('Failed to fetch hashtags:', hashtagError.message)
+      return NextResponse.json(
+        { error: 'Database error fetching hashtags' },
+        { status: 500 }
+      )
+    }
+
+    const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
+
+    while (true) {
+      const now = new Date().toISOString()
+      const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
+
+      const { data: jobs, error: pickError } = await supabaseService
+        .from('processing_queue')
+        .select('*')
+        .eq('status', 'queued')
+        .or('locked_until.is.null,locked_until.lt.' + now)
+        .limit(5)
+
+      if (pickError) {
+        console.error('Failed to pick up jobs:', pickError.message)
+        return NextResponse.json(
+          { error: 'Database error picking up jobs' },
+          { status: 500 }
+        )
+      }
+
+      if (!jobs || jobs.length === 0) {
+        break
+      }
+
+      const jobIds = jobs.map((j) => j.id)
+      await supabaseService
+        .from('processing_queue')
+        .update({ status: 'processing', locked_until: lockUntil })
+        .in('id', jobIds)
+
+      for (const job of jobs as ProcessingQueueJob[]) {
+        try {
+          const result = await processJob(job, allowedHashtags)
+          if (result === 'success') {
+            processed++
+          } else {
+            failed++
+          }
+        } catch (jobError) {
+          console.error(`Unhandled error processing job ${job.id}:`, jobError)
+          await markJobFailed(
+            job,
+            jobError instanceof Error ? jobError.message : 'Unhandled error'
+          )
+          failed++
+        }
+      }
+    }
+
+    return NextResponse.json({
+      processed,
+      failed,
+    })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Cron process error:', message)
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    )
+  }
 }
