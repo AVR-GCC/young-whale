@@ -23,6 +23,7 @@ export default function FailedTokensSection() {
   const [expandedRawData, setExpandedRawData] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string>('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [requeueingId, setRequeueingId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isOpen) return
@@ -76,6 +77,23 @@ export default function FailedTokensSection() {
       }
       return next
     })
+  }
+
+  const requeueToken = async (id: string) => {
+    setRequeueingId(id)
+    try {
+      const res = await fetch(`/api/admin/raw-tokens/${id}/requeue`, { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setRefreshKey((k) => k + 1)
+      } else {
+        setError(data.error || 'Failed to requeue token')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to requeue token')
+    } finally {
+      setRequeueingId(null)
+    }
   }
 
   const formatDate = (date: string | null) => {
@@ -172,9 +190,18 @@ export default function FailedTokensSection() {
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                      {formatDate(token.created_at)}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => requeueToken(token.id)}
+                        disabled={requeueingId === token.id}
+                        className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors disabled:opacity-50"
+                      >
+                        {requeueingId === token.id ? 'Requeueing...' : 'Requeue'}
+                      </button>
+                      <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                        {formatDate(token.created_at)}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="mb-3">
