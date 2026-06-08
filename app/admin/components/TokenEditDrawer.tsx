@@ -41,9 +41,6 @@ export default function TokenEditDrawer({
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<'details' | 'raw'>('details')
   const [editedToken, setEditedToken] = useState<Partial<TokenWithHashtags>>({})
-  const [hashtags, setHashtags] = useState<Hashtag[]>([])
-  const [assignedHashtags, setAssignedHashtags] = useState<Hashtag[]>([])
-  const [hashtagSearch, setHashtagSearch] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showRequeueConfirm, setShowRequeueConfirm] = useState(false)
   const [showRejectConfirm, setShowRejectConfirm] = useState(false)
@@ -58,7 +55,6 @@ export default function TokenEditDrawer({
       if (res.ok) {
         setToken(data)
         setEditedToken(data)
-        setAssignedHashtags(data.hashtags ?? [])
         if (data.raw_token?.raw_payload) {
           setRawJson(JSON.stringify(data.raw_token.raw_payload, null, 2))
           const tags =
@@ -75,22 +71,9 @@ export default function TokenEditDrawer({
     }
   }, [tokenId, showToast])
 
-  const fetchHashtags = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/hashtags')
-      const data = await res.json()
-      if (res.ok) {
-        setHashtags(data)
-      }
-    } catch {
-      // ignore
-    }
-  }, [])
-
   useEffect(() => {
     fetchToken()
-    fetchHashtags()
-  }, [fetchToken, fetchHashtags])
+  }, [fetchToken])
 
   const handleSave = async () => {
     if (!token) return
@@ -129,7 +112,7 @@ export default function TokenEditDrawer({
       const data = await res.json()
       if (res.ok) {
         showToast('Token updated successfully', 'success')
-        const updated = { ...token, ...data, hashtags: assignedHashtags }
+        const updated = { ...token, ...data }
         setToken(updated)
         onUpdate(updated)
       } else {
@@ -153,7 +136,7 @@ export default function TokenEditDrawer({
       const data = await res.json()
       if (res.ok) {
         showToast('Token approved', 'success')
-        const updated = { ...token, ...data, hashtags: assignedHashtags }
+        const updated = { ...token, ...data }
         setToken(updated)
         onUpdate(updated)
         if (mode === 'review' && onNext) {
@@ -178,7 +161,7 @@ export default function TokenEditDrawer({
       const data = await res.json()
       if (res.ok) {
         showToast('Token rejected', 'success')
-        const updated = { ...token, ...data, hashtags: assignedHashtags }
+        const updated = { ...token, ...data }
         setToken(updated)
         onUpdate(updated)
         setShowRejectConfirm(false)
@@ -222,23 +205,6 @@ export default function TokenEditDrawer({
       showToast(err instanceof Error ? err.message : 'Failed to re-queue token', 'error')
     }
   }
-
-  const addHashtag = (hashtag: Hashtag) => {
-    if (!assignedHashtags.find((h) => h.id === hashtag.id)) {
-      setAssignedHashtags((prev) => [...prev, hashtag])
-    }
-    setHashtagSearch('')
-  }
-
-  const removeHashtag = (id: string) => {
-    setAssignedHashtags((prev) => prev.filter((h) => h.id !== id))
-  }
-
-  const filteredHashtags = hashtags.filter(
-    (h) =>
-      h.name.toLowerCase().includes(hashtagSearch.toLowerCase()) &&
-      !assignedHashtags.find((ah) => ah.id === h.id)
-  )
 
   const updateField = <K extends keyof Token>(field: K, value: Token[K]) => {
     setEditedToken((prev) => ({ ...prev, [field]: value }))
@@ -480,61 +446,39 @@ export default function TokenEditDrawer({
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Main Hashtag
-                </label>
-                <input
-                  type="text"
-                  value={currentToken.main_hashtag ?? ''}
-                  onChange={(e) => updateField('main_hashtag', e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                />
-              </div>
-
-              {/* Hashtags */}
+              {/* Immutable Hashtags */}
               <div>
                 <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                   Hashtags
                 </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {assignedHashtags.map((h) => (
+                <div className="flex flex-wrap gap-2">
+                  {token.hashtags.map((h) => (
                     <span
                       key={h.id}
-                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 rounded text-xs"
+                      className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 rounded text-xs"
                     >
                       {h.name}
-                      <button
-                        onClick={() => removeHashtag(h.id)}
-                        className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"
-                      >
-                        ×
-                      </button>
                     </span>
                   ))}
                 </div>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={hashtagSearch}
-                    onChange={(e) => setHashtagSearch(e.target.value)}
-                    placeholder="Search hashtags..."
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                  {hashtagSearch && filteredHashtags.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 rounded shadow-lg z-20 max-h-40 overflow-y-auto">
-                      {filteredHashtags.map((h) => (
-                        <button
-                          key={h.id}
-                          onClick={() => addHashtag(h)}
-                          className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 text-black dark:text-zinc-50"
-                        >
-                          {h.name}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                  Main Hashtag
+                </label>
+                <select
+                  value={currentToken.main_hashtag ?? ''}
+                  onChange={(e) => updateField('main_hashtag', e.target.value)}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                >
+                  <option value="">Select main hashtag...</option>
+                  {token.hashtags.map((h) => (
+                    <option key={h.id} value={h.name}>
+                      {h.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Logo */}
