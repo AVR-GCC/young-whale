@@ -122,17 +122,21 @@ function mapCmcToRawToken(listing: {
     const discordUrls = details.urls.chat.filter((url) => url.includes('discord.gg/'))
     if (discordUrls.length) socialLinks.discord = discordUrls
   }
+  const chain = primaryContract?.platform?.name ?? '';
+  const contract_address = primaryContract?.contract_address ?? '';
+  const source_url = `https://dex.coinmarketcap.com/token/${chain}/${contract_address}`;
+
   return {
     name: details.name,
     symbol: details.symbol,
-    chain: primaryContract?.platform?.name ?? null,
-    contract_address: primaryContract?.contract_address ?? null,
+    chain,
+    contract_address,
     website_url: details.urls.website?.[0] ?? null,
     logo_url: details.logo || null,
     social_links: socialLinks,
     exchange_links: [],
     source_type: 'coinbase' as const,
-    source_url: `https://coinmarketcap.com/currencies/${details.symbol.toLowerCase()}/`,
+    source_url,
     raw_payload: {
       cmc_listing: listing,
       cmc_details: details,
