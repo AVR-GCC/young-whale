@@ -1,5 +1,6 @@
 import { NextResponse, after } from 'next/server'
 import { createOpenAI } from '@ai-sdk/openai'
+import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { generateText } from 'ai'
 import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
@@ -208,7 +209,15 @@ async function callFireworks(
   cmcTags: string[]
 ): Promise<AIResult> {
   const modelName = (await getConfigString('ai_model')) ?? 'accounts/fireworks/models/gpt-oss-120b'
-  const model = fireworks.chat(modelName)
+
+  let model
+  if (modelName.startsWith('gemini-')) {
+    const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? ''
+    const google = createGoogleGenerativeAI({ apiKey: googleApiKey })
+    model = google.chat(modelName)
+  } else {
+    model = fireworks.chat(modelName)
+  }
 
   const system =
     (await getConfigString('ai_prompt_system')) ??

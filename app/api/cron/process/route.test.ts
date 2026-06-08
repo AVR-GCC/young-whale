@@ -25,7 +25,13 @@ vi.mock('@/lib/supabase/service', () => ({
 
 vi.mock('@ai-sdk/openai', () => ({
   createOpenAI: vi.fn(() => ({
-    chat: vi.fn(() => 'mock-model'),
+    chat: vi.fn(() => 'mock-fireworks-model'),
+  })),
+}))
+
+vi.mock('@ai-sdk/google', () => ({
+  createGoogleGenerativeAI: vi.fn(() => ({
+    chat: vi.fn(() => 'mock-gemini-model'),
   })),
 }))
 
@@ -161,6 +167,7 @@ describe('GET /api/cron/process', () => {
     vi.clearAllMocks()
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('FIREWORKS_API_KEY', 'test-fireworks-key')
+    vi.stubEnv('GOOGLE_GENERATIVE_AI_API_KEY', 'test-google-key')
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
     createQueueMock.selectCallCount = 0
   })
