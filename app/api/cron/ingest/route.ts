@@ -113,6 +113,15 @@ function mapCmcToRawToken(listing: {
   if (details.urls.twitter?.length) socialLinks.twitter = details.urls.twitter
   if (details.urls.telegram?.length) socialLinks.telegram = details.urls.telegram
 
+  if (details.urls.chat?.length) {
+    if (!socialLinks.telegram) {
+      const telegramUrls = details.urls.chat.filter((url) => url.includes('t.me/'))
+      if (telegramUrls.length) socialLinks.telegram = telegramUrls
+    }
+
+    const discordUrls = details.urls.chat.filter((url) => url.includes('discord.gg/'))
+    if (discordUrls.length) socialLinks.discord = discordUrls
+  }
   return {
     name: details.name,
     symbol: details.symbol,
@@ -234,7 +243,7 @@ export async function GET(request: Request) {
     const hashtagMap = new Map<string, string>()
 
     if (isEmpty) {
-      // Table is empty: ingest exactly 10 tokens
+      // Table is empty: ingest exactly 20 tokens
       const listings = await getLatestListings(20)
 
       for (const listing of listings) {

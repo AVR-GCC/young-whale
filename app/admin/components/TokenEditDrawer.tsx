@@ -210,7 +210,7 @@ export default function TokenEditDrawer({
     setEditedToken((prev) => ({ ...prev, [field]: value }))
   }
 
-  const updateSocialLink = (platform: 'twitter' | 'telegram' | 'discord', value: string) => {
+  const updateSocialLink = (platform: 'twitter' | 'telegram' | 'discord' | 'facebook', value: string) => {
     setEditedToken((prev) => ({
       ...prev,
       social_links: {
@@ -545,6 +545,15 @@ export default function TokenEditDrawer({
                     type="url"
                     value={currentToken.social_links?.discord ?? ''}
                     onChange={(e) => updateSocialLink('discord', e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-1">Facebook</label>
+                  <input
+                    type="url"
+                    value={currentToken.social_links?.facebook ?? ''}
+                    onChange={(e) => updateSocialLink('facebook', e.target.value)}
                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
                   />
                 </div>

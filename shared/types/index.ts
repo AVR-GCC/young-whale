@@ -40,6 +40,7 @@ export type AdminRole = 'admin' | 'superadmin'
 export interface SocialLinks {
   twitter?: string
   telegram?: string
+  facebook?: string
   discord?: string
 }
 
