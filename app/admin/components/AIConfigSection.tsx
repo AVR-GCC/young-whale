@@ -19,6 +19,9 @@ export default function AIConfigSection() {
   const [aiConfig, setAiConfig] = useState<AIConfig>({})
   const [aiUpdateLoading, setAiUpdateLoading] = useState(false)
   const [aiStatus, setAiStatus] = useState<string>('')
+  const [systemFocused, setSystemFocused] = useState(false)
+  const [shortDescFocused, setShortDescFocused] = useState(false)
+  const [fullDescFocused, setFullDescFocused] = useState(false)
 
   useEffect(() => {
     if (!aiExpanding) return
@@ -129,8 +132,10 @@ export default function AIConfigSection() {
             <textarea
               value={aiConfig.ai_prompt_system || ''}
               onChange={(e) => setAiConfig({ ...aiConfig, ai_prompt_system: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50"
+              onFocus={() => setSystemFocused(true)}
+              onBlur={() => setSystemFocused(false)}
+              rows={systemFocused ? 15 : 3}
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 transition-all"
             />
           </div>
 
@@ -165,8 +170,10 @@ export default function AIConfigSection() {
             <textarea
               value={aiConfig.ai_prompt_short_description || ''}
               onChange={(e) => setAiConfig({ ...aiConfig, ai_prompt_short_description: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50"
+              onFocus={() => setShortDescFocused(true)}
+              onBlur={() => setShortDescFocused(false)}
+              rows={shortDescFocused ? 15 : 3}
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 transition-all"
             />
           </div>
 
@@ -177,8 +184,10 @@ export default function AIConfigSection() {
             <textarea
               value={aiConfig.ai_prompt_full_description || ''}
               onChange={(e) => setAiConfig({ ...aiConfig, ai_prompt_full_description: e.target.value })}
-              rows={3}
-              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50"
+              onFocus={() => setFullDescFocused(true)}
+              onBlur={() => setFullDescFocused(false)}
+              rows={fullDescFocused ? 15 : 3}
+              className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 transition-all"
             />
           </div>
 
