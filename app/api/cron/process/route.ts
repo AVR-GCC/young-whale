@@ -248,12 +248,32 @@ Available tags for this token: ${cmcTags.join(', ')}
 Token data:
 ${rawStr}`
 
-  const { text } = await generateText({
-    model,
-    system,
-    prompt,
-    temperature: 0.2,
-  })
+  let text: string
+  while (true) {
+    try {
+      // const callTime = new Date()
+      // console.log(`[AI Call] ${callTime.getHours().toString().padStart(2, '0')}:${callTime.getMinutes().toString().padStart(2, '0')}:${callTime.getSeconds().toString().padStart(2, '0')}`)
+
+      const result = await generateText({
+        model,
+        system,
+        prompt,
+        temperature: 0.2,
+      })
+      text = result.text
+      break
+    } catch (error: unknown) {
+      const errorCode = (error as { errors: { statusCode: number }[] }).errors[0].statusCode;
+      if (errorCode === 503) { // high demand, rest and try again
+        await new Promise((resolve) => setTimeout(resolve, 60000))
+        continue
+      }
+      if (errorCode === 429) { // exceeded rate limit
+        throw error;
+      }
+      throw error;
+    }
+  }
 
   const cleaned = text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '')
   const parsed = JSON.parse(cleaned)
