@@ -65,7 +65,7 @@ async function processJob(
 
   let aiResult: AIResult
   try {
-    aiResult = await callFireworks(raw, validCmcTags)
+    aiResult = await callAI(raw, validCmcTags)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
@@ -204,7 +204,7 @@ async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
   }
 }
 
-async function callFireworks(
+async function callAI(
   raw: RawToken,
   cmcTags: string[]
 ): Promise<AIResult> {
