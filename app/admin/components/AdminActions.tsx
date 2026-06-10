@@ -123,7 +123,7 @@ export default function AdminActions() {
           {processLoading ? 'Running Process...' : 'Run Process'}
         </button>
         {processStatus && (
-          <p className={`text-sm text-center ${processStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>
+          <p className={`text-sm text-center whitespace-pre-line ${processStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>
             {processStatus}
           </p>
         )}
