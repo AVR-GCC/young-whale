@@ -210,15 +210,6 @@ async function callAI(
 ): Promise<AIResult> {
   const modelName = (await getConfigString('ai_model')) ?? 'accounts/fireworks/models/gpt-oss-120b'
 
-  let model
-  if (modelName.startsWith('gemini-')) {
-    const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? ''
-    const google = createGoogleGenerativeAI({ apiKey: googleApiKey })
-    model = google.chat(modelName)
-  } else {
-    model = fireworks.chat(modelName)
-  }
-
   const system =
     (await getConfigString('ai_prompt_system')) ??
     'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
@@ -248,31 +239,69 @@ Available tags for this token: ${cmcTags.join(', ')}
 Token data:
 ${rawStr}`
 
-  let text: string
-  while (true) {
-    try {
-      // const callTime = new Date()
-      // console.log(`[AI Call] ${callTime.getHours().toString().padStart(2, '0')}:${callTime.getMinutes().toString().padStart(2, '0')}:${callTime.getSeconds().toString().padStart(2, '0')}`)
+  let modelsToTry: string[]
+  let isGoogle: boolean
 
-      const result = await generateText({
-        model,
-        system,
-        prompt,
-        temperature: 0.2,
-      })
-      text = result.text
-      break
-    } catch (error: unknown) {
-      const errorCode = (error as { errors: { statusCode: number }[] }).errors[0].statusCode;
-      if (errorCode === 503) { // high demand, rest and try again
-        await new Promise((resolve) => setTimeout(resolve, 60000))
-        continue
+  if (modelName === 'gemini') {
+    modelsToTry = [
+      'gemini-3.5-flash',
+      'gemini-3-flash-preview',
+      'gemini-3.1-flash-lite',
+      'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      'gemma-4-31b',
+      'gemma-4-26b',
+    ]
+    isGoogle = true
+  } else {
+    modelsToTry = [modelName]
+    isGoogle = modelName.startsWith('gemini-') || modelName.startsWith('gemma-')
+  }
+
+  const googleApiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? ''
+  const google = isGoogle ? createGoogleGenerativeAI({ apiKey: googleApiKey }) : null
+
+  let text: string | undefined
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModelName = modelsToTry[i]
+    const model = isGoogle
+      ? google!.chat(currentModelName)
+      : fireworks.chat(currentModelName)
+
+    while (true) {
+      try {
+        const result = await generateText({
+          model,
+          system,
+          prompt,
+          temperature: 0.2,
+        })
+        text = result.text
+        break
+      } catch (error: unknown) {
+        const errorCode = (error as { errors: { statusCode: number }[] }).errors?.[0]?.statusCode;
+        if (errorCode === 503) {
+          await new Promise((resolve) => setTimeout(resolve, 60000))
+          continue
+        }
+        if (errorCode === 429) {
+          if (i < modelsToTry.length - 1) {
+            break
+          }
+          throw error
+        }
+        throw error
       }
-      if (errorCode === 429) { // exceeded rate limit
-        throw error;
-      }
-      throw error;
     }
+
+    if (text !== undefined) {
+      break
+    }
+  }
+
+  if (text === undefined) {
+    throw new Error('All models failed')
   }
 
   const cleaned = text.trim().replace(/^```json\s*/, '').replace(/\s*```$/, '')
