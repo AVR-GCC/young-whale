@@ -34,7 +34,8 @@ interface AIResult {
 
 async function processJob(
   job: ProcessingQueueJob,
-  allowedHashtags: string[]
+  allowedHashtags: string[],
+  runId: string
 ): Promise<'success' | 'failed'> {
   const { data: rawToken, error: rawError } = await supabaseService
     .from('raw_tokens')
@@ -54,6 +55,12 @@ async function processJob(
     await markJobFailed(job, 'Missing required fields: name, symbol, or chain')
     return 'failed'
   }
+  await supabaseService
+    .from('processing_runs')
+    .update({
+      message: `Processing ${raw.name}`,
+    })
+    .eq('id', runId)
 
   // Extract CMC tags from raw payload
   const cmcDetails = raw.raw_payload?.cmc_details as Record<string, unknown> | undefined
@@ -65,7 +72,7 @@ async function processJob(
 
   let aiResult: AIResult
   try {
-    aiResult = await callAI(raw, validCmcTags)
+    aiResult = await callAI(raw, validCmcTags, runId)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
@@ -77,15 +84,21 @@ async function processJob(
     await markJobFailed(job, validation.error)
     return 'failed'
   }
+  await supabaseService
+    .from('processing_runs')
+    .update({
+      message: `Validation for AI response for token: ${raw.name} succeeded`,
+    })
+    .eq('id', runId)
 
   const uniqueKey = raw.contract_address
     ? `${raw.chain}_${raw.contract_address}`.toLowerCase()
     : `${raw.website_url ?? ''}_${raw.name}`.toLowerCase().replace(/[^a-z0-9]/g, '_')
 
   let slug = `${raw.name}-${raw.symbol}`
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '')
 
   slug = await ensureUniqueSlug(slug)
 
@@ -104,9 +117,9 @@ async function processJob(
     website_url: raw.website_url,
     social_links: raw.social_links ?? {},
     exchange_links:
-      raw.exchange_links && raw.exchange_links.length > 0
-        ? raw.exchange_links
-        : await fetchDexScreenerLinks(raw),
+    raw.exchange_links && raw.exchange_links.length > 0
+      ? raw.exchange_links
+      : await fetchDexScreenerLinks(raw),
     start_date: null,
     end_date: null,
     source_type: raw.source_type,
@@ -119,6 +132,12 @@ async function processJob(
     main_hashtag: aiResult.main_hashtag,
   }
 
+  await supabaseService
+    .from('processing_runs')
+    .update({
+      message: `Got exchanges for ${raw.name}`,
+    })
+    .eq('id', runId)
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
     .upsert(tokenData, { onConflict: 'unique_key' })
@@ -133,6 +152,12 @@ async function processJob(
     return 'failed'
   }
 
+  await supabaseService
+    .from('processing_runs')
+    .update({
+      message: `Token ${raw.name} saved`,
+    })
+    .eq('id', runId)
   if (validCmcTags.length > 0) {
     const { data: hashtagRows } = await supabaseService
       .from('hashtags')
@@ -165,14 +190,21 @@ async function processJob(
   }
 
   await supabaseService
-    .from('processing_queue')
-    .update({ status: 'completed', locked_until: null, error_message: null })
-    .eq('id', job.id)
+  .from('processing_queue')
+  .update({ status: 'completed', locked_until: null, error_message: null })
+  .eq('id', job.id)
 
   await supabaseService
-    .from('raw_tokens')
-    .update({ status: 'processed', error_message: null })
-    .eq('id', job.raw_token_id)
+  .from('raw_tokens')
+  .update({ status: 'processed', error_message: null })
+  .eq('id', job.raw_token_id)
+
+  await supabaseService
+    .from('processing_runs')
+    .update({
+      message: `Token ${raw.name} processed`,
+    })
+    .eq('id', runId)
 
   return 'success'
 }
@@ -206,13 +238,14 @@ async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
 
 async function callAI(
   raw: RawToken,
-  cmcTags: string[]
+  cmcTags: string[],
+  runId: string
 ): Promise<AIResult> {
   const modelName = (await getConfigString('ai_model')) ?? 'accounts/fireworks/models/gpt-oss-120b'
 
   const system =
     (await getConfigString('ai_prompt_system')) ??
-    'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
+      'You are a crypto token classifier. Analyze the token data provided and return a JSON object only. No explanation, no markdown, just raw JSON.'
 
   const rawStr = JSON.stringify(raw, null, 2);
   const [categoryDesc, mainHashtagDesc, shortDescDesc, fullDescDesc, confidenceDesc] = await Promise.all([
@@ -271,6 +304,12 @@ ${rawStr}`
 
     while (true) {
       try {
+        await supabaseService
+          .from('processing_runs')
+          .update({
+            message: `Querying ${raw.name} with ${currentModelName}`,
+          })
+          .eq('id', runId)
         const result = await generateText({
           model,
           system,
@@ -282,11 +321,23 @@ ${rawStr}`
       } catch (error: unknown) {
         const errorCode = (error as { errors: { statusCode: number }[] }).errors?.[0]?.statusCode;
         if (errorCode === 503) {
+          await supabaseService
+            .from('processing_runs')
+            .update({
+              message: `Model ${currentModelName} is overloaded - waiting one minute`,
+            })
+            .eq('id', runId)
           await new Promise((resolve) => setTimeout(resolve, 60000))
           continue
         }
         if (errorCode === 429) {
           if (i < modelsToTry.length - 1) {
+            await supabaseService
+              .from('processing_runs')
+              .update({
+                message: `Model ${currentModelName} quota finished`,
+              })
+              .eq('id', runId)
             break
           }
           throw error
@@ -301,6 +352,12 @@ ${rawStr}`
   }
 
   if (text === undefined) {
+    await supabaseService
+      .from('processing_runs')
+      .update({
+        message: 'All models failed',
+      })
+      .eq('id', runId)
     throw new Error('All models failed')
   }
 
@@ -370,22 +427,22 @@ async function markJobFailed(job: ProcessingQueueJob, errorMessage: string) {
   const shouldRetry = newRetry < job.max_retries
 
   await supabaseService
-    .from('processing_queue')
-    .update({
-      status: shouldRetry ? 'queued' : 'failed',
-      retry_count: newRetry,
-      locked_until: shouldRetry ? null : job.locked_until,
-      error_message: errorMessage,
-    })
-    .eq('id', job.id)
+  .from('processing_queue')
+  .update({
+    status: shouldRetry ? 'queued' : 'failed',
+    retry_count: newRetry,
+    locked_until: shouldRetry ? null : job.locked_until,
+    error_message: errorMessage,
+  })
+  .eq('id', job.id)
 
   await supabaseService
-    .from('raw_tokens')
-    .update({
-      status: 'failed',
-      error_message: errorMessage,
-    })
-    .eq('id', job.raw_token_id)
+  .from('raw_tokens')
+  .update({
+    status: 'failed',
+    error_message: errorMessage,
+  })
+  .eq('id', job.raw_token_id)
 }
 
 async function runProcessing(runId: string) {
@@ -401,18 +458,24 @@ async function runProcessing(runId: string) {
     if (hashtagError) {
       console.error('Failed to fetch hashtags:', hashtagError.message)
       await supabaseService
-        .from('processing_runs')
-        .update({
-          status: 'failed',
-          error_message: 'Database error fetching hashtags',
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', runId)
+      .from('processing_runs')
+      .update({
+        status: 'failed',
+        error_message: 'Database error fetching hashtags',
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', runId)
       return
     }
 
     const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
 
+    await supabaseService
+    .from('processing_runs')
+    .update({
+      message: 'Got hashtags',
+    })
+    .eq('id', runId)
     while (true) {
       const now = new Date().toISOString()
       const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
@@ -427,13 +490,13 @@ async function runProcessing(runId: string) {
       if (pickError) {
         console.error('Failed to pick up jobs:', pickError.message)
         await supabaseService
-          .from('processing_runs')
-          .update({
-            status: 'failed',
-            error_message: 'Database error picking up jobs',
-            completed_at: new Date().toISOString(),
-          })
-          .eq('id', runId)
+        .from('processing_runs')
+        .update({
+          status: 'failed',
+          error_message: 'Database error picking up jobs',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', runId)
         return
       }
 
@@ -443,13 +506,13 @@ async function runProcessing(runId: string) {
 
       const jobIds = jobs.map((j) => j.id)
       await supabaseService
-        .from('processing_queue')
-        .update({ status: 'processing', locked_until: lockUntil })
-        .in('id', jobIds)
+      .from('processing_queue')
+      .update({ message: `Got ${jobs?.length} jobs`, status: 'processing', locked_until: lockUntil })
+      .in('id', jobIds)
 
       for (const job of jobs as ProcessingQueueJob[]) {
         try {
-          const result = await processJob(job, allowedHashtags)
+          const result = await processJob(job, allowedHashtags, runId)
           if (result === 'success') {
             processed++
           } else {
@@ -467,27 +530,27 @@ async function runProcessing(runId: string) {
     }
 
     await supabaseService
-      .from('processing_runs')
-      .update({
-        status: 'completed',
-        processed_count: processed,
-        failed_count: failed,
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', runId)
+    .from('processing_runs')
+    .update({
+      status: 'completed',
+      processed_count: processed,
+      failed_count: failed,
+      completed_at: new Date().toISOString(),
+    })
+    .eq('id', runId)
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('Cron process error:', message)
     await supabaseService
-      .from('processing_runs')
-      .update({
-        status: 'failed',
-        error_message: message,
-        processed_count: processed,
-        failed_count: failed,
-        completed_at: new Date().toISOString(),
-      })
-      .eq('id', runId)
+    .from('processing_runs')
+    .update({
+      status: 'failed',
+      error_message: message,
+      processed_count: processed,
+      failed_count: failed,
+      completed_at: new Date().toISOString(),
+    })
+    .eq('id', runId)
   }
 }
 

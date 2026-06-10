@@ -62,7 +62,7 @@ export default function AdminActions() {
           setProcessLoading(false)
           clearPollInterval()
         } else {
-          setProcessStatus('Processing...')
+          setProcessStatus(`Processing...\n${data.message || ''}`)
         }
       } catch (err) {
         setProcessStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)

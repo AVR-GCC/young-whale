@@ -32,6 +32,7 @@ export async function GET(request: Request) {
       processed: runData.processed_count,
       failed: runData.failed_count,
       errorMessage: runData.error_message,
+      message: runData.message,
       startedAt: runData.started_at,
       completedAt: runData.completed_at,
     })

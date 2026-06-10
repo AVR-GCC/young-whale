@@ -134,6 +134,7 @@ export interface ProcessingRun {
   processed_count: number
   failed_count: number
   error_message: string | null
+  message: string | null
   started_at: string
   completed_at: string | null
 }
