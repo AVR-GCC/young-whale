@@ -191,6 +191,21 @@ export default function TokensSection() {
     [router, pathname]
   )
 
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true)
+    try {
+      const res = await fetch('/api/admin/tokens/stats')
+      const data = await res.json()
+      if (res.ok) {
+        setStats(data)
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setStatsLoading(false)
+    }
+  }, [])
+
   const fetchTokens = useCallback(async () => {
     setLoading(true)
     try {
@@ -217,6 +232,7 @@ export default function TokensSection() {
         setTokens(data.tokens)
         setPagination(data.pagination)
         setSelectedIds(new Set())
+        fetchStats()
       } else {
         showToast(data.error || 'Failed to fetch tokens', 'error')
       }
@@ -225,22 +241,7 @@ export default function TokensSection() {
     } finally {
       setLoading(false)
     }
-  }, [page, pagination.pageSize, debouncedSearch, filters, sort, showToast])
-
-  const fetchStats = useCallback(async () => {
-    setStatsLoading(true)
-    try {
-      const res = await fetch('/api/admin/tokens/stats')
-      const data = await res.json()
-      if (res.ok) {
-        setStats(data)
-      }
-    } catch {
-      // silently fail
-    } finally {
-      setStatsLoading(false)
-    }
-  }, [])
+  }, [page, pagination.pageSize, debouncedSearch, filters, sort, showToast, fetchStats])
 
   useEffect(() => {
     fetchTokens()
