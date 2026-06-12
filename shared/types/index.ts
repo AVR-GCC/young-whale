@@ -102,6 +102,7 @@ export interface Token {
   is_promoted: boolean
   is_verified: boolean
   main_hashtag: string | null
+  rating: number
   created_at: string
   updated_at: string
 }
