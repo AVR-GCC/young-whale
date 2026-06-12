@@ -99,6 +99,7 @@ export default function TokenEditDrawer({
         'status',
         'is_promoted',
         'is_verified',
+        'rating',
       ]
       for (const field of fields) {
         if (field in editedToken && editedToken[field] !== token[field]) {
@@ -625,6 +626,24 @@ export default function TokenEditDrawer({
                   {CONFIDENCE_OPTIONS.map((conf) => (
                     <option key={conf} value={conf}>
                       {conf}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                  Rating
+                </label>
+                <select
+                  value={currentToken.rating ?? ''}
+                  onChange={(e) => updateField('rating', e.target.value ? Number(e.target.value) : 0)}
+                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                >
+                  <option value="">Select rating...</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
                     </option>
                   ))}
                 </select>
