@@ -15,11 +15,12 @@ interface TokenWithHashtags extends Token {
 }
 
 interface TokenEditDrawerProps {
-  tokenId: string
-  mode: 'edit' | 'review'
+  tokenId?: string
+  mode: 'edit' | 'review' | 'create'
   onClose: () => void
-  onUpdate: (token: TokenWithHashtags) => void
-  onDelete: (id: string) => void
+  onUpdate?: (token: TokenWithHashtags) => void
+  onDelete?: (id: string) => void
+  onCreate?: (token: TokenWithHashtags) => void
   onNext?: () => void
   showToast: (message: string, type: 'success' | 'error') => void
 }
@@ -34,14 +35,28 @@ export default function TokenEditDrawer({
   onClose,
   onUpdate,
   onDelete,
+  onCreate,
   onNext,
   showToast,
 }: TokenEditDrawerProps) {
+  const isCreate = mode === 'create'
   const [token, setToken] = useState<TokenWithHashtags | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isCreate)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState<'details' | 'raw'>('details')
-  const [editedToken, setEditedToken] = useState<Partial<TokenWithHashtags>>({})
+  const [editedToken, setEditedToken] = useState<Partial<TokenWithHashtags>>(
+    isCreate
+      ? {
+          status: 'pending_review',
+          confidence: 'medium',
+          category: undefined,
+          social_links: {},
+          exchange_links: [],
+          is_promoted: false,
+          is_verified: false,
+        }
+      : {}
+  )
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showRequeueConfirm, setShowRequeueConfirm] = useState(false)
   const [showRejectConfirm, setShowRejectConfirm] = useState(false)
@@ -49,6 +64,7 @@ export default function TokenEditDrawer({
   const [tagsArray, setTagsArray] = useState<string[]>([])
 
   const fetchToken = useCallback(async () => {
+    if (isCreate || !tokenId) return
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}`)
@@ -70,14 +86,67 @@ export default function TokenEditDrawer({
     } finally {
       setLoading(false)
     }
-  }, [tokenId, showToast])
+  }, [tokenId, showToast, isCreate])
 
   useEffect(() => {
-    fetchToken()
-  }, [fetchToken])
+    if (!isCreate) {
+      fetchToken()
+    }
+  }, [fetchToken, isCreate])
 
   const handleSave = async () => {
-    if (!token) return
+    if (isCreate) {
+      setSaving(true)
+      try {
+        const body = {
+          name: editedToken.name || '',
+          symbol: editedToken.symbol || '',
+          chain: editedToken.chain || '',
+          contract_address: editedToken.contract_address || null,
+          slug: editedToken.slug || '',
+          category: editedToken.category || 'Meme',
+          short_description: editedToken.short_description || null,
+          full_description: editedToken.full_description || null,
+          logo_url: editedToken.logo_url || null,
+          website_url: editedToken.website_url || null,
+          social_links: editedToken.social_links || {},
+          exchange_links: editedToken.exchange_links || [],
+          preferred_exchange: editedToken.preferred_exchange || null,
+          start_date: editedToken.start_date || null,
+          end_date: editedToken.end_date || null,
+          source_url: editedToken.source_url || null,
+          confidence: editedToken.confidence || 'medium',
+          status: editedToken.status || 'pending_review',
+          is_promoted: editedToken.is_promoted || false,
+          is_verified: editedToken.is_verified || false,
+          main_hashtag: editedToken.main_hashtag || null,
+          rating: editedToken.rating || null,
+        }
+
+        const res = await fetch('/api/admin/tokens', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        })
+        const data = await res.json()
+        if (res.ok) {
+          showToast('Token created successfully', 'success')
+          if (onCreate) {
+            onCreate(data)
+          }
+          onClose()
+        } else {
+          showToast(data.error || 'Failed to create token', 'error')
+        }
+      } catch (err) {
+        showToast(err instanceof Error ? err.message : 'Failed to create token', 'error')
+      } finally {
+        setSaving(false)
+      }
+      return
+    }
+
+    if (!token || !tokenId) return
     setSaving(true)
     try {
       const body: Record<string, unknown> = {}
@@ -117,7 +186,9 @@ export default function TokenEditDrawer({
         showToast('Token updated successfully', 'success')
         const updated = { ...token, ...data }
         setToken(updated)
-        onUpdate(updated)
+        if (onUpdate) {
+          onUpdate(updated)
+        }
       } else {
         showToast(data.error || 'Failed to update token', 'error')
       }
@@ -129,7 +200,7 @@ export default function TokenEditDrawer({
   }
 
   const handleApprove = async () => {
-    if (!token) return
+    if (!token || !tokenId) return
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}`, {
         method: 'PATCH',
@@ -141,7 +212,9 @@ export default function TokenEditDrawer({
         showToast('Token approved', 'success')
         const updated = { ...token, ...data }
         setToken(updated)
-        onUpdate(updated)
+        if (onUpdate) {
+          onUpdate(updated)
+        }
         if (mode === 'review' && onNext) {
           onNext()
         }
@@ -154,7 +227,7 @@ export default function TokenEditDrawer({
   }
 
   const handleReject = async () => {
-    if (!token) return
+    if (!token || !tokenId) return
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}`, {
         method: 'PATCH',
@@ -166,7 +239,9 @@ export default function TokenEditDrawer({
         showToast('Token rejected', 'success')
         const updated = { ...token, ...data }
         setToken(updated)
-        onUpdate(updated)
+        if (onUpdate) {
+          onUpdate(updated)
+        }
         setShowRejectConfirm(false)
         if (mode === 'review' && onNext) {
           onNext()
@@ -180,11 +255,14 @@ export default function TokenEditDrawer({
   }
 
   const handleDelete = async () => {
+    if (!tokenId) return
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}`, { method: 'DELETE' })
       if (res.ok) {
         showToast('Token deleted', 'success')
-        onDelete(tokenId)
+        if (onDelete) {
+          onDelete(tokenId)
+        }
       } else {
         const data = await res.json()
         showToast(data.error || 'Failed to delete token', 'error')
@@ -195,12 +273,15 @@ export default function TokenEditDrawer({
   }
 
   const handleRequeue = async () => {
+    if (!tokenId) return
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}/requeue`, { method: 'POST' })
       const data = await res.json()
       if (res.ok) {
         showToast('Token re-queued for reprocessing', 'success')
-        onDelete(tokenId)
+        if (onDelete) {
+          onDelete(tokenId)
+        }
       } else {
         showToast(data.error || 'Failed to re-queue token', 'error')
       }
@@ -261,7 +342,7 @@ export default function TokenEditDrawer({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
-                {mode === 'review' ? 'Review Token' : 'Edit Token'}
+                {isCreate ? 'Create Token' : mode === 'review' ? 'Review Token' : 'Edit Token'}
               </h2>
               {token && (
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -313,16 +394,18 @@ export default function TokenEditDrawer({
             >
               Details
             </button>
-            <button
-              onClick={() => setActiveTab('raw')}
-              className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
-                activeTab === 'raw'
-                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-              }`}
-            >
-              Raw Data
-            </button>
+            {!isCreate && (
+              <button
+                onClick={() => setActiveTab('raw')}
+                className={`px-4 py-2 text-sm font-medium rounded-t transition-colors ${
+                  activeTab === 'raw'
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                Raw Data
+              </button>
+            )}
           </div>
         </div>
 
@@ -334,61 +417,112 @@ export default function TokenEditDrawer({
                 <div key={i} className="h-10 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
               ))}
             </div>
-          ) : !token ? (
+          ) : !token && !isCreate ? (
             <p className="text-zinc-500 dark:text-zinc-400">Failed to load token</p>
           ) : activeTab === 'details' ? (
             <div className="space-y-6">
-              {/* Read-only fields */}
+              {/* Identity fields */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Name
+                    Name {isCreate && <span className="text-red-500">*</span>}
                   </label>
-                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                    {token.name}
-                  </div>
+                  {isCreate ? (
+                    <input
+                      type="text"
+                      value={editedToken.name || ''}
+                      onChange={(e) => updateField('name', e.target.value)}
+                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
+                      {token?.name}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Symbol
+                    Symbol {isCreate && <span className="text-red-500">*</span>}
                   </label>
-                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                    {token.symbol}
-                  </div>
+                  {isCreate ? (
+                    <input
+                      type="text"
+                      value={editedToken.symbol || ''}
+                      onChange={(e) => updateField('symbol', e.target.value)}
+                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
+                      {token?.symbol}
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Chain
+                    Chain {isCreate && <span className="text-red-500">*</span>}
                   </label>
-                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                    {token.chain}
-                  </div>
+                  {isCreate ? (
+                    <input
+                      type="text"
+                      value={editedToken.chain || ''}
+                      onChange={(e) => updateField('chain', e.target.value)}
+                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                    />
+                  ) : (
+                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
+                      {token?.chain}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                     Contract Address
                   </label>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300 truncate font-mono">
-                      {token.contract_address ?? 'N/A'}
+                  {isCreate ? (
+                    <input
+                      type="text"
+                      value={editedToken.contract_address || ''}
+                      onChange={(e) => updateField('contract_address', e.target.value || null)}
+                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm font-mono"
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300 truncate font-mono">
+                        {token?.contract_address ?? 'N/A'}
+                      </div>
+                      {token?.contract_address && (
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(token.contract_address!)
+                            showToast('Copied to clipboard', 'success')
+                          }}
+                          className="px-2 py-1 text-xs bg-zinc-200 dark:bg-zinc-700 rounded hover:bg-zinc-300 dark:hover:bg-zinc-600"
+                        >
+                          Copy
+                        </button>
+                      )}
                     </div>
-                    {token.contract_address && (
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(token.contract_address!)
-                          showToast('Copied to clipboard', 'success')
-                        }}
-                        className="px-2 py-1 text-xs bg-zinc-200 dark:bg-zinc-700 rounded hover:bg-zinc-300 dark:hover:bg-zinc-600"
-                      >
-                        Copy
-                      </button>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
+
+              {isCreate && (
+                <div>
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    Slug <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editedToken.slug || ''}
+                    onChange={(e) => updateField('slug', e.target.value)}
+                    placeholder="e.g. pepe-ai-coin"
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
+                </div>
+              )}
 
               {/* Editable fields */}
               <div>
@@ -449,43 +583,47 @@ export default function TokenEditDrawer({
                 />
               </div>
 
-              {/* Immutable Hashtags */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Hashtags
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {token.hashtags.map((h) => (
-                    <span
-                      key={h.id}
-                      className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 rounded text-xs"
-                    >
-                      {h.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              {/* Hashtags - only show for existing tokens */}
+              {!isCreate && token && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                      Hashtags
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {token.hashtags.map((h) => (
+                        <span
+                          key={h.id}
+                          className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 rounded text-xs"
+                        >
+                          {h.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Main Hashtag
-                </label>
-                <select
-                  value={token.hashtags.find((h) => h.slug === currentToken.main_hashtag)?.id ?? currentToken.main_hashtag ?? ''}
-                  onChange={(e) => {
-                    const tokenHashtag = token.hashtags.find((h) => h.id === e.target.value);
-                    if (tokenHashtag?.slug) updateField('main_hashtag', tokenHashtag?.slug);
-                  }}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                >
-                  <option value="">Select main hashtag...</option>
-                  {token.hashtags.map((h) => (
-                    <option key={h.id} value={h.id}>
-                      {h.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                      Main Hashtag
+                    </label>
+                    <select
+                      value={token.hashtags.find((h) => h.slug === currentToken.main_hashtag)?.id ?? currentToken.main_hashtag ?? ''}
+                      onChange={(e) => {
+                        const tokenHashtag = token.hashtags.find((h) => h.id === e.target.value);
+                        if (tokenHashtag?.slug) updateField('main_hashtag', tokenHashtag?.slug);
+                      }}
+                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                    >
+                      <option value="">Select main hashtag...</option>
+                      {token.hashtags.map((h) => (
+                        <option key={h.id} value={h.id}>
+                          {h.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
 
               {/* Logo */}
               <div>
@@ -748,32 +886,36 @@ export default function TokenEditDrawer({
               disabled={saving}
               className="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {saving ? 'Saving...' : 'Save Changes'}
+              {saving ? 'Saving...' : isCreate ? 'Create Token' : 'Save Changes'}
             </button>
-            <button
-              onClick={handleApprove}
-              className="px-4 py-2 bg-green-600 text-white rounded font-medium hover:bg-green-700 transition-colors"
-            >
-              Approve
-            </button>
-            <button
-              onClick={() => setShowRejectConfirm(true)}
-              className="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors"
-            >
-              Reject
-            </button>
-            <button
-              onClick={() => setShowRequeueConfirm(true)}
-              className="px-4 py-2 bg-yellow-600 text-white rounded font-medium hover:bg-yellow-700 transition-colors"
-            >
-              Re-queue
-            </button>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="px-4 py-2 bg-zinc-600 text-white rounded font-medium hover:bg-zinc-700 transition-colors ml-auto"
-            >
-              Delete
-            </button>
+            {!isCreate && (
+              <>
+                <button
+                  onClick={handleApprove}
+                  className="px-4 py-2 bg-green-600 text-white rounded font-medium hover:bg-green-700 transition-colors"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => setShowRejectConfirm(true)}
+                  className="px-4 py-2 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors"
+                >
+                  Reject
+                </button>
+                <button
+                  onClick={() => setShowRequeueConfirm(true)}
+                  className="px-4 py-2 bg-yellow-600 text-white rounded font-medium hover:bg-yellow-700 transition-colors"
+                >
+                  Re-queue
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="px-4 py-2 bg-zinc-600 text-white rounded font-medium hover:bg-zinc-700 transition-colors ml-auto"
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

@@ -120,7 +120,7 @@ export default function TokensSection() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editingTokenId, setEditingTokenId] = useState<string | null>(null)
-  const [drawerMode, setDrawerMode] = useState<'edit' | 'review'>('edit')
+  const [drawerMode, setDrawerMode] = useState<'edit' | 'review' | 'create'>('edit')
   const [pendingReviewIds, setPendingReviewIds] = useState<string[]>([])
   const [currentPendingIndex, setCurrentPendingIndex] = useState(0)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
@@ -448,6 +448,16 @@ export default function TokensSection() {
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold text-black dark:text-zinc-50">Tokens</span>
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setDrawerMode('create')
+                setEditingTokenId(null)
+                setDrawerOpen(true)
+              }}
+              className="px-3 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
+            >
+              + Create Token
+            </button>
             <button
               onClick={handleReviewQueue}
               className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
@@ -957,9 +967,9 @@ export default function TokensSection() {
       )}
 
       {/* Drawer */}
-      {drawerOpen && editingTokenId && (
+      {drawerOpen && (editingTokenId || drawerMode === 'create') && (
         <TokenEditDrawer
-          tokenId={editingTokenId}
+          tokenId={editingTokenId ?? undefined}
           mode={drawerMode}
           onClose={() => {
             setDrawerOpen(false)
@@ -967,6 +977,10 @@ export default function TokensSection() {
           }}
           onUpdate={handleTokenUpdate}
           onDelete={handleTokenDelete}
+          onCreate={() => {
+            fetchTokens()
+            fetchStats()
+          }}
           onNext={drawerMode === 'review' ? handleNextPending : undefined}
           showToast={showToast}
         />

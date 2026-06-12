@@ -146,6 +146,67 @@ export async function GET(request: Request) {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+
+    // Required fields
+    const { name, symbol, chain, contract_address, slug, category } = body
+
+    if (!name || !symbol || !chain || !slug || !category) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, symbol, chain, slug, category' },
+        { status: 400 }
+      )
+    }
+
+    // Generate unique_key from chain + contract_address (or chain + symbol if no contract)
+    const unique_key = contract_address
+      ? `${chain.toLowerCase()}:${contract_address.toLowerCase()}`
+      : `${chain.toLowerCase()}:${symbol.toLowerCase()}`
+
+    const tokenData = {
+      name,
+      symbol,
+      chain,
+      contract_address: contract_address || null,
+      unique_key,
+      slug,
+      category,
+      short_description: body.short_description || null,
+      full_description: body.full_description || null,
+      logo_url: body.logo_url || null,
+      website_url: body.website_url || null,
+      social_links: body.social_links || {},
+      exchange_links: body.exchange_links || [],
+      preferred_exchange: body.preferred_exchange || null,
+      start_date: body.start_date || null,
+      end_date: body.end_date || null,
+      source_type: body.source_type || 'user_paid',
+      source_url: body.source_url || null,
+      confidence: body.confidence || 'medium',
+      status: body.status || 'pending_review',
+      is_promoted: body.is_promoted || false,
+      is_verified: body.is_verified || false,
+      main_hashtag: body.main_hashtag || null,
+      rating: body.rating || null,
+    }
+
+    const { data, error } = await supabaseService.from('tokens').insert(tokenData).select().single()
+
+    if (error) {
+      console.error('Failed to create token:', error.message)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json(data, { status: 201 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Tokens POST error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const body = await request.json()
