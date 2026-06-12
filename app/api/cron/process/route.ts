@@ -101,6 +101,10 @@ async function processJob(
   .replace(/^-|-$/g, '')
 
   slug = await ensureUniqueSlug(slug)
+  const exchange_links = raw.exchange_links && raw.exchange_links.length > 0
+    ? raw.exchange_links
+    : await fetchDexScreenerLinks(raw);
+  const preferred_exchange = exchange_links?.[0] ?? null;
 
   const tokenData = {
     name: raw.name,
@@ -116,10 +120,8 @@ async function processJob(
     logo_storage_path: null,
     website_url: raw.website_url,
     social_links: raw.social_links ?? {},
-    exchange_links:
-    raw.exchange_links && raw.exchange_links.length > 0
-      ? raw.exchange_links
-      : await fetchDexScreenerLinks(raw),
+    exchange_links,
+    preferred_exchange,
     start_date: null,
     end_date: null,
     source_type: raw.source_type,
