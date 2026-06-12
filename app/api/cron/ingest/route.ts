@@ -52,6 +52,7 @@ async function getTokenDetails(cmcId: number) {
   return json.data[cmcId.toString()] as {
     name: string
     symbol: string
+    slug: string
     logo: string
     description: string
     urls: {
@@ -84,6 +85,7 @@ function mapCmcToRawToken(listing: {
 }, details: {
   name: string
   symbol: string
+  slug: string
   logo: string
   description: string
   urls: {
@@ -124,7 +126,7 @@ function mapCmcToRawToken(listing: {
   }
   const chain = primaryContract?.platform?.name ?? '';
   const contract_address = primaryContract?.contract_address ?? '';
-  const source_url = `https://dex.coinmarketcap.com/token/${chain}/${contract_address}`;
+  const source_url = `https://coinmarketcap.com/currencies/${details.slug}`;
 
   return {
     name: details.name,
