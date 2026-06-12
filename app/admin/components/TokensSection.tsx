@@ -437,10 +437,10 @@ export default function TokensSection() {
     fetchStats()
   }
 
-  // const formatDate = (date: string | null) => {
-  //   if (!date) return '-'
-  //   return new Date(date).toLocaleDateString()
-  // }
+  const formatDate = (date: string | null) => {
+    if (!date) return '-'
+    return new Date(date).toLocaleDateString()
+  }
 
   return (
     <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
@@ -749,16 +749,12 @@ export default function TokensSection() {
               >
                 Status <SortIcon column="status" sortColumn={sort.column} sortDirection={sort.direction} />
               </th>
-              {/*
-              <th className="px-4 py-3 text-left">Promoted</th>
-              <th className="px-4 py-3 text-left">Verified</th>
               <th
                 className="px-4 py-3 text-left cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 onClick={() => handleSort('created_at')}
               >
                 Created <SortIcon column="created_at" sortColumn={sort.column} sortDirection={sort.direction} />
               </th>
-              */}
               <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
@@ -766,7 +762,7 @@ export default function TokensSection() {
             {loading ? (
               [...Array(5)].map((_, i) => (
                 <tr key={i} className="border-b border-zinc-100 dark:border-zinc-800">
-                  {[...Array(12)].map((_, j) => (
+                  {[...Array(9)].map((_, j) => (
                     <td key={j} className="px-4 py-3">
                       <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded animate-pulse" />
                     </td>
@@ -775,7 +771,7 @@ export default function TokensSection() {
               ))
             ) : tokens.length === 0 ? (
               <tr>
-                <td colSpan={12} className="px-4 py-12 text-center text-zinc-500 dark:text-zinc-400">
+                <td colSpan={9} className="px-4 py-12 text-center text-zinc-500 dark:text-zinc-400">
                   {filters.review_queue
                     ? 'No tokens pending review'
                     : filters.search ||
@@ -859,43 +855,9 @@ export default function TokensSection() {
                       {token.status.replace('_', ' ')}
                     </span>
                   </td>
-                  {/*
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() =>
-                        handleInlineToggle(token.id, 'is_promoted', !token.is_promoted)
-                      }
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        token.is_promoted ? 'bg-blue-600' : 'bg-zinc-300 dark:bg-zinc-700'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                          token.is_promoted ? 'translate-x-5' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() =>
-                        handleInlineToggle(token.id, 'is_verified', !token.is_verified)
-                      }
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                        token.is_verified ? 'bg-green-600' : 'bg-zinc-300 dark:bg-zinc-700'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                          token.is_verified ? 'translate-x-5' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </td>
                   <td className="px-4 py-3 text-zinc-500 dark:text-zinc-400">
                     {formatDate(token.created_at)}
                   </td>
-                  */}
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
                       <button
