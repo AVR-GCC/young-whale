@@ -488,13 +488,16 @@ export default function TokenEditDrawer({
                   Main Hashtag
                 </label>
                 <select
-                  value={currentToken.main_hashtag ?? ''}
-                  onChange={(e) => updateField('main_hashtag', e.target.value)}
+                  value={token.hashtags.find((h) => h.slug === currentToken.main_hashtag)?.id ?? currentToken.main_hashtag ?? ''}
+                  onChange={(e) => {
+                    const tokenHashtag = token.hashtags.find((h) => h.id === e.target.value);
+                    if (tokenHashtag?.slug) updateField('main_hashtag', tokenHashtag?.slug);
+                  }}
                   className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
                 >
                   <option value="">Select main hashtag...</option>
                   {token.hashtags.map((h) => (
-                    <option key={h.id} value={h.name}>
+                    <option key={h.id} value={h.id}>
                       {h.name}
                     </option>
                   ))}
