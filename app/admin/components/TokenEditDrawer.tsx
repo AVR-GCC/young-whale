@@ -387,26 +387,6 @@ export default function TokenEditDrawer({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Source URL
-                </label>
-                {token.source_url ? (
-                  <a
-                    href={token.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
-                  >
-                    {token.source_url}
-                  </a>
-                ) : (
-                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                    N/A
-                  </div>
-                )}
-              </div>
-
               {/* Editable fields */}
               <div>
                 <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
@@ -524,6 +504,26 @@ export default function TokenEditDrawer({
                     className="mt-2 rounded object-cover"
                     unoptimized
                   />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                  Source URL
+                </label>
+                {token.source_url ? (
+                  <a
+                    href={token.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
+                  >
+                    {token.source_url}
+                  </a>
+                ) : (
+                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
+                    N/A
+                  </div>
                 )}
               </div>
 
