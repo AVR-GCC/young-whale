@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import type { Token, TokenStatus, TokenCategory, Confidence, Hashtag } from '@/shared/types'
+import LinkInput from './LinkInput'
 
 interface TokenWithHashtags extends Token {
   hashtags: Hashtag[]
@@ -87,6 +88,7 @@ export default function TokenEditDrawer({
         'full_description',
         'main_hashtag',
         'logo_url',
+        'source_url',
         'website_url',
         'social_links',
         'exchange_links',
@@ -507,79 +509,43 @@ export default function TokenEditDrawer({
                 )}
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Source URL
-                </label>
-                {token.source_url ? (
-                  <a
-                    href={token.source_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-blue-600 dark:text-blue-400 hover:underline truncate"
-                  >
-                    {token.source_url}
-                  </a>
-                ) : (
-                  <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                    N/A
-                  </div>
-                )}
-              </div>
+              <LinkInput
+                label="Source URL"
+                value={currentToken.source_url ?? ''}
+                onChange={(value) => updateField('source_url', value)}
+              />
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Website URL
-                </label>
-                <input
-                  type="url"
-                  value={currentToken.website_url ?? ''}
-                  onChange={(e) => updateField('website_url', e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                />
-              </div>
+              <LinkInput
+                label="Website URL"
+                value={currentToken.website_url ?? ''}
+                onChange={(value) => updateField('website_url', value)}
+              />
 
               {/* Social Links */}
               <div className="space-y-3">
                 <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
                   Social Links
                 </label>
-                <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Twitter</label>
-                  <input
-                    type="url"
-                    value={currentToken.social_links?.twitter ?? ''}
-                    onChange={(e) => updateSocialLink('twitter', e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Telegram</label>
-                  <input
-                    type="url"
-                    value={currentToken.social_links?.telegram ?? ''}
-                    onChange={(e) => updateSocialLink('telegram', e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Discord</label>
-                  <input
-                    type="url"
-                    value={currentToken.social_links?.discord ?? ''}
-                    onChange={(e) => updateSocialLink('discord', e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-zinc-400 mb-1">Facebook</label>
-                  <input
-                    type="url"
-                    value={currentToken.social_links?.facebook ?? ''}
-                    onChange={(e) => updateSocialLink('facebook', e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                </div>
+                <LinkInput
+                  label="Twitter"
+                  value={currentToken.social_links?.twitter ?? ''}
+                  onChange={(value) => updateSocialLink('twitter', value)}
+                />
+                <LinkInput
+                  label="Telegram"
+                  value={currentToken.social_links?.telegram ?? ''}
+                  onChange={(value) => updateSocialLink('telegram', value)}
+                />
+                <LinkInput
+                  label="Discord"
+                  value={currentToken.social_links?.discord ?? ''}
+                  onChange={(value) => updateSocialLink('discord', value)}
+                />
+                <LinkInput
+                  label="Facebook"
+                  value={currentToken.social_links?.facebook ?? ''}
+                  onChange={(value) => updateSocialLink('facebook', value)}
+                />
               </div>
 
               {/* Exchange Links */}
@@ -590,15 +556,15 @@ export default function TokenEditDrawer({
                 <div className="space-y-2">
                   {exchangeLinks.map((link, index) => (
                     <div key={index} className="flex gap-2">
-                      <input
-                        type="url"
-                        value={link}
-                        onChange={(e) => updateExchangeLink(index, e.target.value)}
-                        className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                      />
+                      <div className="flex-1">
+                        <LinkInput
+                          value={link}
+                          onChange={(value) => updateExchangeLink(index, value)}
+                        />
+                      </div>
                       <button
                         onClick={() => removeExchangeLink(index)}
-                        className="px-2 py-1 text-xs bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800"
+                        className="px-2 py-1 text-xs bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 rounded hover:bg-red-200 dark:hover:bg-red-800 self-end"
                       >
                         Remove
                       </button>
@@ -613,25 +579,13 @@ export default function TokenEditDrawer({
                 </button>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Preferred Exchange
-                </label>
-                <select
-                  value={currentToken.preferred_exchange ?? ''}
-                  onChange={(e) => updateField('preferred_exchange', e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                >
-                  <option value="">Select preferred exchange...</option>
-                  {exchangeLinks
-                    .filter((l) => l.trim())
-                    .map((link, i) => (
-                      <option key={i} value={link}>
-                        {link}
-                      </option>
-                    ))}
-                </select>
-              </div>
+              <LinkInput
+                label="Preferred Exchange"
+                value={currentToken.preferred_exchange ?? ''}
+                onChange={(value) => updateField('preferred_exchange', value)}
+                suggestions={exchangeLinks.filter((l) => l.trim())}
+                placeholder="Select preferred exchange..."
+              />
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
