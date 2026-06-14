@@ -393,7 +393,7 @@ export default function TokenEditDrawer({
   const exchangeLinks = editedToken.exchange_links ?? token?.exchange_links ?? []
 
   const currentHashtags = [
-    ...allHashtags.filter((h) => selectedHashtagIds.includes(h.id)),
+    ...(Array.isArray(allHashtags) ? allHashtags : []).filter((h) => selectedHashtagIds.includes(h.id)),
     ...newHashtags.map((name, i) => ({
       id: `new-${i}`,
       name,

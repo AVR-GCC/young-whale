@@ -41,6 +41,7 @@ const mockToken: TokenWithHashtags = {
   is_promoted: false,
   is_verified: true,
   main_hashtag: 'defi',
+  rating: 5,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
   hashtags: [{ id: 'h1', name: 'defi', slug: 'defi', is_active: true, created_at: '2024-01-01' }],
@@ -80,11 +81,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -105,11 +106,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -135,11 +136,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -169,11 +170,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -203,11 +204,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -236,11 +237,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
       .mockResolvedValueOnce({
         ok: true,
@@ -274,11 +275,11 @@ describe('TokenEditDrawer', () => {
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockToken,
+        json: async () => mockHashtags,
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => mockHashtags,
+        json: async () => mockToken,
       })
 
     render(
@@ -307,12 +308,12 @@ describe('TokenEditDrawer', () => {
   it('handles API errors when loading token', async () => {
     mockFetch
       .mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ error: 'Token not found' }),
-      })
-      .mockResolvedValueOnce({
         ok: true,
         json: async () => mockHashtags,
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: 'Token not found' }),
       })
 
     render(
