@@ -5,6 +5,9 @@ import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import type { Token, TokenStatus, TokenCategory, Confidence, Hashtag } from '@/shared/types'
 import LinkInput from './LinkInput'
+import HashtagMultiSelect from './HashtagMultiSelect'
+import NewHashtagInput from './NewHashtagInput'
+import MainHashtagSelect from './MainHashtagSelect'
 
 interface TokenWithHashtags extends Token {
   hashtags: Hashtag[]
@@ -62,6 +65,22 @@ export default function TokenEditDrawer({
   const [showRejectConfirm, setShowRejectConfirm] = useState(false)
   const [rawJson, setRawJson] = useState<string>('')
   const [tagsArray, setTagsArray] = useState<string[]>([])
+  const [allHashtags, setAllHashtags] = useState<Hashtag[]>([])
+  const [selectedHashtagIds, setSelectedHashtagIds] = useState<string[]>([])
+  const [newHashtags, setNewHashtags] = useState<string[]>([])
+
+
+  const fetchAllHashtags = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/hashtags')
+      const data = await res.json()
+      if (res.ok) {
+        setAllHashtags(data)
+      }
+    } catch (err) {
+      console.error('Failed to fetch hashtags:', err)
+    }
+  }, [])
 
   const fetchToken = useCallback(async () => {
     if (isCreate || !tokenId) return
@@ -72,6 +91,7 @@ export default function TokenEditDrawer({
       if (res.ok) {
         setToken(data)
         setEditedToken(data)
+        setSelectedHashtagIds(data.hashtags?.map((h: Hashtag) => h.id) ?? [])
         if (data.raw_token?.raw_payload) {
           setRawJson(JSON.stringify(data.raw_token.raw_payload, null, 2))
           const tags =
@@ -87,6 +107,10 @@ export default function TokenEditDrawer({
       setLoading(false)
     }
   }, [tokenId, showToast, isCreate])
+
+  useEffect(() => {
+    fetchAllHashtags()
+  }, [fetchAllHashtags])
 
   useEffect(() => {
     if (!isCreate) {
@@ -121,6 +145,8 @@ export default function TokenEditDrawer({
           is_verified: editedToken.is_verified || false,
           main_hashtag: editedToken.main_hashtag || null,
           rating: editedToken.rating || null,
+          hashtags: selectedHashtagIds,
+          new_hashtags: newHashtags,
         }
 
         const res = await fetch('/api/admin/tokens', {
@@ -174,6 +200,18 @@ export default function TokenEditDrawer({
         if (field in editedToken && editedToken[field] !== token[field]) {
           body[field] = editedToken[field]
         }
+      }
+
+      const currentHashtagIds = token.hashtags.map((h) => h.id)
+      const hashtagsChanged =
+        selectedHashtagIds.length !== currentHashtagIds.length ||
+        selectedHashtagIds.some((id) => !currentHashtagIds.includes(id)) ||
+        currentHashtagIds.some((id) => !selectedHashtagIds.includes(id))
+      if (hashtagsChanged) {
+        body.hashtags = selectedHashtagIds
+      }
+      if (newHashtags.length > 0) {
+        body.new_hashtags = newHashtags
       }
 
       const res = await fetch(`/api/admin/tokens/${tokenId}`, {
@@ -327,8 +365,43 @@ export default function TokenEditDrawer({
     })
   }
 
+  const toggleHashtag = (hashtagId: string) => {
+    setSelectedHashtagIds((prev) =>
+      prev.includes(hashtagId) ? prev.filter((id) => id !== hashtagId) : [...prev, hashtagId]
+    )
+  }
+
+  const handleAddNewHashtag = (name: string) => {
+    if (newHashtags.includes(name)) return
+    if (allHashtags.some((h) => h.slug === name || h.name.toLowerCase() === name)) {
+      const existing = allHashtags.find(
+        (h) => h.slug === name || h.name.toLowerCase() === name
+      )
+      if (existing && !selectedHashtagIds.includes(existing.id)) {
+        setSelectedHashtagIds((prev) => [...prev, existing.id])
+      }
+      return
+    }
+    setNewHashtags((prev) => [...prev, name])
+  }
+
+  const handleRemoveNewHashtag = (name: string) => {
+    setNewHashtags((prev) => prev.filter((n) => n !== name))
+  }
+
   const currentToken = { ...token, ...editedToken } as TokenWithHashtags
   const exchangeLinks = editedToken.exchange_links ?? token?.exchange_links ?? []
+
+  const currentHashtags = [
+    ...allHashtags.filter((h) => selectedHashtagIds.includes(h.id)),
+    ...newHashtags.map((name, i) => ({
+      id: `new-${i}`,
+      name,
+      slug: name,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    })),
+  ]
 
   return (
     <div className="fixed inset-0 z-50 flex">
@@ -583,47 +656,23 @@ export default function TokenEditDrawer({
                 />
               </div>
 
-              {/* Hashtags - only show for existing tokens */}
-              {!isCreate && token && (
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                      Hashtags
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {token.hashtags.map((h) => (
-                        <span
-                          key={h.id}
-                          className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200 rounded text-xs"
-                        >
-                          {h.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+              <HashtagMultiSelect
+                allHashtags={allHashtags}
+                selectedIds={selectedHashtagIds}
+                onToggle={toggleHashtag}
+              />
 
-                  <div>
-                    <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                      Main Hashtag
-                    </label>
-                    <select
-                      value={token.hashtags.find((h) => h.slug === currentToken.main_hashtag)?.id ?? currentToken.main_hashtag ?? ''}
-                      onChange={(e) => {
-                        const tokenHashtag = token.hashtags.find((h) => h.id === e.target.value);
-                        if (tokenHashtag?.slug) updateField('main_hashtag', tokenHashtag?.slug);
-                      }}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                    >
-                      <option value="">Select main hashtag...</option>
-                      {token.hashtags.map((h) => (
-                        <option key={h.id} value={h.id}>
-                          {h.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </>
-              )}
+              <NewHashtagInput
+                newHashtags={newHashtags}
+                onAdd={handleAddNewHashtag}
+                onRemove={handleRemoveNewHashtag}
+              />
+
+              <MainHashtagSelect
+                availableHashtags={currentHashtags}
+                currentMainHashtag={currentToken.main_hashtag ?? null}
+                onChange={(slug) => updateField('main_hashtag', slug)}
+              />
 
               {/* Logo */}
               <div>

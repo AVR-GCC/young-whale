@@ -199,6 +199,46 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    const tokenId = data.id
+    const hashtagIds: string[] = body.hashtags ?? []
+    const newHashtagNames: string[] = body.new_hashtags ?? []
+
+    // Create new hashtags if provided
+    if (newHashtagNames.length > 0) {
+      const newHashtagData = newHashtagNames.map((name: string) => ({
+        slug: name.toLowerCase().replace(/\s+/g, '-'),
+        name: name,
+        is_active: true,
+      }))
+
+      const { data: createdHashtags, error: createError } = await supabaseService
+        .from('hashtags')
+        .insert(newHashtagData)
+        .select('id')
+
+      if (createError) {
+        console.error('Failed to create hashtags:', createError.message)
+      } else if (createdHashtags) {
+        hashtagIds.push(...createdHashtags.map((h: { id: string }) => h.id))
+      }
+    }
+
+    // Associate hashtags with token
+    if (hashtagIds.length > 0) {
+      const tokenHashtags = hashtagIds.map((hashtagId: string) => ({
+        token_id: tokenId,
+        hashtag_id: hashtagId,
+      }))
+
+      const { error: assocError } = await supabaseService
+        .from('token_hashtags')
+        .insert(tokenHashtags)
+
+      if (assocError) {
+        console.error('Failed to associate hashtags:', assocError.message)
+      }
+    }
+
     return NextResponse.json(data, { status: 201 })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
