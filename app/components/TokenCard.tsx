@@ -7,6 +7,7 @@ import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
 import type { ReactNode } from 'react'
 import { getCategoryColor } from '../lib/categories'
+import { CustomTooltip } from './CustomTooltip';
 
 function TimeSince({ date }: { date: string }) {
   const now = new Date()
@@ -201,9 +202,11 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
         className="flex items-center h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
       >
         {/* Token Logo */}
-        <div className="flex-shrink-0 relative block">
-          <TokenIcon name={token.name} logoUrl={token.logo_url} className="w-8 h-8 rounded-full border-2 border-white transition-transform hover:scale-105" />
-        </div>
+        <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
+          <div className="flex-shrink-0 relative block">
+            <TokenIcon name={token.name} logoUrl={token.logo_url} className="w-8 h-8 rounded-full border-2 border-white transition-transform hover:scale-105" />
+          </div>
+        </CustomTooltip>
 
         {/* Token Name */}
         <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
@@ -243,6 +246,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
         </div>
 
         {/* Rating */}
+        <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
         <div className="flex-shrink-0 flex items-center justify-center w-7 mr-1 sm:mr-2 ml-0 sm:ml-1 h-7">
           {isExpired ? (
             <svg
@@ -279,6 +283,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
             </div>
           )}
         </div>
+        </CustomTooltip>
 
         {/* Time */}
         <div className="w-[42px] md:w-[48px] text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0 text-[#94A3B8]">
