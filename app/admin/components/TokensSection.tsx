@@ -88,6 +88,7 @@ const CONFIDENCE_COLORS: Record<Confidence, string> = {
 
 const CATEGORY_COLORS: Record<TokenCategory, string> = {
   Presale: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  Airdrop: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   Tech: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
   Meme: 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
   RWA: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
