@@ -99,7 +99,7 @@ describe('TokenCard', () => {
 
   it('renders time since creation', () => {
     render(<TokenCard token={mockToken} />)
-    // Token created 5 days ago
+    // Token created 5 days ago (> 48h)
     expect(screen.getByText('5d')).toBeDefined()
   })
 
@@ -236,18 +236,35 @@ describe('TokenCard', () => {
   it('renders hours correctly', () => {
     const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
     render(<TokenCard token={hoursAgoToken} />)
-    expect(screen.getByText('4h')).toBeDefined()
+    // Within past 24h
+    expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders minutes correctly', () => {
     const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
     render(<TokenCard token={recentToken} />)
-    expect(screen.getByText('1m')).toBeDefined()
+    // Within past 24h
+    expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders seconds correctly', () => {
     const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
     render(<TokenCard token={secondsAgoToken} />)
-    expect(screen.getByText('1s')).toBeDefined()
+    // Within past 24h
+    expect(screen.getByText('TODAY')).toBeDefined()
+  })
+
+  it('renders 1D AGO for past 48h', () => {
+    const dayAgoToken = { ...mockToken, created_at: '2024-06-14T10:00:00Z' }
+    render(<TokenCard token={dayAgoToken} />)
+    // Between 24h and 48h ago shows TimeSince
+    expect(screen.getByText('1D AGO')).toBeDefined()
+  })
+
+  it('renders 2D AGO for past 72h', () => {
+    const dayAgoToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
+    render(<TokenCard token={dayAgoToken} />)
+    // Between 24h and 48h ago shows TimeSince
+    expect(screen.getByText('2d')).toBeDefined()
   })
 })

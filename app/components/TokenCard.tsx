@@ -173,9 +173,9 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
     return new Date(token.created_at) < oneDayAgo
   }, [token.created_at, now])
 
-  const isYesterday = useMemo(() => {
-    const twoDaysAgo = new Date(now - ONE_DAY * 2)
-    return new Date(token.created_at) < twoDaysAgo
+  const isBeforeYesterday = useMemo(() => {
+    const twoDaysAgo = new Date(now - (ONE_DAY * 2))
+    return new Date(token.created_at) < twoDaysAgo;
   }, [token.created_at, now])
 
   const themeColor = getCategoryColor(token.category);
@@ -183,7 +183,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
   if (isPromoted) {
     timeLabel = <>FEATURED</>;
   }
-  if (isYesterday) {
+  if (!isBeforeYesterday) {
     timeLabel = <>1D AGO</>;
   }
   if (!isExpired) {
