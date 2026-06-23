@@ -176,19 +176,29 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
   return (
     <div
       className={`
-        border-b border-zinc-200 dark:border-zinc-700 last:border-b-0
+        relative border-b border-zinc-200 dark:border-zinc-700 last:border-b-0
         transition-all duration-300 ease-in-out cursor-pointer
         ${isExpanded ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}
       `}
-      // onMouseEnter={expand}
-      // onMouseLeave={collapse}
+      style={{
+        borderColor: (isExpanded || isHovered) ? `${themeColor}20` : undefined,
+        boxShadow: (isExpanded || isHovered) ? `0 0 15px ${themeColor}10` : 'none'
+      }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={toggle}
     >
+      {/* 2px Left vertical laser locked-on guides (on hover) */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-0.5 z-10"
+        style={{
+          opacity: isHovered ? 1 : 0,
+          backgroundColor: themeColor
+        }}
+      />
       {/* Collapsed / Header row */}
       <div
         className="flex items-center h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Token Logo */}
         <div className="flex-shrink-0 relative block">
