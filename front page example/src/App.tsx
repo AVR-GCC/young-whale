@@ -1,24 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { INITIAL_TOKENS } from './data';
 import { PROMOTED_TOKENS } from './promotedData';
-import { TokenItem, SonarScoreType } from './types';
+import { TokenItem } from './types';
 import { TokenRowComponent } from './components/TokenRowComponent';
 import { SkeletonTokenRow } from './components/SkeletonTokenRow';
 import { CategoryBlock } from './components/CategoryBlock';
 import { 
-  Sparkles, 
-  Terminal, 
-  Filter, 
-  Orbit, 
-  Compass, 
-  CheckCircle,
-  TrendingUp,
-  Cpu,
-  Coins,
-  Shield,
-  Layers,
-  HelpCircle,
-  Info,
   Search
 } from 'lucide-react';
 import { CustomTooltip } from './components/CustomTooltip';
@@ -32,7 +19,6 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'cto'>('home');
   const [tokens, setTokens] = useState<TokenItem[]>(INITIAL_TOKENS);
   const [selectedToken, setSelectedToken] = useState<TokenItem | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(false);
 
   // Pagination limits for "View more" sectors (initially showing 5, clicking view more appends 5)
   const [techLimit, setTechLimit] = useState(5);
@@ -156,77 +142,6 @@ export default function App() {
   const promotedMemeList = PROMOTED_TOKENS.filter((t) => t.category === 'new-meme-coins');
   const promotedRwaList = PROMOTED_TOKENS.filter((t) => t.category === 'latest-rwa-tokens');
   const promotedPresaleList = PROMOTED_TOKENS.filter((t) => t.category === 'upcoming-presale');
-
-  // Interactive Live Injector to verify other token structures under four sectors
-  const handleAddNewSignal = (
-    category: 'new-tech-projects' | 'new-meme-coins' | 'latest-rwa-tokens' | 'upcoming-presale', 
-    scoreType: SonarScoreType
-  ) => {
-    playAudioFeedback('select');
-    const randomId = Math.random().toString(36).substr(2, 9);
-    
-    // Categorized structural templates (each brief restricted to max 6 words)
-    const templates: Record<typeof category, { name: string; desc: string; chain: string; icon: string; tags: string[] }> = {
-      'new-tech-projects': {
-        name: 'NeuralHedge',
-        desc: 'Sovereign mathematical core neural computation', // 5 words
-        chain: 'Ethereum',
-        icon: 'Zap',
-        tags: ['AI', 'Computing']
-      },
-      'new-meme-coins': {
-        name: 'HuskyVibe',
-        desc: 'Stylish dog avatar wearing sunglasses', // 5 words
-        chain: 'Solana',
-        icon: 'Flame',
-        tags: ['Meme', 'Organic']
-      },
-      'latest-rwa-tokens': {
-        name: 'SwissVault',
-        desc: 'Sovereign physical precious metal backing', // 5 words
-        chain: 'Base',
-        icon: 'Layers',
-        tags: ['Gold', 'Audit']
-      },
-      'upcoming-presale': {
-        name: 'ApexPortal',
-        desc: 'Hyper scale transaction bridge protocol', // 5 words
-        chain: 'Arbitrum',
-        icon: 'Cpu',
-        tags: ['DeFi', 'Bridge']
-      }
-    };
-
-    const block = templates[category];
-
-    const injectedRow: TokenItem = {
-      id: `${category}-${randomId}`,
-      name: `${block.name} #${Math.floor(Math.random() * 80 + 10)}`,
-      description: block.desc,
-      scoreType,
-      scoreValue: scoreType === 'expired' ? undefined : (scoreType === 'perfect' ? 9 : 8),
-      chain: block.chain,
-      chainIconName: block.icon,
-      time: 'today',
-      tags: block.tags,
-      category,
-      volume24h: scoreType === 'expired' ? 'Expired' : '$2.5M',
-      backing: 'Direct autonomous validator pool',
-      riskScore: scoreType === 'perfect' ? 'LOW' : 'MEDIUM',
-      curatorInsight: `An exceptional high-velocity project newly injected into the system directory. Confirmed responsive on OLED indicators.`,
-      socials: {
-        twitter: 'https://twitter.com',
-        website: 'https://youngwhale.io'
-      }
-    };
-
-    setTokens((prev) => [injectedRow, ...prev]);
-  };
-
-  const handleResetSignals = () => {
-    playAudioFeedback('select');
-    setTokens(INITIAL_TOKENS);
-  };
 
   if (currentView === 'cto') {
     return <CtoSpecs onBack={() => setCurrentView('home')} />;
