@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Oxanium:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import "tailwindcss";
+
+@layer base {
+  html, body, #root {
+    width: 100%;
+    max-width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: #0B0F19;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1E293B;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1E293B transparent;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  
+  @keyframes sonar-pulse {
+    0%, 100% {
+      opacity: 0.15;
+      box-shadow: 0 0 2px rgba(148,163,184,0.1);
+    }
+    50% {
+      opacity: 0.60;
+      box-shadow: 0 0 6px rgba(148,163,184,0.4);
+    }
+  }
+
+  /* Radar Ping Animation for the left signal bar */
+  @keyframes radarPing {
+    0% { box-shadow: 0 0 0 0 var(--hover-color, rgba(0,207,221,0.6)); }
+    70% { box-shadow: 0 0 0 12px rgba(0,207,221,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,207,221,0); }
+  }
+
+  .t10-row:hover .t10-sig {
+    animation: radarPing 1.8s ease-out infinite;
+  }
+
+  /* Scanline Sweep */
+  @keyframes scan {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  .t10-inner::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .t10-row:hover .t10-inner::after { 
+    animation: scan 0.8s linear forwards; 
+    opacity: 1;
+  }
+
+  /* CRT Overlay/Noise background utility */
+  .crt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 8px 8px;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+
+@theme {
+  --font-sans: "Outfit", sans-serif;
+  --font-oxanium: "Oxanium", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-mono: "Space Mono", "JetBrains Mono", monospace;
+  
+  --color-whale-bg: #0B0F19;
+  --color-whale-nav: #070A10;
+  --color-whale-card: #131A26;
+  --color-whale-border: #1E293B;
+  --color-whale-hover: #1C2536;
+  --color-whale-text-primary: #F8FAFC;
+  --color-whale-text-secondary: #94A3B8;
+  
+  --color-electric-violet: #B026FF;
+  --color-neon-mint: #00FA9A;
+  --color-sonar-cyan: #00E5D2;
+}
+

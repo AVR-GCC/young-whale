@@ -8,7 +8,7 @@
 // Enums
 // ---------------------------
 
-export type TokenCategory = 'Presale' | 'Tech' | 'Meme' | 'RWA'
+export type TokenCategory = 'Presale' | 'Tech' | 'Meme' | 'RWA' | 'Airdrop'
 
 export type TokenStatus = 'approved' | 'pending_review' | 'rejected'
 
