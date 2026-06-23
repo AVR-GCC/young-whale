@@ -202,7 +202,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
       >
         {/* Token Logo */}
         <div className="flex-shrink-0 relative block">
-          <TokenIcon name={token.name} logoUrl={token.logo_url} className="w-8 h-8" />
+          <TokenIcon name={token.name} logoUrl={token.logo_url} className="w-8 h-8 rounded-full border-2 border-white transition-transform hover:scale-105" />
         </div>
 
         {/* Token Name */}
