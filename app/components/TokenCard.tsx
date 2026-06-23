@@ -179,8 +179,8 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
         transition-all duration-300 ease-in-out cursor-pointer
         ${isExpanded ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}
       `}
-      onMouseEnter={expand}
-      onMouseLeave={collapse}
+      // onMouseEnter={expand}
+      // onMouseLeave={collapse}
       onClick={toggle}
     >
       {/* Collapsed / Header row */}
@@ -248,7 +248,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
               style={{
                 borderColor: isPromoted ? 'rgba(255, 255, 255, 0.2)' : (isExpired ? '#FFD700' : '#FFFFFF'),
                 color: isPromoted ? 'rgba(255, 255, 255, 0.3)' : (isExpired ? '#FFD700' : '#FFFFFF'),
-                boxShadow: (!isPromoted && token.rating && token.rating >= 85) ? `0 0 12px ${themeColor}40` : (isHovered && !isPromoted ? `0 0 10px ${themeColor}60` : 'none'),
+                boxShadow: (!isPromoted && token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered && !isPromoted ? `0 0 10px ${themeColor}60` : 'none'),
               }}
             >
               {isPromoted ? (
@@ -256,7 +256,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                   <path d="M12 2v10" />
                   <path d="M12 22a9 9 0 0 0 9-9c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9z" />
                 </svg>
-              ) : (token.rating !== undefined ? token.rating : '★')}
+              ) : (isExpired ? '★' : token.rating)}
             </div>
           )}
         </div>
