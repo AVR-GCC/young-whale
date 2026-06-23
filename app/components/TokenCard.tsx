@@ -6,6 +6,7 @@ const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000
 import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
 import type { ReactNode } from 'react'
+import { getCategoryColor } from '../lib/categories'
 
 function TimeSince({ date }: { date: string }) {
   const now = new Date()
@@ -154,13 +155,13 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
     setIsExpanded(prev => !prev);
   }, []);
 
-  const expand = useCallback(() => {
-    setIsExpanded(true);
-  }, []);
-
-  const collapse = useCallback(() => {
-    setIsExpanded(false);
-  }, []);
+  // const expand = useCallback(() => {
+  //   setIsExpanded(true);
+  // }, []);
+  //
+  // const collapse = useCallback(() => {
+  //   setIsExpanded(false);
+  // }, []);
 
   const socialEntries = Object.entries(token.social_links).filter(([, url]) => url)
 
@@ -170,7 +171,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
     const fiveDaysAgo = new Date(now - FIVE_DAYS_MS)
     return new Date(token.created_at) < fiveDaysAgo
   }, [token.created_at, now])
-  const themeColor = '#00F0FF'
+  const themeColor = getCategoryColor(token.category);
 
   return (
     <div
@@ -216,7 +217,15 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
             <button
               key={hashtag.id}
               type="button"
-              className="text-[9px] font-mono font-semibold tracking-wider uppercase text-[#94A3B8] bg-[#2A3441] rounded-[4px] px-1.5 py-0.5 truncate transition-colors focus:outline-none hover:bg-[#00F0FF] hover:text-[#0B0F19]"
+              className="text-[9px] font-mono font-semibold tracking-wider uppercase text-[#94A3B8] bg-[#2A3441] rounded-[4px] px-1.5 py-0.5 truncate transition-colors focus:outline-none"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = themeColor;
+                e.currentTarget.style.color = '#0B0F19';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#2A3441';
+                e.currentTarget.style.color = '#94A3B8';
+              }}
             >
               #{hashtag.name}
             </button>
