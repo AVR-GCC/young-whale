@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Oxanium:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import "tailwindcss";
 
 @layer base {
@@ -105,10 +104,10 @@
 
 
 @theme {
-  --font-sans: "Outfit", sans-serif;
-  --font-oxanium: "Oxanium", sans-serif;
-  --font-outfit: "Outfit", sans-serif;
-  --font-mono: "Space Mono", "JetBrains Mono", monospace;
+  --font-sans: var(--font-outfit), sans-serif;
+  --font-oxanium: var(--font-oxanium), sans-serif;
+  --font-outfit: var(--font-outfit), sans-serif;
+  --font-mono: var(--font-space-mono), var(--font-jetbrains-mono), monospace;
   
   --color-whale-bg: #0B0F19;
   --color-whale-nav: #070A10;
