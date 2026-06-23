@@ -1,6 +1,8 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
+
+const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000
 import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
 import type { ReactNode } from 'react'
@@ -118,7 +120,7 @@ function ExchangeIcon({ url }: { url: string }) {
   )
 }
 
-function TokenIcon({ name, logoUrl }: { name: string; logoUrl: string | null }) {
+function TokenIcon({ name, logoUrl, className = "w-10 h-10" }: { name: string; logoUrl: string | null; className?: string }) {
   const [imageError, setImageError] = useState(false)
 
   if (logoUrl && !imageError) {
@@ -128,7 +130,7 @@ function TokenIcon({ name, logoUrl }: { name: string; logoUrl: string | null }) 
         alt={`${name} icon`}
         width={40}
         height={40}
-        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        className={`${className} rounded-full object-cover flex-shrink-0`}
         onError={() => setImageError(true)}
         unoptimized
       />
@@ -136,7 +138,7 @@ function TokenIcon({ name, logoUrl }: { name: string; logoUrl: string | null }) 
   }
 
   return (
-    <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0">
+    <div className={`${className} rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0`}>
       <span className="text-sm font-bold text-zinc-600 dark:text-zinc-300">
         {name.slice(0, 2).toUpperCase()}
       </span>
@@ -146,6 +148,7 @@ function TokenIcon({ name, logoUrl }: { name: string; logoUrl: string | null }) 
 
 export default function TokenCard({ token }: { token: TokenWithHashtags }) {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
   const toggle = useCallback(() => {
     setIsExpanded(prev => !prev);
@@ -161,6 +164,14 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
 
   const socialEntries = Object.entries(token.social_links).filter(([, url]) => url)
 
+  const isPromoted = false
+  const [now] = useState(() => Date.now())
+  const isExpired = useMemo(() => {
+    const fiveDaysAgo = new Date(now - FIVE_DAYS_MS)
+    return new Date(token.created_at) < fiveDaysAgo
+  }, [token.created_at, now])
+  const themeColor = '#00F0FF'
+
   return (
     <div
       className={`
@@ -173,19 +184,85 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
       onClick={toggle}
     >
       {/* Collapsed / Header row */}
-      <div className="flex items-center justify-between p-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <TokenIcon name={token.name} logoUrl={token.logo_url} />
-          <div className="min-w-0">
-            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-              {token.name}
-            </h4>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">
-              {token.short_description}
-            </p>
-          </div>
+      <div
+        className="flex items-center h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Token Logo */}
+        <div className="flex-shrink-0 relative block">
+          <TokenIcon name={token.name} logoUrl={token.logo_url} className="w-8 h-8" />
         </div>
-        <div className="flex-shrink-0 ml-4 text-sm text-zinc-400 dark:text-zinc-500">
+
+        {/* Token Name */}
+        <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
+          {token.name}
+        </span>
+
+        {/* Description */}
+        <div
+          className="flex-grow min-w-0 overflow-hidden text-[11px] text-[#CBD5E1] font-normal whitespace-nowrap text-left ml-1.5 md:ml-2 mr-1 md:mr-2"
+          style={{
+            WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)',
+            maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)'
+          }}
+        >
+          {token.short_description}
+        </div>
+
+        {/* Hashtag */}
+        <div className="hidden sm:block flex-shrink-0 mr-1 sm:mr-2">
+          {token.hashtags.slice(0, 1).map((hashtag) => (
+            <button
+              key={hashtag.id}
+              type="button"
+              className="text-[9px] font-mono font-semibold tracking-wider uppercase text-[#94A3B8] bg-[#2A3441] rounded-[4px] px-1.5 py-0.5 truncate transition-colors focus:outline-none hover:bg-[#00F0FF] hover:text-[#0B0F19]"
+            >
+              #{hashtag.name}
+            </button>
+          ))}
+        </div>
+
+        {/* Rating */}
+        <div className="flex-shrink-0 flex items-center justify-center w-7 mr-1 sm:mr-2 ml-0 sm:ml-1 h-7">
+          {isExpired ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="w-4 h-4 text-white/40 transition-colors"
+            >
+              <path d="M5 22h14" />
+              <path d="M5 2h14" />
+              <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+              <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+              <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
+            </svg>
+          ) : (
+            <div
+              className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered && !isPromoted ? 'scale-105' : ''}`}
+              style={{
+                borderColor: isPromoted ? 'rgba(255, 255, 255, 0.2)' : (isExpired ? '#FFD700' : '#FFFFFF'),
+                color: isPromoted ? 'rgba(255, 255, 255, 0.3)' : (isExpired ? '#FFD700' : '#FFFFFF'),
+                boxShadow: (!isPromoted && token.rating && token.rating >= 85) ? `0 0 12px ${themeColor}40` : (isHovered && !isPromoted ? `0 0 10px ${themeColor}60` : 'none'),
+              }}
+            >
+              {isPromoted ? (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
+                  <path d="M12 2v10" />
+                  <path d="M12 22a9 9 0 0 0 9-9c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9z" />
+                </svg>
+              ) : (token.rating !== undefined ? token.rating : '★')}
+            </div>
+          )}
+        </div>
+
+        {/* Time */}
+        <div className="w-[42px] md:w-[48px] text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0 text-[#94A3B8]">
           <TimeSince date={token.created_at} />
         </div>
       </div>
