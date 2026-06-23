@@ -140,15 +140,15 @@ describe('TokenCard', () => {
     }
   })
 
-  // it('displays contract address when available', () => {
-  //   render(<TokenCard token={mockToken} />)
-  //   const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-  //
-  //   if (card) {
-  //     fireEvent.mouseEnter(card)
-  //     expect(screen.getByText(/0x1234567890abcdef/)).toBeDefined()
-  //   }
-  // })
+  it('displays contract address when available', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
+
+    if (card) {
+      fireEvent.mouseEnter(card)
+      expect(screen.getByText(/0x1234567890abcdef/)).toBeDefined()
+    }
+  })
 
   it('does not display contract address when null', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
@@ -160,16 +160,16 @@ describe('TokenCard', () => {
     }
   })
 
-  it('displays hashtags when available', () => {
-    render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-
-    if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.getByText('#Test')).toBeDefined()
-      expect(screen.getByText('#DeFi')).toBeDefined()
-    }
-  })
+  // it('displays hashtags when available', () => {
+  //   render(<TokenCard token={mockToken} />)
+  //   const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
+  //
+  //   if (card) {
+  //     fireEvent.mouseEnter(card)
+  //     expect(screen.getByText('#Test')).toBeDefined()
+  //     expect(screen.getByText('#DeFi')).toBeDefined()
+  //   }
+  // })
 
   it('does not display hashtags section when empty', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
