@@ -130,11 +130,11 @@ function getExplorerLink(chain: string, address: string | null) {
   }
 }
 
-function getPairsList(symbol: string, exchangeLinks: string[]) {
+function getPairsList(exchangeLinks: string[]) {
   return exchangeLinks.map(str => {
     try {
-      const [quote, url] = str.split('_');
-      const name = `${symbol}/${quote}`;
+      const [base, quote, url] = str.split('_');
+      const name = `${base}/${quote}`;
       return { url, name }
     } catch {
       return { url: str, name: 'Exchange' }
@@ -340,7 +340,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
           {(() => {
             const explorer = getExplorerLink(token.chain, token.contract_address);
             const symbol = token.symbol;
-            const pairs = getPairsList(symbol, token.exchange_links);
+            const pairs = getPairsList(token.exchange_links);
             const socials = token.social_links;
 
             return (

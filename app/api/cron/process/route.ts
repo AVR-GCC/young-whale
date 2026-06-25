@@ -226,12 +226,12 @@ async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
     if (!response.ok) return []
 
     const data = (await response.json()) as {
-      pairs?: Array<{ url: string, quoteToken: { symbol: string } }>
+      pairs?: Array<{ url: string, baseToken: { symbol: string }, quoteToken: { symbol: string } }>
     }
 
     if (!data.pairs || data.pairs.length === 0) return []
 
-    const urls = data.pairs.map((pair) => `${pair.quoteToken.symbol}_${pair.url}`)
+    const urls = data.pairs.map((pair) => `${pair.baseToken.symbol}_${pair.quoteToken.symbol}_${pair.url}`)
     return [...new Set(urls)]
   } catch {
     return []
