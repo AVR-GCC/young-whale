@@ -505,7 +505,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                             <span className="text-[14px] font-mono text-white/90">
                               [ {explorer.label} ]
                             </span>
-                            <CopyButton text={explorer.rawAddress} />
+                            <CopyButton address={explorer.rawAddress} />
                           </div>
                         </div>
 
