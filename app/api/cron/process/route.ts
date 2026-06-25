@@ -132,6 +132,7 @@ async function processJob(
     is_promoted: false,
     is_verified: false,
     main_hashtag: aiResult.main_hashtag,
+    supply: raw.supply,
   }
 
   await supabaseService

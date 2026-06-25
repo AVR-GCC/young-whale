@@ -521,7 +521,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                           </div>
                           <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-[14px] border-l border-white/5 content-start">
                             <span className="text-[14px] font-mono text-white/90">
-                              1,000,000,000 {symbol.toUpperCase()}
+                              {token.supply} {symbol.toUpperCase()}
                             </span>
                           </div>
                         </div>

@@ -82,6 +82,7 @@ function mapCmcToRawToken(listing: {
   symbol: string
   date_added: string
   quote?: { USD?: { price?: number } }
+  total_supply: number
 }, details: {
   name: string
   symbol: string
@@ -144,6 +145,7 @@ function mapCmcToRawToken(listing: {
       cmc_details: details,
     },
     status: 'pending' as const,
+    supply: listing.total_supply,
   }
 }
 
