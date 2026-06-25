@@ -71,7 +71,7 @@ export default function CategoryContainer({
       </div>
 
       {/* Token list - height of exactly 5 tokens with scroll */}
-      <div className="flex-1 overflow-y-auto max-h-[400px] min-h-[400px]">
+      <div className="flex-1 overflow-y-auto min-h-[400px]">
         <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {tokens.length === 0 ? (
             <div className="p-4 text-sm text-zinc-500 dark:text-zinc-400 text-center">
