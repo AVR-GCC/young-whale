@@ -11,11 +11,8 @@ import { Compass, Zap } from 'lucide-react';
 const ONE_DAY = 24 * 60 * 60 * 1000
 
 /*
- * live
  * exchange currencies
- * copy text not icon
  * real supply
- * Sonar score design
  * */
 function TimeSince({ date }: { date: string }) {
   const now = new Date()
@@ -42,37 +39,21 @@ function TimeSince({ date }: { date: string }) {
   return <span>{value}{unit}</span>
 }
 
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(text)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch {
-      console.error('Failed to copy to clipboard')
-    }
-  }, [text])
-
+const CopyButton = ({ address }: { address: string }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(address);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   return (
-    <button
-      onClick={handleCopy}
-      className="ml-2 p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-      title="Copy to clipboard"
-    >
-      {copied ? (
-        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      ) : (
-        <svg className="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
-      )}
+    <button onClick={handleCopy} className={`text-[12px] font-bold tracking-wider uppercase transition-colors cursor-pointer px-1.5 py-0.5 rounded ${copied ? 'text-[#00E5D2] bg-[#00E5D2]/10' : 'text-[#CBD5E1] hover:text-white hover:bg-white/5'}`}>
+      [ {copied ? 'COPIED ✓' : 'COPY'} ]
     </button>
-  )
-}
+  );
+};
+
 
 function SocialIcon({ type, url }: { type: string; url: string }) {
   const icons: Record<string, ReactNode> = {
