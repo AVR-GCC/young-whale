@@ -18,12 +18,12 @@ const mockToken: TokenWithHashtags = {
   logo_storage_path: null,
   website_url: 'https://testtoken.example',
   social_links: {
-    twitter: 'https://twitter.com/testtoken',
-    telegram: 'https://t.me/testtoken',
-    discord: 'https://discord.gg/testtoken',
-    facebook: 'https://facebook.com/testtoken',
+    twitter: ['https://twitter.com/testtoken'],
+    telegram: ['https://t.me/testtoken'],
+    discord: ['https://discord.gg/testtoken'],
+    facebook: ['https://facebook.com/testtoken'],
   },
-  exchange_links: ['https://uniswap.org', 'https://binance.com'],
+  exchange_links: ['ETH_USDT_https://uniswap.org', 'TEST_BNB_https://binance.com'],
   preferred_exchange: 'Uniswap',
   start_date: null,
   end_date: null,
@@ -36,6 +36,7 @@ const mockToken: TokenWithHashtags = {
   is_verified: true,
   main_hashtag: 'Test',
   rating: 4.5,
+  supply: 1000000,
   created_at: '2024-06-10T10:00:00Z',
   updated_at: '2024-06-10T10:00:00Z',
   hashtags: [
@@ -72,6 +73,7 @@ const mockTokenNoOptional: TokenWithHashtags = {
   is_verified: false,
   main_hashtag: null,
   rating: 0,
+  supply: null,
   created_at: '2024-06-09T10:00:00Z',
   updated_at: '2024-06-09T10:00:00Z',
   hashtags: [],
@@ -87,9 +89,10 @@ describe('TokenCard', () => {
     vi.useRealTimers()
   })
 
-  it('renders token name and symbol', () => {
+  it('renders token name in header', () => {
     render(<TokenCard token={mockToken} />)
-    expect(screen.getByText('TestToken')).toBeDefined()
+    const names = screen.getAllByText('TestToken')
+    expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders short description when available', () => {
@@ -97,117 +100,201 @@ describe('TokenCard', () => {
     expect(screen.getByText('A test token for testing')).toBeDefined()
   })
 
-  it('renders time since creation', () => {
+  it('renders time since creation for expired tokens', () => {
     render(<TokenCard token={mockToken} />)
-    // Token created 5 days ago (> 48h)
+    // Token created 5 days ago (> 48h), so it shows TimeSince value
     expect(screen.getByText('5d')).toBeDefined()
   })
 
   it('renders with minimal data (no optional fields)', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
-    expect(screen.getByText('MinimalToken')).toBeDefined()
+    const names = screen.getAllByText('MinimalToken')
+    expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows initials when no logo_url', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
-    expect(screen.getByText('MI')).toBeDefined()
+    const initials = screen.getAllByText('MI')
+    expect(initials.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('expands on mouse enter', () => {
+  it('shows token logo when logo_url is provided', () => {
     render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
+    const imgs = screen.getAllByAltText('TestToken icon')
+    expect(imgs.length).toBeGreaterThanOrEqual(1)
+    expect(imgs[0].getAttribute('src')).toBe('https://example.com/logo.png')
+  })
+
+  it('expands on click', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
     expect(card).toBeDefined()
 
     if (card) {
-      fireEvent.mouseEnter(card)
+      fireEvent.click(card)
+      expect(screen.getByText('YOUNGWHALE TERMINAL')).toBeDefined()
+    }
+  })
+
+  it('collapses on second click', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('YOUNGWHALE TERMINAL')).toBeDefined()
+
+      fireEvent.click(card)
+      // After collapse, the terminal should still be in DOM but hidden
+      // In jsdom, max-h-0 doesn't remove from DOM, so we check it's still there
+      expect(screen.getByText('YOUNGWHALE TERMINAL')).toBeDefined()
+    }
+  })
+
+  it('displays full description in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('WHALE INTELLIGENCE BRIEF')).toBeDefined()
       expect(screen.getByText('This is the full description of the test token with more details.')).toBeDefined()
     }
   })
 
-  it('collapses on mouse leave', () => {
-    render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-
-    if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.getByText('This is the full description of the test token with more details.')).toBeDefined()
-
-      fireEvent.mouseLeave(card)
-      // After collapse, the description should be hidden (max-h-0)
-      const description = screen.queryByText('This is the full description of the test token with more details.')
-      // Note: In jsdom, the element might still be in the DOM but hidden
-      expect(description).toBeDefined()
-    }
-  })
-
-  it('displays contract address when available', () => {
-    render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-
-    if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.getByText(/0x1234567890abcdef/)).toBeDefined()
-    }
-  })
-
-  it('does not display contract address when null', () => {
+  it('displays fallback description when full_description is null', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
-    const card = screen.getByText('MinimalToken').closest('div[class*="cursor-pointer"]')?.parentElement
+    const names = screen.getAllByText('MinimalToken')
+    const card = names[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.queryByText('Contract:')).toBeNull()
+      fireEvent.click(card)
+      expect(screen.getByText('No description available.')).toBeDefined()
     }
   })
 
-  // it('displays hashtags when available', () => {
-  //   render(<TokenCard token={mockToken} />)
-  //   const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-  //
-  //   if (card) {
-  //     fireEvent.mouseEnter(card)
-  //     expect(screen.getByText('#Test')).toBeDefined()
-  //     expect(screen.getByText('#DeFi')).toBeDefined()
-  //   }
-  // })
-
-  it('does not display hashtags section when empty', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
-    const card = screen.getByText('MinimalToken').closest('div[class*="cursor-pointer"]')?.parentElement
-
-    if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.queryByText('#Test')).toBeNull()
-    }
-  })
-
-  it('displays social links when available', () => {
+  it('displays contract address in expanded view', () => {
     render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.getByText('Socials:')).toBeDefined()
+      fireEvent.click(card)
+      // Contract is shown as "0x1234...5678" in the explorer label
+      expect(screen.getByText(/0x1234/)).toBeDefined()
     }
   })
 
-  it('displays exchange links when available', () => {
-    render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
-
-    if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.getByText('Buy on:')).toBeDefined()
-    }
-  })
-
-  it('does not display exchange links when empty', () => {
+  it('displays N/A when contract address is null', () => {
     render(<TokenCard token={mockTokenNoOptional} />)
-    const card = screen.getByText('MinimalToken').closest('div[class*="cursor-pointer"]')?.parentElement
+    const names = screen.getAllByText('MinimalToken')
+    const card = names[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
-      fireEvent.mouseEnter(card)
-      expect(screen.queryByText('Buy on:')).toBeNull()
+      fireEvent.click(card)
+      // N/A is rendered as "[ N/A ]" with brackets, use custom matcher
+      expect(screen.getByText((content) => content.includes('N/A'))).toBeDefined()
+    }
+  })
+
+  it('displays hashtags in collapsed view', () => {
+    render(<TokenCard token={mockToken} />)
+    expect(screen.getByText('#Test')).toBeDefined()
+  })
+
+  it('does not display hashtags when empty', () => {
+    render(<TokenCard token={mockTokenNoOptional} />)
+    expect(screen.queryByText('#Test')).toBeNull()
+  })
+
+  it('displays social links in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText(/x.com/)).toBeDefined()
+      expect(screen.getByText(/t.me/)).toBeDefined()
+      expect(screen.getByText('discord')).toBeDefined()
+      expect(screen.getByText('facebook')).toBeDefined()
+    }
+  })
+
+  it('displays website url in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('testtoken.example')).toBeDefined()
+    }
+  })
+
+  it('does not display social links section when empty', () => {
+    render(<TokenCard token={mockTokenNoOptional} />)
+    const names = screen.getAllByText('MinimalToken')
+    const card = names[0].closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.queryByText(/x.com/)).toBeNull()
+      expect(screen.queryByText(/t.me/)).toBeNull()
+    }
+  })
+
+  it('displays exchange links in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('[ETH/USDT]')).toBeDefined()
+      expect(screen.getByText('[TEST/BNB]')).toBeDefined()
+    }
+  })
+
+  it('displays no pairs message when exchange links are empty', () => {
+    render(<TokenCard token={mockTokenNoOptional} />)
+    const names = screen.getAllByText('MinimalToken')
+    const card = names[0].closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('[NO PAIRS FOUND]')).toBeDefined()
+    }
+  })
+
+  it('displays supply in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      // Supply is rendered as "1000000 TEST" which may be split across text nodes
+      expect(screen.getByText((content) => content.includes('1000000'))).toBeDefined()
+    }
+  })
+
+  it('displays rating in expanded view', () => {
+    // Use a recent token so it's not expired
+    const recentToken = { ...mockToken, created_at: '2024-06-15T10:00:00Z' }
+    render(<TokenCard token={recentToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('4.5/10')).toBeDefined()
+    }
+  })
+
+  it('displays expired rating for old tokens', () => {
+    render(<TokenCard token={mockToken} />)
+    // Token is 5 days old, so rating should show expired icon (★) in header
+    // In expanded view, it shows [ SIGNAL EXPIRED ]
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('[ SIGNAL EXPIRED ]')).toBeDefined()
     }
   })
 
@@ -220,51 +307,132 @@ describe('TokenCard', () => {
     })
 
     render(<TokenCard token={mockToken} />)
-    const card = screen.getByText('TestToken').closest('div[class*="cursor-pointer"]')?.parentElement
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
-      fireEvent.mouseEnter(card)
+      fireEvent.click(card)
 
-      // Find the copy button by its title
-      const copyButton = screen.getByTitle('Copy to clipboard')
+      // Find the copy button by text - text is "[ COPY ]" but may be split
+      const copyButton = screen.getByText((content) => content.includes('COPY'))
       fireEvent.click(copyButton)
 
       expect(clipboardWriteText).toHaveBeenCalledWith(mockToken.contract_address)
     }
   }, 10000)
 
-  it('renders hours correctly', () => {
-    const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
-    render(<TokenCard token={hoursAgoToken} />)
-    // Within past 24h
-    expect(screen.getByText('TODAY')).toBeDefined()
+  it('shows copied state after clicking copy button', async () => {
+    const clipboardWriteText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, {
+      clipboard: {
+        writeText: clipboardWriteText,
+      },
+    })
+
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      const copyButton = screen.getByText((content) => content.includes('COPY'))
+      fireEvent.click(copyButton)
+      expect(screen.getByText((content) => content.includes('COPIED'))).toBeDefined()
+    }
   })
 
-  it('renders minutes correctly', () => {
-    const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
+  it('renders TODAY for tokens created within 24 hours', () => {
+    const recentToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
     render(<TokenCard token={recentToken} />)
-    // Within past 24h
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
-  it('renders seconds correctly', () => {
-    const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
-    render(<TokenCard token={secondsAgoToken} />)
-    // Within past 24h
-    expect(screen.getByText('TODAY')).toBeDefined()
-  })
-
-  it('renders 1D AGO for past 48h', () => {
+  it('renders 1D AGO for tokens created between 24-48 hours ago', () => {
     const dayAgoToken = { ...mockToken, created_at: '2024-06-14T10:00:00Z' }
     render(<TokenCard token={dayAgoToken} />)
-    // Between 24h and 48h ago shows TimeSince
     expect(screen.getByText('1D AGO')).toBeDefined()
   })
 
-  it('renders 2D AGO for past 72h', () => {
-    const dayAgoToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
-    render(<TokenCard token={dayAgoToken} />)
-    // Between 24h and 48h ago shows TimeSince
+  it('renders TimeSince for tokens older than 48 hours', () => {
+    const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
+    render(<TokenCard token={oldToken} />)
     expect(screen.getByText('2d')).toBeDefined()
+  })
+
+  it('renders hours correctly for recent tokens', () => {
+    const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
+    render(<TokenCard token={hoursAgoToken} />)
+    // Within past 24h shows TODAY
+    expect(screen.getByText('TODAY')).toBeDefined()
+  })
+
+  it('renders minutes correctly for very recent tokens', () => {
+    const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
+    render(<TokenCard token={recentToken} />)
+    // Within past 24h shows TODAY
+    expect(screen.getByText('TODAY')).toBeDefined()
+  })
+
+  it('renders seconds correctly for just created tokens', () => {
+    const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
+    render(<TokenCard token={secondsAgoToken} />)
+    // Within past 24h shows TODAY
+    expect(screen.getByText('TODAY')).toBeDefined()
+  })
+
+  it('displays chain badge in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(screen.getByText('Ethereum')).toBeDefined()
+    }
+  })
+
+  it('displays symbol in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      // $TEST appears multiple times in the expanded view
+      const symbols = screen.getAllByText('$TEST')
+      expect(symbols.length).toBeGreaterThanOrEqual(1)
+    }
+  })
+
+  it('applies hover styles on mouse enter', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.mouseEnter(card)
+      // Check that the left border indicator is visible
+      // The component sets opacity to 1 on hover
+      expect(card.getAttribute('style')).toContain('box-shadow')
+    }
+  })
+
+  it('displays explorer link for different chains', () => {
+    const bscToken = { ...mockToken, chain: 'BSC' }
+    render(<TokenCard token={bscToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      // The contract address is displayed as text (not a link), with format "0x1234...5678"
+      expect(screen.getByText((content) => content.includes('0x1234'))).toBeDefined()
+    }
+  })
+
+  it('displays share to X link in expanded view', () => {
+    render(<TokenCard token={mockToken} />)
+    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      const links = screen.getAllByRole('link')
+      const twitterLink = links.find(link => link.getAttribute('href')?.includes('twitter.com/intent/tweet'))
+      expect(twitterLink).toBeDefined()
+    }
   })
 })
