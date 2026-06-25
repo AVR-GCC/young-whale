@@ -61,6 +61,7 @@ export interface RawToken {
   source_type: 'coinbase' | 'dex' | null
   source_url: string | null
   raw_payload: Record<string, unknown> | null
+  supply: number | null
   status: 'pending' | 'processing' | 'processed' | 'failed'
   retry_count: number
   error_message: string | null
@@ -103,6 +104,7 @@ export interface Token {
   is_verified: boolean
   main_hashtag: string | null
   rating: number
+  supply: number | null
   created_at: string
   updated_at: string
 }
