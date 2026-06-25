@@ -451,7 +451,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                       <>
                         {/* Socials Section */}
                         <div className="flex items-start px-1 leading-snug transition-colors group relative">
-                          <div className="flex shrink-0 min-w-[160px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+                          <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                             <div className="flex items-center">
                               <span>${symbol.toUpperCase()}</span>
                               <span>@</span>
@@ -491,7 +491,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
 
                         {/* Trade Row */}
                         <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-                          <div className="flex shrink-0 min-w-[160px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+                          <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                             <div className="flex items-center">
                               <span>${symbol.toUpperCase()}</span>
                               <span>@</span>
@@ -512,7 +512,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
 
                         {/* Contract Row */}
                         <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-                          <div className="flex shrink-0 min-w-[160px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+                          <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                             <div className="flex items-center">
                               <span>${symbol.toUpperCase()}</span>
                               <span>@</span>
@@ -530,7 +530,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
 
                         {/* Supply Row */}
                         <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-                          <div className="flex shrink-0 min-w-[160px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+                          <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                             <div className="flex items-center">
                               <span>${symbol.toUpperCase()}</span>
                               <span>@</span>
@@ -547,11 +547,11 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
 
                         {/* Cursor */}
                         <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
-                          <div className="flex shrink-0 min-w-[160px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+                          <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                             <div className="flex items-center">
                               <span>${symbol.toUpperCase()}</span>
                               <span>@</span>
-                              <span className="tracking-wide font-bold">score</span>
+                              <span className="tracking-wide font-bold">Sonar Score</span>
                               <span className="mr-1 font-bold">:</span>
                             </div>
                           </div>
