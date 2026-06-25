@@ -128,7 +128,7 @@ async function processJob(
     source_url: raw.source_url,
     confidence: aiResult.confidence as Confidence,
     raw_token_id: raw.id,
-    status: aiResult.confidence === 'low' ? 'pending_review' : 'approved' as const,
+    status: 'pending_review' as const,
     is_promoted: false,
     is_verified: false,
     main_hashtag: aiResult.main_hashtag,
