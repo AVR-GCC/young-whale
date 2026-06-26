@@ -110,20 +110,20 @@ function mapCmcToRawToken(listing: {
 }) {
   const primaryContract = details.contract_address?.[0]
 
-  const socialLinks: Record<string, string[]> = {}
-  if (details.urls.facebook?.length) socialLinks.facebook = details.urls.facebook
-  if (details.urls.reddit?.length) socialLinks.reddit = details.urls.reddit
-  if (details.urls.twitter?.length) socialLinks.twitter = details.urls.twitter
-  if (details.urls.telegram?.length) socialLinks.telegram = details.urls.telegram
+  const socialLinks: Record<string, string> = {}
+  if (details.urls.facebook?.length) socialLinks.facebook = details.urls.facebook[0]
+  if (details.urls.reddit?.length) socialLinks.reddit = details.urls.reddit[0]
+  if (details.urls.twitter?.length) socialLinks.twitter = details.urls.twitter[0]
+  if (details.urls.telegram?.length) socialLinks.telegram = details.urls.telegram[0]
 
   if (details.urls.chat?.length) {
     if (!socialLinks.telegram) {
       const telegramUrls = details.urls.chat.filter((url) => url.includes('t.me/'))
-      if (telegramUrls.length) socialLinks.telegram = telegramUrls
+      if (telegramUrls.length) socialLinks.telegram = telegramUrls[0]
     }
 
     const discordUrls = details.urls.chat.filter((url) => url.includes('discord.gg/'))
-    if (discordUrls.length) socialLinks.discord = discordUrls
+    if (discordUrls.length) socialLinks.discord = discordUrls[0]
   }
   const chain = primaryContract?.platform?.name ?? '';
   const contract_address = primaryContract?.contract_address ?? '';

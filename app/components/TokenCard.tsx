@@ -447,22 +447,22 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                               </a>
                             )}
                             {socials.twitter && (
-                              <a href={socials.twitter[0]} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                                x.com/{socials.twitter[0].replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
+                              <a href={socials.twitter} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                                x.com/{socials.twitter.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
                               </a>
                             )}
                             {socials.telegram && (
-                              <a href={socials.telegram[0]} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                                t.me/{socials.telegram[0].replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
+                              <a href={socials.telegram} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                                t.me/{socials.telegram.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
                               </a>
                             )}
                             {socials.discord && (
-                              <a href={socials.discord[0]} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                              <a href={socials.discord} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
                                 discord
                               </a>
                             )}
                             {socials.facebook && (
-                              <a href={socials.facebook[0]} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                              <a href={socials.facebook} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
                                 facebook
                               </a>
                             )}
