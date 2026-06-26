@@ -47,9 +47,7 @@ describe('POST /api/admin/tokens/[id]/requeue', () => {
   })
 
   it('re-queues token for reprocessing and deletes hashtags', async () => {
-    let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
-      callCount++
       if (table === 'tokens') {
         return createMockQueryBuilder(
           {
@@ -131,9 +129,7 @@ describe('POST /api/admin/tokens/[id]/requeue', () => {
   })
 
   it('handles database error when deleting hashtags', async () => {
-    let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
-      callCount++
       if (table === 'tokens') {
         return createMockQueryBuilder(
           {

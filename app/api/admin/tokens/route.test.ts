@@ -143,7 +143,6 @@ describe('GET /api/admin/tokens', () => {
     )
 
     const response = await GET(createRequest('/api/admin/tokens?review_queue=true'))
-    const json = await response.json()
 
     expect(response.status).toBe(200)
   })
