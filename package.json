@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest"
+    "test": "vitest",
+    "check": "tsc --noEmit && eslint && vitest"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.80",
