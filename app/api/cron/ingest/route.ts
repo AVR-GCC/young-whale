@@ -30,6 +30,7 @@ async function getLatestListings(limit = 10, start = 1) {
     symbol: string
     date_added: string
     quote?: { USD?: { price?: number } }
+    total_supply: number
   }>
 }
 
@@ -55,6 +56,7 @@ async function getTokenDetails(cmcId: number) {
     slug: string
     logo: string
     description: string
+    total_supply: number
     urls: {
       facebook?: string[]
       reddit?: string[]

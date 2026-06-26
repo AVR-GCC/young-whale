@@ -45,6 +45,7 @@ const mockToken: TokenWithHashtags = {
   is_verified: false,
   main_hashtag: null,
   rating: 0,
+  supply: 1000000,
   created_at: '2024-06-10T10:00:00Z',
   updated_at: '2024-06-10T10:00:00Z',
   hashtags: [],
