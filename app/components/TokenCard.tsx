@@ -141,6 +141,15 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
+const chainIcons: Record<string, string> = {
+  Arbitrum: 'arbitrum-arb-logo',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo',
+  Ethereum: 'ethereum-eth-logo-diamond-purple',
+  Polygon: 'polygon-matic-logo',
+  Solana: 'solana-sol-logo',
+  Base: 'blue'
+}
+
 function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
   const [imageError, setImageError] = useState(false)
 
@@ -157,8 +166,19 @@ function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: 
           unoptimized
         />
         {!!chain && (
-          <div className="absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-6 h-6 flex items-center justify-center rounded bg-[#0F1624] border-[1.5px] border-white text-slate-400 p-0.5 shadow-md z-15 pointer-events-none">
-            <span className="text-[8px] font-bold uppercase">{chain.slice(0, 3)}</span>
+          <div className={`absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-6 h-6 flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
+            {chainIcons[chain] && chainIcons[chain] !== 'blue' ? (
+              <Image
+                src={`/chain-logos/${chainIcons[chain]}.svg`}
+                alt={chain}
+                width={20}
+                height={20}
+                className="w-full h-full object-contain p-0.5"
+                unoptimized
+              />
+            ) : !chainIcons[chain] && (
+              <span className="text-[8px] font-bold uppercase text-slate-400">{chain.slice(0, 3)}</span>
+            )}
           </div>
         )}
       </div>
