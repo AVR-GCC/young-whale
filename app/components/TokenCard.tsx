@@ -141,7 +141,7 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
-function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10" }: { name: string; logoUrl: string | null; chain: string | null, className?: string }) {
+function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
   const [imageError, setImageError] = useState(false)
 
   if (logoUrl && !imageError) {
@@ -152,7 +152,7 @@ function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10" }: { name: st
           alt={`${name} icon`}
           width={40}
           height={40}
-          className={`${className} rounded-full object-cover flex-shrink-0`}
+          className={`w-${size} h-${size} border-2 border-white rounded-full object-cover flex-shrink-0`}
           onError={() => setImageError(true)}
           unoptimized
         />
@@ -245,8 +245,8 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
       >
         {/* Token Logo */}
         <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
-          <div className="flex-shrink-0 relative block">
-            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} className="w-8 h-8 rounded-full border-2 border-white transition-transform hover:scale-105" />
+          <div className="flex-shrink-0 relative block transition-transform hover:scale-105">
+            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={8} className="" />
           </div>
         </CustomTooltip>
 
@@ -402,7 +402,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
                     </CustomTooltip>
 
                     <div className="relative block shrink-0 ml-2 sm:ml-3">
-                      <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} className="w-16 h-16 rounded-full border-[3px] border-white z-10 box-border bg-black" />
+                      <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={16} />
                     </div>
                   </div>
                 </div>
