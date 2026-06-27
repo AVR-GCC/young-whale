@@ -146,13 +146,13 @@ function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: 
 
   if (logoUrl && !imageError) {
     return (
-      <div className="relative block">
+      <div style={{ transform: `scale(${size / 16})` }} className="relative block">
         <Image
           src={logoUrl}
           alt={`${name} icon`}
           width={40}
           height={40}
-          className={`w-${size} h-${size} border-2 border-white rounded-full object-cover flex-shrink-0`}
+          className="w-16 h-16 border-[3px] border-white rounded-full object-cover flex-shrink-0"
           onError={() => setImageError(true)}
           unoptimized
         />
@@ -246,7 +246,7 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
         {/* Token Logo */}
         <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
           <div className="flex-shrink-0 transition-transform hover:scale-105">
-            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={8} className="" />
+            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={8} />
           </div>
         </CustomTooltip>
 
