@@ -10,7 +10,7 @@ export default async function Home() {
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black">
       <HeaderBanner />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 w-full max-w-[88rem] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page title and subtitle */}
         <div className="mb-8 text-center sm:text-left">
           <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">

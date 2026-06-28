@@ -149,34 +149,39 @@ const chainIcons: Record<string, string> = {
   Base: 'blue'
 }
 
-function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
+function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 32 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
   const [imageError, setImageError] = useState(false)
+  const isSmall = size <= 32;
+  const badgeSizeClass = isSmall ? 'w-4.5 h-4.5' : 'w-6 h-6';
+  const badgePositionClass = isSmall ? '-bottom-1 -right-1' : '-bottom-0.5 -right-0.5';
+  const chainIconSize = isSmall ? 14 : 20;
+  const chainTextSize = isSmall ? 'text-[6px]' : 'text-[8px]';
 
   if (logoUrl && !imageError) {
     return (
-      <div style={{ transform: `scale(${size / 16})` }} className="relative block">
+      <div className={`relative block ${className}`} style={{ width: size, height: size }}>
         <Image
           src={logoUrl}
           alt={`${name} icon`}
-          width={40}
-          height={40}
-          className="w-16 h-16 border-[3px] border-white rounded-full object-cover flex-shrink-0"
+          width={size}
+          height={size}
+          className="w-full h-full border-[3px] border-white rounded-full object-cover flex-shrink-0"
           onError={() => setImageError(true)}
           unoptimized
         />
         {!!chain && (
-          <div className={`absolute -bottom-0.5 -right-0.5 sm:-bottom-1 sm:-right-1 w-6 h-6 flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
+          <div className={`absolute ${badgePositionClass} ${badgeSizeClass} flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
             {chainIcons[chain] && chainIcons[chain] !== 'blue' ? (
               <Image
                 src={`/chain-logos/${chainIcons[chain]}.svg`}
                 alt={chain}
-                width={20}
-                height={20}
+                width={chainIconSize}
+                height={chainIconSize}
                 className="w-full h-full object-contain p-0.5"
                 unoptimized
               />
             ) : !chainIcons[chain] && (
-              <span className="text-[8px] font-bold uppercase text-slate-400">{chain.slice(0, 3)}</span>
+              <span className={`font-bold uppercase text-slate-400 ${chainTextSize}`}>{chain.slice(0, 3)}</span>
             )}
           </div>
         )}
@@ -223,26 +228,28 @@ export default function TokenCard({ token, themeColor }: { token: TokenWithHasht
     return new Date(token.created_at) < twoDaysAgo;
   }, [token.created_at, now])
 
-  let timeLabel = <TimeSince date={token.created_at} />;
+  let timeLabel;
   if (isPromoted) {
     timeLabel = <>FEATURED</>;
-  }
-  if (!isBeforeYesterday) {
-    timeLabel = <>1D AGO</>;
-  }
-  if (!isExpired) {
+  } else if (!isExpired) {
     timeLabel = <>TODAY</>;
+  } else if (!isBeforeYesterday) {
+    timeLabel = <>1D AGO</>;
+  } else {
+    timeLabel = <TimeSince date={token.created_at} />;
   }
 
   return (
     <div
       className={`
-        relative border-b border-zinc-200 dark:border-zinc-700 last:border-b-0
-        transition-all duration-300 ease-in-out cursor-pointer
-        ${isExpanded ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}
+        relative w-full cursor-pointer select-none flex flex-col rounded mb-1 border border-transparent
+        transition-all duration-300 ease-in-out scroll-mt-[64px]
       `}
       style={{
-        borderColor: (isExpanded || isHovered) ? `${themeColor}20` : undefined,
+        backgroundColor: isExpanded || isHovered
+          ? 'rgba(255, 255, 255, 0.06)'
+          : 'rgba(255, 255, 255, 0.03)',
+        borderColor: (isExpanded || isHovered) ? `${themeColor}20` : 'transparent',
         boxShadow: (isExpanded || isHovered) ? `0 0 15px ${themeColor}10` : 'none'
       }}
       onMouseEnter={() => setIsHovered(true)}
@@ -264,7 +271,7 @@ export default function TokenCard({ token, themeColor }: { token: TokenWithHasht
         {/* Token Logo */}
         <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
           <div className="flex-shrink-0 transition-transform hover:scale-105">
-            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={8} />
+            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={32} />
           </div>
         </CustomTooltip>
 
@@ -420,7 +427,7 @@ export default function TokenCard({ token, themeColor }: { token: TokenWithHasht
                     </CustomTooltip>
 
                     <div className="shrink-0 ml-2 sm:ml-3">
-                      <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={16} />
+                      <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={64} />
                     </div>
                   </div>
                 </div>
@@ -579,6 +586,7 @@ export default function TokenCard({ token, themeColor }: { token: TokenWithHasht
           })()}
         </div>
       </div>
+      <div className="h-px w-full bg-[#1E293B] pointer-events-none flex-shrink-0 my-[2px]" />
     </div>
   )
 }

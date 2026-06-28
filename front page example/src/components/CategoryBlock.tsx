@@ -59,7 +59,7 @@ export const CategoryBlock: React.FC<CategoryBlockProps> = ({
       <div className="px-5 pt-2 pb-1.5 bg-[#0B0F19] flex items-center justify-between border-b border-[#1E293B]/25">
         <div className="flex items-center gap-2">
           <h2 
-            className="font-oxanium text-[13px] font-extrabold uppercase tracking-[2px]"
+            className="font-oxanium text-[13px] font-extrabold tracking-[2px]"
             style={{ color: headerColor }}
           >
             {title}
