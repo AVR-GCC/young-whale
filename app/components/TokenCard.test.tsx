@@ -90,43 +90,43 @@ describe('TokenCard', () => {
   })
 
   it('renders token name in header', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const names = screen.getAllByText('TestToken')
     expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders short description when available', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     expect(screen.getByText('A test token for testing')).toBeDefined()
   })
 
   it('renders time since creation for expired tokens', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     // Token created 5 days ago (> 48h), so it shows TimeSince value
     expect(screen.getByText('5d')).toBeDefined()
   })
 
   it('renders with minimal data (no optional fields)', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const names = screen.getAllByText('MinimalToken')
     expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows initials when no logo_url', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const initials = screen.getAllByText('MI')
     expect(initials.length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows token logo when logo_url is provided', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const imgs = screen.getAllByAltText('TestToken icon')
     expect(imgs.length).toBeGreaterThanOrEqual(1)
     expect(imgs[0].getAttribute('src')).toBe('https://example.com/logo.png')
   })
 
   it('expands on click', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
     expect(card).toBeDefined()
 
@@ -137,7 +137,7 @@ describe('TokenCard', () => {
   })
 
   it('collapses on second click', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -152,7 +152,7 @@ describe('TokenCard', () => {
   })
 
   it('displays full description in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -163,7 +163,7 @@ describe('TokenCard', () => {
   })
 
   it('displays fallback description when full_description is null', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const names = screen.getAllByText('MinimalToken')
     const card = names[0].closest('[class*="cursor-pointer"]')
 
@@ -174,7 +174,7 @@ describe('TokenCard', () => {
   })
 
   it('displays contract address in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -185,7 +185,7 @@ describe('TokenCard', () => {
   })
 
   it('displays N/A when contract address is null', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const names = screen.getAllByText('MinimalToken')
     const card = names[0].closest('[class*="cursor-pointer"]')
 
@@ -197,17 +197,17 @@ describe('TokenCard', () => {
   })
 
   it('displays hashtags in collapsed view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     expect(screen.getByText('#Test')).toBeDefined()
   })
 
   it('does not display hashtags when empty', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     expect(screen.queryByText('#Test')).toBeNull()
   })
 
   it('displays social links in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -220,7 +220,7 @@ describe('TokenCard', () => {
   })
 
   it('displays website url in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -230,7 +230,7 @@ describe('TokenCard', () => {
   })
 
   it('does not display social links section when empty', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const names = screen.getAllByText('MinimalToken')
     const card = names[0].closest('[class*="cursor-pointer"]')
 
@@ -242,7 +242,7 @@ describe('TokenCard', () => {
   })
 
   it('displays exchange links in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -253,7 +253,7 @@ describe('TokenCard', () => {
   })
 
   it('displays no pairs message when exchange links are empty', () => {
-    render(<TokenCard token={mockTokenNoOptional} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} />)
     const names = screen.getAllByText('MinimalToken')
     const card = names[0].closest('[class*="cursor-pointer"]')
 
@@ -264,7 +264,7 @@ describe('TokenCard', () => {
   })
 
   it('displays supply in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -277,7 +277,7 @@ describe('TokenCard', () => {
   it('displays rating in expanded view', () => {
     // Use a recent token so it's not expired
     const recentToken = { ...mockToken, created_at: '2024-06-15T10:00:00Z' }
-    render(<TokenCard token={recentToken} />)
+    render(<TokenCard themeColor="#ff0000" token={recentToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -287,7 +287,7 @@ describe('TokenCard', () => {
   })
 
   it('displays expired rating for old tokens', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     // Token is 5 days old, so rating should show expired icon (★) in header
     // In expanded view, it shows [ SIGNAL EXPIRED ]
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
@@ -306,7 +306,7 @@ describe('TokenCard', () => {
       },
     })
 
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -328,7 +328,7 @@ describe('TokenCard', () => {
       },
     })
 
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -341,45 +341,45 @@ describe('TokenCard', () => {
 
   it('renders TODAY for tokens created within 24 hours', () => {
     const recentToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
-    render(<TokenCard token={recentToken} />)
+    render(<TokenCard themeColor="#ff0000" token={recentToken} />)
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders 1D AGO for tokens created between 24-48 hours ago', () => {
     const dayAgoToken = { ...mockToken, created_at: '2024-06-14T10:00:00Z' }
-    render(<TokenCard token={dayAgoToken} />)
+    render(<TokenCard themeColor="#ff0000" token={dayAgoToken} />)
     expect(screen.getByText('1D AGO')).toBeDefined()
   })
 
   it('renders TimeSince for tokens older than 48 hours', () => {
     const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
-    render(<TokenCard token={oldToken} />)
+    render(<TokenCard themeColor="#ff0000" token={oldToken} />)
     expect(screen.getByText('2d')).toBeDefined()
   })
 
   it('renders hours correctly for recent tokens', () => {
     const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
-    render(<TokenCard token={hoursAgoToken} />)
+    render(<TokenCard themeColor="#ff0000" token={hoursAgoToken} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders minutes correctly for very recent tokens', () => {
     const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
-    render(<TokenCard token={recentToken} />)
+    render(<TokenCard themeColor="#ff0000" token={recentToken} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders seconds correctly for just created tokens', () => {
     const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
-    render(<TokenCard token={secondsAgoToken} />)
+    render(<TokenCard themeColor="#ff0000" token={secondsAgoToken} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('displays chain badge in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -389,7 +389,7 @@ describe('TokenCard', () => {
   })
 
   it('displays symbol in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -401,7 +401,7 @@ describe('TokenCard', () => {
   })
 
   it('applies hover styles on mouse enter', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -414,7 +414,7 @@ describe('TokenCard', () => {
 
   it('displays explorer link for different chains', () => {
     const bscToken = { ...mockToken, chain: 'BSC' }
-    render(<TokenCard token={bscToken} />)
+    render(<TokenCard themeColor="#ff0000" token={bscToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -425,7 +425,7 @@ describe('TokenCard', () => {
   })
 
   it('displays share to X link in expanded view', () => {
-    render(<TokenCard token={mockToken} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
 
     if (card) {

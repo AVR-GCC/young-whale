@@ -2,14 +2,15 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import Home from './page'
 import type { TokenWithHashtags } from '@/shared/types'
+import { categories, CategoryType } from './lib/categories'
 
 vi.mock('./components/HeaderBanner', () => ({
   default: () => <header data-testid="header-banner">Young Whale</header>,
 }))
 
 vi.mock('./components/CategoryContainer', () => ({
-  default: ({ category, title, tokenCount, tokens }: { category: string; title: string; tokenCount: number; tokens: TokenWithHashtags[] }) => (
-    <div data-testid={`category-${category}`}>
+  default: ({ category, title, tokenCount, tokens }: { category: CategoryType; title: string; tokenCount: number; tokens: TokenWithHashtags[] }) => (
+    <div data-testid={`category-${category.id}`}>
       <h3>{title}</h3>
       <span>{tokenCount} tokens</span>
       <div data-testid="token-list">
@@ -217,10 +218,10 @@ describe('Home Page', () => {
     const HomeComponent = await Home()
     render(HomeComponent)
     
-    expect(screen.getByText('Tech')).toBeDefined()
-    expect(screen.getByText('Meme')).toBeDefined()
-    expect(screen.getByText('Real World Assets')).toBeDefined()
-    expect(screen.getByText('Presale')).toBeDefined()
+    expect(screen.getByTestId('category-Tech')).toBeDefined()
+    expect(screen.getByTestId('category-Meme')).toBeDefined()
+    expect(screen.getByTestId('category-RWA')).toBeDefined()
+    expect(screen.getByTestId('category-Presale')).toBeDefined()
   })
 
   it('handles empty tokens array', async () => {

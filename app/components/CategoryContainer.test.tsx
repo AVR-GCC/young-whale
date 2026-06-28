@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import CategoryContainer from './CategoryContainer'
 import type { TokenWithHashtags } from '@/shared/types'
+import { categories } from '../lib/categories'
 
 const mockTokens: TokenWithHashtags[] = [
   {
@@ -208,20 +209,18 @@ describe('CategoryContainer', () => {
   it('renders category title', () => {
     render(
       <CategoryContainer
-        category="Tech"
-        title="Technology"
+        category={categories[0]}
         tokenCount={5}
         tokens={mockTokens.slice(0, 5)}
       />
     )
-    expect(screen.getByText('Technology')).toBeDefined()
+    expect(screen.getByText(categories[0].title)).toBeDefined()
   })
 
   it('shows empty state when no tokens', () => {
     render(
       <CategoryContainer
-        category="Tech"
-        title="Technology"
+        category={categories[0]}
         tokenCount={0}
         tokens={[]}
       />
@@ -234,8 +233,7 @@ describe('CategoryContainer', () => {
   it('shows scan-deeper (+) control when there are more than 5 tokens', () => {
     render(
       <CategoryContainer
-        category="Tech"
-        title="Technology"
+        category={categories[0]}
         tokenCount={6}
         tokens={mockTokens}
       />
@@ -248,8 +246,7 @@ describe('CategoryContainer', () => {
   it('does not show expand controls when there are 5 or fewer tokens', () => {
     render(
       <CategoryContainer
-        category="Tech"
-        title="Technology"
+        category={categories[0]}
         tokenCount={5}
         tokens={mockTokens.slice(0, 5)}
       />
@@ -270,8 +267,7 @@ describe('CategoryContainer', () => {
 
     render(
       <CategoryContainer
-        category="Tech"
-        title="Technology"
+        category={categories[0]}
         tokenCount={12}
         tokens={manyTokens}
       />
@@ -286,18 +282,15 @@ describe('CategoryContainer', () => {
   })
 
   it('renders for every category', () => {
-    const categories = ['Tech', 'Meme', 'RWA', 'Presale'] as const
-
     categories.forEach((category) => {
       const { unmount } = render(
         <CategoryContainer
           category={category}
-          title={category}
           tokenCount={0}
           tokens={[]}
         />
       )
-      expect(screen.getByText(category)).toBeDefined()
+      expect(screen.getByText(category.title)).toBeDefined()
       unmount()
     })
   })

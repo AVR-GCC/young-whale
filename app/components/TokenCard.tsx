@@ -3,7 +3,6 @@
 import { useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
-import { getCategoryColor } from '../lib/categories'
 import { CustomTooltip } from './CustomTooltip';
 import { Compass, Zap } from 'lucide-react';
 
@@ -194,7 +193,7 @@ function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 8 }: 
   )
 }
 
-export default function TokenCard({ token }: { token: TokenWithHashtags }) {
+export default function TokenCard({ token, themeColor }: { token: TokenWithHashtags, themeColor: string }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
 
@@ -224,7 +223,6 @@ export default function TokenCard({ token }: { token: TokenWithHashtags }) {
     return new Date(token.created_at) < twoDaysAgo;
   }, [token.created_at, now])
 
-  const themeColor = getCategoryColor(token.category);
   let timeLabel = <TimeSince date={token.created_at} />;
   if (isPromoted) {
     timeLabel = <>FEATURED</>;

@@ -26,8 +26,7 @@ export default async function Home() {
           {categories.map((category) => (
             <CategoryContainer
               key={category.id}
-              category={category.id}
-              title={category.name}
+              category={category}
               tokenCount={getCategoryCount(tokens, category.id)}
               tokens={getTokensByCategory(tokens, category.id)}
             />
