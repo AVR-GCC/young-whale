@@ -2,31 +2,9 @@
 
 import { useState, useCallback } from 'react'
 import type { TokenWithHashtags } from '@/shared/types'
-import type { ReactNode } from 'react'
+import { getCategoryColor } from '../lib/categories'
+import { CustomTooltip } from './CustomTooltip'
 import TokenCard from './TokenCard'
-
-const categoryIcons: Record<string, ReactNode> = {
-  Tech: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-    </svg>
-  ),
-  Meme: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  ),
-  RWA: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-    </svg>
-  ),
-  Presale: (
-    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  ),
-}
 
 interface CategoryContainerProps {
   category: string
@@ -35,65 +13,149 @@ interface CategoryContainerProps {
   tokens: TokenWithHashtags[]
 }
 
-const INITIAL_VISIBLE = 5
-const LOAD_MORE_COUNT = 5
+// --- Constants for CategoryBlock features with no working-app equivalent ---
+// CategoryBlock receives these as props; here they are fixed defaults.
+const TOOLTIP_TEXT = 'Live radar scan of the freshest channels in this sector.'
+const PROMOTED_LIST: TokenWithHashtags[] = []
+const IS_LOADING = false
+const EMPTY_MESSAGE = 'NO CHANNELS DISCOVERED UNDER ACTIVE SCAN SECTORS'
+
+// CategoryBlock's `limit` / `setLimit` map to these.
+const INITIAL_LIMIT = 5
+const LIMIT_STEP = 5
 
 export default function CategoryContainer({
   category,
   title,
-  tokenCount,
   tokens,
 }: CategoryContainerProps) {
-  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE)
+  const [limit, setLimit] = useState(INITIAL_LIMIT)
 
-  const handleLoadMore = useCallback(() => {
-    setVisibleCount((prev) => prev + LOAD_MORE_COUNT)
+  const headerColor = getCategoryColor(category)
+
+  const handleSurface = useCallback(() => {
+    setLimit(INITIAL_LIMIT)
   }, [])
 
-  const visibleTokens = tokens.slice(0, visibleCount)
-  const hasMore = tokens.length > visibleCount
+  const handleScanDeeper = useCallback(() => {
+    setLimit((prev) => prev + LIMIT_STEP)
+  }, [])
+
+  // Sort all tokens by rating (highest first) — homolog of CategoryBlock's scoreValue sort.
+  const sortedTokens = [...tokens].sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime() ?? 0
+    const dateB = new Date(b.created_at).getTime() ?? 0
+    return dateB - dateA
+  })
+
+  const sliced = sortedTokens.slice(0, limit)
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-sm flex flex-col">
-      {/* Titlebar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 flex-shrink-0">
-        <div className="text-zinc-600 dark:text-zinc-400">
-          {categoryIcons[category]}
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-            {title}
-          </h3>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {tokenCount} token{tokenCount !== 1 ? 's' : ''} available
-          </p>
-        </div>
-      </div>
-
-      {/* Token list - height of exactly 5 tokens with scroll */}
-      <div className="flex-1 overflow-y-auto min-h-[400px]">
-        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-          {tokens.length === 0 ? (
-            <div className="p-4 text-sm text-zinc-500 dark:text-zinc-400 text-center">
-              No tokens in this category yet
-            </div>
-          ) : (
-            visibleTokens.map((token) => <TokenCard key={token.id} token={token} />)
-          )}
-        </div>
-      </div>
-
-      {/* Load more button */}
-      {hasMore && (
-        <div className="px-4 py-3 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 flex-shrink-0">
-          <button
-            onClick={handleLoadMore}
-            className="w-full py-2 px-4 rounded-lg bg-zinc-100 dark:bg-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-600 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition-colors"
+    <div className="flex flex-col bg-[#0B0F19] rounded-xl overflow-hidden border border-[#1E293B]/40 transition-colors break-inside-avoid">
+      <div className="px-5 pt-2 pb-1.5 bg-[#0B0F19] flex items-center justify-between border-b border-[#1E293B]/25">
+        <div className="flex items-center gap-2">
+          <h2
+            className="font-oxanium text-[13px] font-extrabold uppercase tracking-[2px]"
+            style={{ color: headerColor }}
           >
-            Load more ({tokens.length - visibleCount} remaining)
-          </button>
+            {title}
+          </h2>
+          <CustomTooltip content={TOOLTIP_TEXT} position="bottom" borderColor={headerColor}>
+            <div
+              className="w-4 h-4 rounded-full flex items-center justify-center bg-[#1E293B] hover:text-[#0B0F19] font-bold font-serif text-[10px] cursor-default transition-colors leading-none italic pb-[1px]"
+              style={{ color: '#94A3B8' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = headerColor; e.currentTarget.style.color = '#0B0F19'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1E293B'; e.currentTarget.style.color = '#94A3B8'; }}
+            >
+              i
+            </div>
+          </CustomTooltip>
         </div>
-      )}
+      </div>
+
+      <div className="flex flex-col bg-[#0B0F19]">
+        {IS_LOADING ? (
+          <>
+            {[...Array(5)].map((_, i) => (
+              <div
+                key={`${category}-skeleton-${i}`}
+                className="h-[46px] border-b border-[#1E293B] bg-[#070A10]/20 animate-pulse"
+              />
+            ))}
+          </>
+        ) : (
+          sliced.length > 0 ? (
+            <>
+              {/* Sliced List */}
+              <div className="flex flex-col">
+                {sliced.map((token) => (
+                  <TokenCard key={token.id} token={token} />
+                ))}
+              </div>
+
+              {/* Expand/Collapse Separator */}
+              {tokens.length > 5 && (
+                <div className="relative w-full flex items-center justify-center z-30 h-[10px] my-1">
+                  <div className="absolute w-full h-px bg-[#1E293B] left-0 top-1/2 -translate-y-1/2" />
+                  <div className="absolute top-1/2 -translate-y-1/2 bg-[#0B0F19] px-2 flex items-center gap-2 rounded-sm border border-[#1E293B]/60 shadow-[0_0_4px_rgba(0,0,0,0.8)] z-10 h-5">
+                    {limit > 5 && (
+                      <CustomTooltip content="Surface list" position="top" borderColor={headerColor}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleSurface()
+                          }}
+                          className="font-oxanium text-[20px] font-black transition-all duration-200 cursor-pointer select-none hover:scale-125 focus:outline-none w-5 h-5 flex items-center justify-center leading-none"
+                          style={{
+                            color: headerColor,
+                            opacity: 0.8,
+                            textShadow: `0 0 6px ${headerColor}66`,
+                          }}
+                          onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
+                          onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
+                        >
+                          −
+                        </button>
+                      </CustomTooltip>
+                    )}
+                    {tokens.length > limit && (
+                      <CustomTooltip content="Scan deeper" position="top" borderColor={headerColor}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleScanDeeper()
+                          }}
+                          className="font-oxanium text-[20px] font-black transition-all duration-200 cursor-pointer select-none hover:scale-125 focus:outline-none w-5 h-5 flex items-center justify-center leading-none"
+                          style={{
+                            color: headerColor,
+                            opacity: 0.8,
+                            textShadow: `0 0 6px ${headerColor}66`,
+                          }}
+                          onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
+                          onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
+                        >
+                          +
+                        </button>
+                      </CustomTooltip>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Promoted List (not inside the scrollable container) */}
+              {PROMOTED_LIST.map((token) => (
+                <TokenCard key={token.id} token={token} />
+              ))}
+            </>
+          ) : (
+            <div className="p-8 text-center font-mono text-xs text-slate-500 bg-[#070A10]/10 border-b border-[#1E293B]">
+              {EMPTY_MESSAGE}
+            </div>
+          )
+        )}
+      </div>
     </div>
   )
 }

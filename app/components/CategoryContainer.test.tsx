@@ -217,58 +217,6 @@ describe('CategoryContainer', () => {
     expect(screen.getByText('Technology')).toBeDefined()
   })
 
-  it('renders token count in subtitle', () => {
-    render(
-      <CategoryContainer
-        category="Tech"
-        title="Technology"
-        tokenCount={5}
-        tokens={mockTokens.slice(0, 5)}
-      />
-    )
-    expect(screen.getByText('5 tokens available')).toBeDefined()
-  })
-
-  it('renders single token count correctly', () => {
-    render(
-      <CategoryContainer
-        category="Tech"
-        title="Technology"
-        tokenCount={1}
-        tokens={mockTokens.slice(0, 1)}
-      />
-    )
-    expect(screen.getByText('1 token available')).toBeDefined()
-  })
-
-  // TODO - restore
-  // it('renders all tokens in the list after clicking load more', () => {
-  //   render(
-  //     <CategoryContainer
-  //       category="Tech"
-  //       title="Technology"
-  //       tokenCount={6}
-  //       tokens={mockTokens}
-  //     />
-  //   )
-  //
-  //   // Initially shows 5 tokens
-  //   expect(screen.getByText('Token1')).toBeDefined()
-  //   expect(screen.getByText('Token2')).toBeDefined()
-  //   expect(screen.getByText('Token3')).toBeDefined()
-  //   expect(screen.getByText('Token4')).toBeDefined()
-  //   expect(screen.getByText('Token5')).toBeDefined()
-  //
-  //   // Token6 is not visible initially
-  //   expect(screen.queryByText('Token6')).toBeNull()
-  //
-  //   // Click load more to show Token6
-  //   const loadMoreButton = screen.getByText(/Load more/)
-  //   fireEvent.click(loadMoreButton)
-  //
-  //   expect(screen.getByText('Token6')).toBeDefined()
-  // })
-
   it('shows empty state when no tokens', () => {
     render(
       <CategoryContainer
@@ -278,10 +226,12 @@ describe('CategoryContainer', () => {
         tokens={[]}
       />
     )
-    expect(screen.getByText('No tokens in this category yet')).toBeDefined()
+    expect(
+      screen.getByText('NO CHANNELS DISCOVERED UNDER ACTIVE SCAN SECTORS')
+    ).toBeDefined()
   })
 
-  it('shows load more button when there are more than 5 tokens', () => {
+  it('shows scan-deeper (+) control when there are more than 5 tokens', () => {
     render(
       <CategoryContainer
         category="Tech"
@@ -290,11 +240,12 @@ describe('CategoryContainer', () => {
         tokens={mockTokens}
       />
     )
-    expect(screen.getByText(/Load more/)).toBeDefined()
-    expect(screen.getByText(/1 remaining/)).toBeDefined()
+    expect(screen.getByText('+')).toBeDefined()
+    // Surface (−) control is hidden until expanded past the initial limit
+    expect(screen.queryByText('−')).toBeNull()
   })
 
-  it('does not show load more button when there are 5 or fewer tokens', () => {
+  it('does not show expand controls when there are 5 or fewer tokens', () => {
     render(
       <CategoryContainer
         category="Tech"
@@ -303,53 +254,38 @@ describe('CategoryContainer', () => {
         tokens={mockTokens.slice(0, 5)}
       />
     )
-    expect(screen.queryByText(/Load more/)).toBeNull()
+    expect(screen.queryByText('+')).toBeNull()
+    expect(screen.queryByText('−')).toBeNull()
   })
 
-  // TODO - restore
-  // it('loads more tokens when clicking load more button', () => {
-  //   render(
-  //     <CategoryContainer
-  //       category="Tech"
-  //       title="Technology"
-  //       tokenCount={6}
-  //       tokens={mockTokens}
-  //     />
-  //   )
-  //
-  //   // Initially shows 5 tokens
-  //   expect(screen.getByText('Token1')).toBeDefined()
-  //   expect(screen.getByText('Token2')).toBeDefined()
-  //   expect(screen.getByText('Token3')).toBeDefined()
-  //   expect(screen.getByText('Token4')).toBeDefined()
-  //   expect(screen.getByText('Token5')).toBeDefined()
-  //
-  //   // Click load more
-  //   const loadMoreButton = screen.getByText(/Load more/)
-  //   fireEvent.click(loadMoreButton)
-  //
-  //   // Now shows all 6 tokens
-  //   expect(screen.getByText('Token6')).toBeDefined()
-  // })
+  it('reveals more tokens and surface control after clicking scan-deeper', () => {
+    const manyTokens = Array.from({ length: 12 }, (_, i) => ({
+      ...mockTokens[0],
+      id: `${i + 1}`,
+      name: `Token${i + 1}`,
+      symbol: `TK${i + 1}`,
+      rating: 12 - i,
+      created_at: `2024-06-${String(15 - i).padStart(2, '0')}T10:00:00Z`,
+    }))
 
-  it('hides load more button after loading all tokens', () => {
     render(
       <CategoryContainer
         category="Tech"
         title="Technology"
-        tokenCount={6}
-        tokens={mockTokens}
+        tokenCount={12}
+        tokens={manyTokens}
       />
     )
 
-    const loadMoreButton = screen.getByText(/Load more/)
-    fireEvent.click(loadMoreButton)
+    // Initially limited to 5, so the scan-deeper control is present
+    const scanDeeper = screen.getByText('+')
+    fireEvent.click(scanDeeper)
 
-    // Button should be gone after loading all
-    expect(screen.queryByText(/Load more/)).toBeNull()
+    // Now expanded past the initial limit, the surface (−) control appears
+    expect(screen.getByText('−')).toBeDefined()
   })
 
-  it('renders different category icons', () => {
+  it('renders for every category', () => {
     const categories = ['Tech', 'Meme', 'RWA', 'Presale'] as const
 
     categories.forEach((category) => {
@@ -364,37 +300,5 @@ describe('CategoryContainer', () => {
       expect(screen.getByText(category)).toBeDefined()
       unmount()
     })
-  })
-
-  it('displays correct remaining count on load more button', () => {
-    const manyTokens = Array.from({ length: 12 }, (_, i) => ({
-      ...mockTokens[0],
-      id: `${i + 1}`,
-      name: `Token${i + 1}`,
-      symbol: `TK${i + 1}`,
-      created_at: `2024-06-${String(15 - i).padStart(2, '0')}T10:00:00Z`,
-    }))
-
-    render(
-      <CategoryContainer
-        category="Tech"
-        title="Technology"
-        tokenCount={12}
-        tokens={manyTokens}
-      />
-    )
-
-    // Initially shows 5, so 7 remaining
-    expect(screen.getByText(/7 remaining/)).toBeDefined()
-
-    // Click load more, now shows 10, so 2 remaining
-    const loadMoreButton = screen.getByText(/Load more/)
-    fireEvent.click(loadMoreButton)
-
-    expect(screen.getByText(/2 remaining/)).toBeDefined()
-
-    // Click again, now shows all 12, button should be gone
-    fireEvent.click(loadMoreButton)
-    expect(screen.queryByText(/Load more/)).toBeNull()
   })
 })
