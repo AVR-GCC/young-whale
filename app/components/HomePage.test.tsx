@@ -1,14 +1,14 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import Home from './page'
+import HomePage from './HomePage'
 import type { TokenWithHashtags } from '@/shared/types'
-import { categories, CategoryType } from './lib/categories'
+import { CategoryType } from '../lib/categories'
 
-vi.mock('./components/HeaderBanner', () => ({
+vi.mock('./HeaderBanner', () => ({
   default: () => <header data-testid="header-banner">Young Whale</header>,
 }))
 
-vi.mock('./components/CategoryContainer', () => ({
+vi.mock('./CategoryContainer', () => ({
   default: ({ category, title, tokenCount, tokens }: { category: CategoryType; title: string; tokenCount: number; tokens: TokenWithHashtags[] }) => (
     <div data-testid={`category-${category.id}`}>
       <h3>{title}</h3>
@@ -22,8 +22,7 @@ vi.mock('./components/CategoryContainer', () => ({
   ),
 }))
 
-vi.mock('./lib/data', () => ({
-  getAllApprovedTokens: vi.fn(),
+vi.mock('../lib/data', () => ({
   getTokensByCategory: vi.fn((tokens: TokenWithHashtags[], category: string) => 
     tokens.filter(t => t.category === category)
   ),
@@ -168,42 +167,26 @@ const mockTokens: TokenWithHashtags[] = [
 ]
 
 describe('Home Page', () => {
-  it('renders header banner', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('renders header banner', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     expect(screen.getByTestId('header-banner')).toBeDefined()
   })
 
-  it('renders page title', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('renders page title', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     expect(screen.getByText('New Token Listings')).toBeDefined()
   })
 
-  it('renders page subtitle', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('renders page subtitle', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     expect(screen.getByText(/Explore latest cryptocurrency tokens/)).toBeDefined()
   })
 
-  it('renders all 4 category containers', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('renders all 4 category containers', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     expect(screen.getByTestId('category-Tech')).toBeDefined()
     expect(screen.getByTestId('category-Meme')).toBeDefined()
@@ -211,12 +194,8 @@ describe('Home Page', () => {
     expect(screen.getByTestId('category-Presale')).toBeDefined()
   })
 
-  it('passes correct tokens to each category', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('passes correct tokens to each category', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     expect(screen.getByTestId('category-Tech')).toBeDefined()
     expect(screen.getByTestId('category-Meme')).toBeDefined()
@@ -224,12 +203,8 @@ describe('Home Page', () => {
     expect(screen.getByTestId('category-Presale')).toBeDefined()
   })
 
-  it('handles empty tokens array', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue([])
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('handles empty tokens array', () => {
+    render(<HomePage tokens={[]} />)
     
     expect(screen.getByTestId('category-Tech')).toBeDefined()
     expect(screen.getByTestId('category-Meme')).toBeDefined()
@@ -237,12 +212,8 @@ describe('Home Page', () => {
     expect(screen.getByTestId('category-Presale')).toBeDefined()
   })
 
-  it('passes correct token counts to categories', async () => {
-    const { getAllApprovedTokens } = await import('./lib/data')
-    vi.mocked(getAllApprovedTokens).mockResolvedValue(mockTokens)
-    
-    const HomeComponent = await Home()
-    render(HomeComponent)
+  it('passes correct token counts to categories', () => {
+    render(<HomePage tokens={mockTokens} />)
     
     // All categories have 1 token each, so we should find 4 instances
     const tokenCounts = screen.getAllByText('1 tokens')
