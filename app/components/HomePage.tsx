@@ -1,7 +1,9 @@
+'use client'
+
+import { useState } from 'react'
 import HeaderBanner from './HeaderBanner'
 import CategoryContainer from './CategoryContainer'
 import { categories } from '../lib/categories'
-import { getTokensByCategory, getCategoryCount } from '../lib/data'
 import type { TokenWithHashtags } from '@/shared/types'
 
 interface HomePageProps {
@@ -9,6 +11,7 @@ interface HomePageProps {
 }
 
 export default function HomePage({ tokens }: HomePageProps) {
+  const [selectedToken, setSelectedToken] = useState<string | null>(null)
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black">
       <HeaderBanner />
@@ -26,14 +29,21 @@ export default function HomePage({ tokens }: HomePageProps) {
 
         {/* Category grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {categories.map((category) => (
-            <CategoryContainer
-              key={category.id}
-              category={category}
-              tokenCount={getCategoryCount(tokens, category.id)}
-              tokens={getTokensByCategory(tokens, category.id)}
-            />
-          ))}
+          {categories.map((category) => {
+            const categoryTokens = tokens
+            .filter((token) => token.category === category.id)
+            .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+            return (
+              <CategoryContainer
+                key={category.id}
+                category={category}
+                tokenCount={categoryTokens.length}
+                tokens={categoryTokens}
+                selectedToken={selectedToken}
+                setSelectedTokenAction={setSelectedToken}
+              />
+            )
+          })}
         </div>
       </main>
     </div>

@@ -26,16 +26,3 @@ export async function getAllApprovedTokens(): Promise<TokenWithHashtags[]> {
       ) ?? [],
   }))
 }
-
-export function getTokensByCategory(
-  tokens: TokenWithHashtags[],
-  category: string
-): TokenWithHashtags[] {
-  return tokens
-    .filter((token) => token.category === category)
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-}
-
-export function getCategoryCount(tokens: TokenWithHashtags[], category: string): number {
-  return tokens.filter((token) => token.category === category).length
-}

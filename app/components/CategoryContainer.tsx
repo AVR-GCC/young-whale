@@ -10,6 +10,8 @@ interface CategoryContainerProps {
   category: CategoryType
   tokenCount: number
   tokens: TokenWithHashtags[]
+  selectedToken: string | null
+  setSelectedTokenAction: (st: string | null) => void
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
@@ -25,6 +27,8 @@ const LIMIT_STEP = 5
 export default function CategoryContainer({
   category,
   tokens,
+  selectedToken,
+  setSelectedTokenAction
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
 
@@ -83,9 +87,15 @@ export default function CategoryContainer({
             <>
               {/* Sliced List */}
               <div className="flex flex-col">
-                {sliced.map((token) => (
-                  <TokenCard key={token.id} token={token} themeColor={category.color} />
-                ))}
+                  {sliced.map((token) => (
+                    <TokenCard
+                      key={token.id}
+                      token={token}
+                      themeColor={category.color}
+                      isExpanded={selectedToken === token.id}
+                      setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
+                    />
+                  ))}
               </div>
 
               {/* Expand/Collapse Separator */}
@@ -141,7 +151,13 @@ export default function CategoryContainer({
 
               {/* Promoted List (not inside the scrollable container) */}
               {PROMOTED_LIST.map((token) => (
-                <TokenCard key={token.id} token={token} themeColor={category.color} />
+                  <TokenCard
+                    key={token.id}
+                    token={token}
+                    themeColor={category.color}
+                    isExpanded={selectedToken === token.id}
+                    setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
+                  />
               ))}
             </>
           ) : (

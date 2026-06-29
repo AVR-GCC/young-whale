@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import CategoryContainer from './CategoryContainer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { categories } from '../lib/categories'
+
+const mockSetSelectedToken = vi.fn()
 
 const mockTokens: TokenWithHashtags[] = [
   {
@@ -212,6 +214,8 @@ describe('CategoryContainer', () => {
         category={categories[0]}
         tokenCount={5}
         tokens={mockTokens.slice(0, 5)}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
@@ -223,6 +227,8 @@ describe('CategoryContainer', () => {
         category={categories[0]}
         tokenCount={0}
         tokens={[]}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
       />
     )
     expect(
@@ -236,6 +242,8 @@ describe('CategoryContainer', () => {
         category={categories[0]}
         tokenCount={6}
         tokens={mockTokens}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
@@ -249,6 +257,8 @@ describe('CategoryContainer', () => {
         category={categories[0]}
         tokenCount={5}
         tokens={mockTokens.slice(0, 5)}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
       />
     )
     expect(screen.queryByText('+')).toBeNull()
@@ -270,6 +280,8 @@ describe('CategoryContainer', () => {
         category={categories[0]}
         tokenCount={12}
         tokens={manyTokens}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
       />
     )
 
@@ -288,6 +300,8 @@ describe('CategoryContainer', () => {
           category={category}
           tokenCount={0}
           tokens={[]}
+          selectedToken={null}
+          setSelectedTokenAction={mockSetSelectedToken}
         />
       )
       expect(screen.getByText(category.title)).toBeDefined()

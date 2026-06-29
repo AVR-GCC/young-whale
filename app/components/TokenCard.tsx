@@ -198,13 +198,12 @@ function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 32 }:
   )
 }
 
-export default function TokenCard({ token, themeColor }: { token: TokenWithHashtags, themeColor: string }) {
-  const [isExpanded, setIsExpanded] = useState(false)
+export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void }) {
   const [isHovered, setIsHovered] = useState(false)
 
   const toggle = useCallback(() => {
-    setIsExpanded(prev => !prev);
-  }, []);
+    setIsExpandedAction(!isExpanded);
+  }, [isExpanded, setIsExpandedAction]);
 
   // const expand = useCallback(() => {
   //   setIsExpanded(true);
