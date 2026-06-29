@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getAllApprovedTokens, getTokensByCategory, getCategoryCount } from './data'
+import { getAllApprovedTokens } from './data'
 import { supabaseService } from '@/lib/supabase/service'
 import type { TokenWithHashtags } from '@/shared/types'
 
@@ -149,65 +149,5 @@ describe('getAllApprovedTokens', () => {
 
     const tokens = await getAllApprovedTokens()
     expect(tokens[0].hashtags).toHaveLength(0)
-  })
-})
-
-describe('getTokensByCategory', () => {
-  it('filters tokens by category', () => {
-    const tokens = [mockToken, mockToken2, mockToken3]
-    const techTokens = getTokensByCategory(tokens, 'Tech')
-    
-    expect(techTokens).toHaveLength(2)
-    expect(techTokens[0].name).toBe('TestToken')
-    expect(techTokens[1].name).toBe('AnotherTech')
-  })
-
-  it('returns empty array when no tokens match category', () => {
-    const tokens = [mockToken, mockToken3]
-    const memeTokens = getTokensByCategory(tokens, 'Meme')
-    
-    expect(memeTokens).toHaveLength(0)
-  })
-
-  it('sorts tokens by created_at descending', () => {
-    const tokens = [mockToken3, mockToken, mockToken2]
-    const techTokens = getTokensByCategory(tokens, 'Tech')
-    
-    expect(techTokens[0].name).toBe('TestToken') // June 10
-    expect(techTokens[1].name).toBe('AnotherTech') // June 9
-  })
-
-  it('returns all tokens for matching category', () => {
-    const tokens = [mockToken, mockToken2, mockToken3]
-    const allTokens = getTokensByCategory(tokens, 'Tech')
-    
-    expect(allTokens).toHaveLength(2)
-  })
-})
-
-describe('getCategoryCount', () => {
-  it('counts tokens in a category', () => {
-    const tokens = [mockToken, mockToken2, mockToken3]
-    expect(getCategoryCount(tokens, 'Tech')).toBe(2)
-    expect(getCategoryCount(tokens, 'Meme')).toBe(1)
-  })
-
-  it('returns 0 for empty category', () => {
-    const tokens = [mockToken, mockToken3]
-    expect(getCategoryCount(tokens, 'RWA')).toBe(0)
-  })
-
-  it('returns 0 for empty token list', () => {
-    expect(getCategoryCount([], 'Tech')).toBe(0)
-  })
-
-  it('counts all matching tokens', () => {
-    const tokens = [
-      mockToken,
-      { ...mockToken, id: '4' },
-      { ...mockToken, id: '5' },
-      mockToken2,
-    ]
-    expect(getCategoryCount(tokens, 'Tech')).toBe(3)
   })
 })
