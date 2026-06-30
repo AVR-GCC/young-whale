@@ -4,7 +4,7 @@ import { useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
-import { Compass, Zap } from 'lucide-react';
+import { Compass, Zap, Pin } from 'lucide-react';
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 
@@ -211,7 +211,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   // const socialEntries = Object.entries(token.social_links).filter(([, url]) => url)
 
-  const isPromoted = false
+  const isPromoted = token.is_promoted
   const [now] = useState(() => Date.now())
   const isExpired = useMemo(() => {
     const oneDayAgo = new Date(now - ONE_DAY)
@@ -310,40 +310,55 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         {/* Rating */}
         <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
           <div className="flex-shrink-0 flex items-center justify-center w-7 mr-1 sm:mr-2 ml-0 sm:ml-1 h-7">
-            {isExpired ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4 text-white/40 transition-colors"
+            {isPromoted ? (
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
+                style={{
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                  color: 'rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'none',
+                }}
               >
-                <path d="M5 22h14" />
-                <path d="M5 2h14" />
-                <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
-                <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
-                <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
-              </svg>
-            ) : (
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered && !isPromoted ? 'scale-105' : ''}`}
-                  style={{
-                    borderColor: isPromoted ? 'rgba(255, 255, 255, 0.2)' : (isExpired ? '#FFD700' : '#FFFFFF'),
-                    color: isPromoted ? 'rgba(255, 255, 255, 0.3)' : (isExpired ? '#FFD700' : '#FFFFFF'),
-                    boxShadow: (!isPromoted && token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered && !isPromoted ? `0 0 10px ${themeColor}60` : 'none'),
-                  }}
+                <Pin className="w-3.5 h-3.5" />
+              </div>
+            ) : isExpired ? (
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
+                style={{
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                  color: 'rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'none',
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-3.5 h-3.5"
                 >
-                  {isPromoted ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5">
-                      <path d="M12 2v10" />
-                      <path d="M12 22a9 9 0 0 0 9-9c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9z" />
-                    </svg>
-                  ) : (isExpired ? '★' : token.rating)}
-                </div>
-              )}
+                  <path d="M5 22h14" />
+                  <path d="M5 2h14" />
+                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+                  <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
+                </svg>
+              </div>
+            ) : (
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}
+                style={{
+                  borderColor: '#FFFFFF',
+                  color: '#FFFFFF',
+                  boxShadow: (token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered ? `0 0 10px ${themeColor}60` : 'none'),
+                }}
+              >
+                {token.rating}
+              </div>
+            )}
           </div>
         </CustomTooltip>
 
