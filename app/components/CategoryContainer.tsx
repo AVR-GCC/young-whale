@@ -16,7 +16,6 @@ interface CategoryContainerProps {
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
 // CategoryBlock receives these as props; here they are fixed defaults.
-const PROMOTED_LIST: TokenWithHashtags[] = []
 const IS_LOADING = false
 const EMPTY_MESSAGE = 'NO CHANNELS DISCOVERED UNDER ACTIVE SCAN SECTORS'
 
@@ -47,6 +46,7 @@ export default function CategoryContainer({
     return dateB - dateA
   })
 
+  const promotedList = sortedTokens.filter(st => st.is_promoted)
   const sliced = sortedTokens.slice(0, limit)
 
   return (
@@ -150,7 +150,7 @@ export default function CategoryContainer({
               )}
 
               {/* Promoted List (not inside the scrollable container) */}
-              {PROMOTED_LIST.map((token) => (
+              {promotedList.map((token) => (
                   <TokenCard
                     key={token.id}
                     token={token}
