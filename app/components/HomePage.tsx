@@ -8,9 +8,10 @@ import type { TokenWithHashtags } from '@/shared/types'
 
 interface HomePageProps {
   tokens: TokenWithHashtags[]
+  loading: boolean
 }
 
-export default function HomePage({ tokens }: HomePageProps) {
+export default function HomePage({ tokens, loading }: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black">
@@ -41,6 +42,7 @@ export default function HomePage({ tokens }: HomePageProps) {
                 tokens={categoryTokens}
                 selectedToken={selectedToken}
                 setSelectedTokenAction={setSelectedToken}
+                loading={loading}
               />
             )
           })}

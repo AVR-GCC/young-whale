@@ -8,10 +8,6 @@ import { Compass, Zap } from 'lucide-react';
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 
-/*
- * exchange currencies
- * real supply
- * */
 function TimeSince({ date }: { date: string }) {
   const now = new Date()
   const then = new Date(date)

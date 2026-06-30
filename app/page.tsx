@@ -1,8 +1,22 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import HomePage from './components/HomePage'
-import { getAllApprovedTokens } from './lib/data'
+import type { TokenWithHashtags } from '@/shared/types'
 
-export default async function Home() {
-  const tokens = await getAllApprovedTokens()
+export default function Home() {
+  const [tokens, setTokens] = useState<TokenWithHashtags[]>([])
+  const [loading, setLoading] = useState(true)
 
-  return <HomePage tokens={tokens} />
+  useEffect(() => {
+    fetch('/api/tokens/public')
+      .then((res) => res.json())
+      .then((data) => {
+        setTokens(data.tokens ?? [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  return <HomePage tokens={tokens} loading={loading} />
 }

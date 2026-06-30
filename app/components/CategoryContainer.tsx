@@ -5,6 +5,7 @@ import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip'
 import TokenCard from './TokenCard'
 import { CategoryType } from '../lib/categories'
+import { SkeletonTokenRow } from './SkeletonTokenRow'
 
 interface CategoryContainerProps {
   category: CategoryType
@@ -12,11 +13,11 @@ interface CategoryContainerProps {
   tokens: TokenWithHashtags[]
   selectedToken: string | null
   setSelectedTokenAction: (st: string | null) => void
+  loading: boolean
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
 // CategoryBlock receives these as props; here they are fixed defaults.
-const IS_LOADING = false
 const EMPTY_MESSAGE = 'NO CHANNELS DISCOVERED UNDER ACTIVE SCAN SECTORS'
 
 // CategoryBlock's `limit` / `setLimit` map to these.
@@ -27,6 +28,7 @@ export default function CategoryContainer({
   category,
   tokens,
   selectedToken,
+  loading,
   setSelectedTokenAction
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
@@ -73,14 +75,9 @@ export default function CategoryContainer({
       </div>
 
       <div className="flex flex-col bg-[#0B0F19]">
-        {IS_LOADING ? (
+        {loading ? (
           <>
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={`${category}-skeleton-${i}`}
-                className="h-[46px] border-b border-[#1E293B] bg-[#070A10]/20 animate-pulse"
-              />
-            ))}
+            {[...Array(5)].map((_, i) => <SkeletonTokenRow key={`skeleton-${category.id}-${i}`} />)}
           </>
         ) : (
           sliced.length > 0 ? (

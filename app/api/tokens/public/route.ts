@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
 import type { TokenWithHashtags } from '@/shared/types'
+// import { sleep } from '@/app/lib/utils'
 
 export const revalidate = 60 // Revalidate every 60 seconds
 
@@ -30,6 +31,7 @@ export async function GET() {
         ) ?? [],
     }))
 
+    // await sleep(5000)
     return NextResponse.json({ tokens })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
