@@ -216,6 +216,7 @@ describe('CategoryContainer', () => {
         tokens={mockTokens.slice(0, 5)}
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
@@ -229,6 +230,7 @@ describe('CategoryContainer', () => {
         tokens={[]}
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
       />
     )
     expect(
@@ -244,6 +246,7 @@ describe('CategoryContainer', () => {
         tokens={mockTokens}
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
@@ -259,6 +262,7 @@ describe('CategoryContainer', () => {
         tokens={mockTokens.slice(0, 5)}
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
       />
     )
     expect(screen.queryByText('+')).toBeNull()
@@ -282,6 +286,7 @@ describe('CategoryContainer', () => {
         tokens={manyTokens}
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
       />
     )
 
@@ -302,10 +307,28 @@ describe('CategoryContainer', () => {
           tokens={[]}
           selectedToken={null}
           setSelectedTokenAction={mockSetSelectedToken}
+          loading={false}
         />
       )
       expect(screen.getByText(category.title)).toBeDefined()
       unmount()
     })
+  })
+
+  it('shows skeleton rows when loading is true', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={6}
+        tokens={mockTokens}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={true}
+      />
+    )
+    // Token names should not be visible while loading
+    expect(screen.queryByText('Token1')).toBeNull()
+    // Skeleton rows should be present (animate-pulse class indicates skeleton)
+    expect(document.querySelectorAll('.animate-pulse').length).toBe(5)
   })
 })
