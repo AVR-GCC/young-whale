@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import HomePage from './HomePage'
+import CategoryGrid from './CategoryGrid'
 import type { TokenWithHashtags } from '@/shared/types'
 
 vi.mock('./CategoryContainer', () => ({
@@ -15,10 +15,6 @@ vi.mock('./CategoryContainer', () => ({
       </div>
     </div>
   ),
-}))
-
-vi.mock('./CustomTooltip', () => ({
-  CustomTooltip: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }))
 
 const mockTokens: TokenWithHashtags[] = [
@@ -156,60 +152,122 @@ const mockTokens: TokenWithHashtags[] = [
   },
 ]
 
-describe('HomePage Integration', () => {
-  it('renders complete page layout', () => {
-    render(<HomePage tokens={mockTokens} loading={false} />)
-    
-    // Header
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
-    expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
-    
-    // Categories
+describe('CategoryGrid', () => {
+  it('renders all 4 category containers', () => {
+    render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
+
+    // Categories appear twice (desktop + mobile layouts)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Meme').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-RWA').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Presale').length).toBeGreaterThanOrEqual(1)
-    
-    // Subscription terminal
-    expect(screen.getByText('SUBSCRIPTION TERMINAL PLACEHOLDER')).toBeDefined()
-    
-    // Footer
-    expect(screen.getByText(/SONAR RADAR ACTIVE/)).toBeDefined()
   })
 
-  it('renders with empty tokens', () => {
-    render(<HomePage tokens={[]} loading={false} />)
-    
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+  it('passes correct tokens to each category', () => {
+    render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
+
+    // Token names appear twice (desktop + mobile layouts)
+    expect(screen.getAllByText('TechToken1').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('MemeToken1').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('RWAToken1').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('PresaleToken1').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('handles empty tokens array', () => {
+    render(
+      <CategoryGrid
+        tokens={[]}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
+
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByTestId('category-Meme').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByTestId('category-RWA').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByTestId('category-Presale').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('passes correct token counts to categories', () => {
+    render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
+
+    // All categories have 1 token each, but rendered twice (desktop + mobile)
+    const tokenCounts = screen.getAllByText('1 tokens')
+    expect(tokenCounts.length).toBeGreaterThanOrEqual(4)
   })
 
   it('renders loading state', () => {
-    render(<HomePage tokens={mockTokens} loading={true} />)
-    
-    // Header still renders
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
-    
-    // Categories still render (with skeletons inside)
+    render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={true}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
+    // Categories should still render even when loading
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('renders countdown timer', () => {
-    render(<HomePage tokens={mockTokens} loading={false} />)
-    const timers = screen.getAllByText('02:00:00')
-    expect(timers.length).toBeGreaterThanOrEqual(1)
+  it('hides grid when active filter is set', () => {
+    const { container } = render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter="defi"
+      />
+    )
+
+    // Check that the desktop grid has opacity-0 class
+    const desktopGrid = container.querySelector('.hidden.lg\\:grid')
+    expect(desktopGrid?.classList.contains('opacity-0')).toBe(true)
   })
 
-  it('renders search functionality', () => {
-    render(<HomePage tokens={mockTokens} loading={false} />)
-    expect(screen.getByRole('button', { name: /toggle search/i })).toBeDefined()
-  })
+  it('filters tokens by category', () => {
+    render(
+      <CategoryGrid
+        tokens={mockTokens}
+        loading={false}
+        selectedToken={null}
+        setSelectedToken={() => {}}
+        activeFilter={null}
+      />
+    )
 
-  it('renders footer links', () => {
-    render(<HomePage tokens={mockTokens} loading={false} />)
-    expect(screen.getByText('[ SUBMIT TOKEN ]')).toBeDefined()
-    expect(screen.getByText('[ ADVERTISE ]')).toBeDefined()
-    expect(screen.getByText('[ T&C ]')).toBeDefined()
-    expect(screen.getByText('[ PRIVACY ]')).toBeDefined()
+    // Each category should only have its own token
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      expect(cat.textContent).toContain('TechToken1')
+      expect(cat.textContent).not.toContain('MemeToken1')
+    })
   })
 })

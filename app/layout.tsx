@@ -42,7 +42,7 @@ export default function RootLayout({
       lang="en"
       className={`${outfit.variable} ${oxanium.variable} ${jetbrainsMono.variable} ${spaceMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black">{children}</body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   )
 }
