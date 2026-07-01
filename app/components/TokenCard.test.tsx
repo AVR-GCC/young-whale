@@ -208,6 +208,20 @@ describe('TokenCard', () => {
     expect(screen.queryByText('#Test')).toBeNull()
   })
 
+  it('displays main_hashtag name instead of first hashtag', () => {
+    const tokenWithDifferentMainHashtag = {
+      ...mockToken,
+      main_hashtag: 'secondtag',
+      hashtags: [
+        { id: '1', name: 'FirstTag', slug: 'firsttag', is_active: true, created_at: '2024-01-01T00:00:00Z' },
+        { id: '2', name: 'SecondTag', slug: 'secondtag', is_active: true, created_at: '2024-01-01T00:00:00Z' },
+      ],
+    }
+    render(<TokenCard themeColor="#ff0000" token={tokenWithDifferentMainHashtag} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    expect(screen.getByText('#SecondTag')).toBeDefined()
+    expect(screen.queryByText('#FirstTag')).toBeNull()
+  })
+
   it('displays social links in expanded view', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')

@@ -234,6 +234,8 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     timeLabel = <TimeSince date={token.created_at} />;
   }
 
+  const displayHashtag = (token.hashtags.find(h => h.slug === token.main_hashtag)?.name) || token.main_hashtag
+
   return (
     <div
       className={`
@@ -288,9 +290,9 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
         {/* Hashtag */}
         <div className="hidden sm:block flex-shrink-0 mr-1 sm:mr-2">
-          {token.hashtags.slice(0, 1).map((hashtag) => (
+          {token.main_hashtag && (
             <button
-              key={hashtag.id}
+              key="main-hashtag"
               type="button"
               className="text-[9px] font-mono font-semibold tracking-wider uppercase text-[#94A3B8] bg-[#2A3441] rounded-[4px] px-1.5 py-0.5 truncate transition-colors focus:outline-none"
               onMouseEnter={(e) => {
@@ -302,9 +304,9 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
                 e.currentTarget.style.color = '#94A3B8';
               }}
             >
-              #{hashtag.name}
+              #{displayHashtag}
             </button>
-          ))}
+          )}
         </div>
 
         {/* Rating */}
