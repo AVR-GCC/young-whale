@@ -161,6 +161,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
 
@@ -179,6 +180,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
 
@@ -197,6 +199,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
 
@@ -214,6 +217,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
 
@@ -230,6 +234,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
     // Categories should still render even when loading
@@ -244,6 +249,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter="defi"
+        sortBy="default"
       />
     )
 
@@ -260,6 +266,7 @@ describe('CategoryGrid', () => {
         selectedToken={null}
         setSelectedToken={() => {}}
         activeFilter={null}
+        sortBy="default"
       />
     )
 

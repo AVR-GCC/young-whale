@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Search } from 'lucide-react'
 import { CustomTooltip } from './CustomTooltip'
 
@@ -20,7 +21,9 @@ interface HeaderProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
   timeFilter: 'all' | 'today' | 'yesterday'
+  setTimeFilter: (filter: 'all' | 'today' | 'yesterday') => void
   sortBy: 'default' | 'score' | 'hashtag'
+  setSortBy: (sort: 'default' | 'score' | 'hashtag') => void
 }
 
 export default function Header({
@@ -30,7 +33,9 @@ export default function Header({
   searchQuery,
   setSearchQuery,
   timeFilter,
+  setTimeFilter,
   sortBy,
+  setSortBy,
 }: HeaderProps) {
   return (
     <header className="pt-2 pb-1.5 w-full border-b border-[#1E293B]/25 bg-[#070A10]/50 backdrop-blur-md sticky top-0 z-40">
@@ -38,12 +43,12 @@ export default function Header({
 
         {/* Top Left: Logo */}
         <div className="flex-shrink-0 flex items-center">
-          <a
+          <Link
             href="/"
             className="font-oxanium font-bold text-xl tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300"
           >
             YoungWhale.io
-          </a>
+          </Link>
         </div>
 
         {/* Center: Timer */}
@@ -100,6 +105,7 @@ export default function Header({
                 />
                 <select
                   value={timeFilter}
+                  onChange={(e) => setTimeFilter(e.target.value as 'all' | 'today' | 'yesterday')}
                   className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
                 >
                   <option value="all">TIME: ALL</option>
@@ -108,6 +114,7 @@ export default function Header({
                 </select>
                 <select
                   value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'default' | 'score' | 'hashtag')}
                   className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
                 >
                   <option value="default">SORT: DFLT</option>

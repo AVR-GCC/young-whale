@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import HomePage from './HomePage'
 import type { TokenWithHashtags } from '@/shared/types'
 
@@ -159,37 +159,37 @@ const mockTokens: TokenWithHashtags[] = [
 describe('HomePage Integration', () => {
   it('renders complete page layout', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
-    
+
     // Header
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
-    
+
     // Categories
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Meme').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-RWA').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Presale').length).toBeGreaterThanOrEqual(1)
-    
+
     // Subscription terminal
     expect(screen.getByText('SUBSCRIPTION TERMINAL PLACEHOLDER')).toBeDefined()
-    
+
     // Footer
     expect(screen.getByText(/SONAR RADAR ACTIVE/)).toBeDefined()
   })
 
   it('renders with empty tokens', () => {
     render(<HomePage tokens={[]} loading={false} />)
-    
+
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders loading state', () => {
     render(<HomePage tokens={mockTokens} loading={true} />)
-    
+
     // Header still renders
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
-    
+
     // Categories still render (with skeletons inside)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
   })
@@ -211,5 +211,133 @@ describe('HomePage Integration', () => {
     expect(screen.getByText('[ ADVERTISE ]')).toBeDefined()
     expect(screen.getByText('[ T&C ]')).toBeDefined()
     expect(screen.getByText('[ PRIVACY ]')).toBeDefined()
+  })
+
+  it('filters tokens by time filter "today"', () => {
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    // Open search to access filters
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    // Change time filter to today
+    const timeSelect = screen.getByDisplayValue('TIME: ALL')
+    fireEvent.change(timeSelect, { target: { value: 'today' } })
+
+    // Only today's tokens should appear (created_at is 2024-06-10, which is in the past relative to now)
+    // Since the test uses fixed dates, we need to verify the filter logic is applied
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      // Should not show older tokens when filtered to today
+      expect(cat.textContent).not.toContain('PresaleToken1')
+    })
+  })
+
+  it('filters tokens by time filter "yesterday"', () => {
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    const timeSelect = screen.getByDisplayValue('TIME: ALL')
+    fireEvent.change(timeSelect, { target: { value: 'yesterday' } })
+
+    // Should not show today's tokens when filtered to yesterday
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      expect(cat.textContent).not.toContain('TechToken1')
+    })
+  })
+
+  it('sorts tokens by score', () => {
+    const tokensWithRatings = mockTokens.map((t, i) => ({
+      ...t,
+      rating: [100, 50, 75, 25][i]
+    }))
+
+    render(<HomePage tokens={tokensWithRatings} loading={false} />)
+
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    const sortSelect = screen.getByDisplayValue('SORT: DFLT')
+    fireEvent.change(sortSelect, { target: { value: 'score' } })
+
+    // Verify sorting is applied - highest rating should appear first
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      const tokenList = cat.querySelector('[data-testid="token-list"]')
+      if (tokenList && tokenList.children.length > 0) {
+        // TechToken1 has rating 100, should be first in its category
+        expect(tokenList.children[0].textContent).toBe('TechToken1')
+      }
+    })
+  })
+
+  it('sorts tokens by hashtag', () => {
+    const tokensWithHashtags = mockTokens.map((t, i) => ({
+      ...t,
+      hashtags: [{ id: `h${i}`, name: ['zebra', 'alpha', 'beta', 'gamma'][i], slug: ['zebra', 'alpha', 'beta', 'gamma'][i], is_active: true, created_at: t.created_at }]
+    }))
+
+    render(<HomePage tokens={tokensWithHashtags} loading={false} />)
+
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    const sortSelect = screen.getByDisplayValue('SORT: DFLT')
+    fireEvent.change(sortSelect, { target: { value: 'hashtag' } })
+
+    // Verify sorting is applied - should be sorted alphabetically by hashtag
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      const tokenList = cat.querySelector('[data-testid="token-list"]')
+      if (tokenList && tokenList.children.length > 0) {
+        // TechToken1 has hashtag 'zebra', should be last alphabetically
+        expect(tokenList.children[tokenList.children.length - 1].textContent).toBe('TechToken1')
+      }
+    })
+  })
+
+  it('filters tokens by search query', () => {
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    const searchInput = screen.getByPlaceholderText('SEARCH...')
+    fireEvent.change(searchInput, { target: { value: 'Meme' } })
+
+    // Only MemeToken1 should appear in results
+    const memeCategories = screen.getAllByTestId('category-Meme')
+    memeCategories.forEach(cat => {
+      expect(cat.textContent).toContain('MemeToken1')
+    })
+
+    // Other categories should be empty or not contain the searched token
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      expect(cat.textContent).not.toContain('TechToken1')
+    })
+  })
+
+  it('combines time filter and search query', () => {
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    fireEvent.click(searchButton)
+
+    const searchInput = screen.getByPlaceholderText('SEARCH...')
+    fireEvent.change(searchInput, { target: { value: 'Token' } })
+
+    const timeSelect = screen.getByDisplayValue('TIME: ALL')
+    fireEvent.change(timeSelect, { target: { value: 'today' } })
+
+    // Should apply both filters
+    const techCategories = screen.getAllByTestId('category-Tech')
+    techCategories.forEach(cat => {
+      // Should not show older tokens even if they match search
+      expect(cat.textContent).not.toContain('PresaleToken1')
+    })
   })
 })

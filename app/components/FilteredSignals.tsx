@@ -3,6 +3,7 @@
 import type { TokenWithHashtags } from '@/shared/types'
 
 const playAudioFeedback = (type: 'hover' | 'select' | 'error' = 'hover') => {
+  console.log('type', type);
   // No-op: audio feedback not implemented in current app
 }
 

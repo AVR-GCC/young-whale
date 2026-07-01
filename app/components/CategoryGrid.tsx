@@ -10,6 +10,7 @@ interface CategoryGridProps {
   selectedToken: string | null
   setSelectedToken: (token: string | null) => void
   activeFilter: string | null
+  sortBy: 'default' | 'score' | 'hashtag'
 }
 
 export default function CategoryGrid({
@@ -18,11 +19,23 @@ export default function CategoryGrid({
   selectedToken,
   setSelectedToken,
   activeFilter,
+  sortBy,
 }: CategoryGridProps) {
   const renderCategory = (category: typeof categories[0]) => {
     const categoryTokens = tokens
       .filter((token) => token.category === category.id)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort((a, b) => {
+        if (sortBy === 'score') {
+          return (b.rating || 0) - (a.rating || 0)
+        }
+        if (sortBy === 'hashtag') {
+          const tagA = a.hashtags?.[0]?.name || ''
+          const tagB = b.hashtags?.[0]?.name || ''
+          if (tagA !== tagB) return tagA.localeCompare(tagB)
+        }
+        // Default: sort by created_at desc (newest first)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
     return (
       <CategoryContainer
         key={category.id}

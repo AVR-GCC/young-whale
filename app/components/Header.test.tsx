@@ -20,7 +20,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
@@ -35,7 +37,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
     // Timer appears twice (desktop + mobile) so use getAllByText
@@ -52,7 +56,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
@@ -67,7 +73,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
     expect(screen.getByRole('button', { name: /toggle search/i })).toBeDefined()
@@ -83,7 +91,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
 
@@ -104,7 +114,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
 
@@ -125,7 +137,9 @@ describe('Header', () => {
         searchQuery="test"
         setSearchQuery={setSearchQuery}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
 
@@ -145,7 +159,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="today"
+        setTimeFilter={() => {}}
         sortBy="hashtag"
+        setSortBy={() => {}}
       />
     )
 
@@ -154,6 +170,32 @@ describe('Header', () => {
     expect(screen.getByText('1D AGO')).toBeDefined()
     expect(screen.getByText('SORT: DFLT')).toBeDefined()
     expect(screen.getByText('HASHTAG')).toBeDefined()
+  })
+
+  it('calls setTimeFilter and setSortBy on select change', () => {
+    const setTimeFilter = vi.fn()
+    const setSortBy = vi.fn()
+    render(
+      <Header
+        secondsLeft={7200}
+        isSearchOpen={true}
+        setIsSearchOpen={() => {}}
+        searchQuery=""
+        setSearchQuery={() => {}}
+        timeFilter="all"
+        setTimeFilter={setTimeFilter}
+        sortBy="default"
+        setSortBy={setSortBy}
+      />
+    )
+
+    const timeSelect = screen.getByDisplayValue('TIME: ALL') as HTMLSelectElement
+    fireEvent.change(timeSelect, { target: { value: 'today' } })
+    expect(setTimeFilter).toHaveBeenCalledWith('today')
+
+    const sortSelect = screen.getByDisplayValue('SORT: DFLT') as HTMLSelectElement
+    fireEvent.change(sortSelect, { target: { value: 'hashtag' } })
+    expect(setSortBy).toHaveBeenCalledWith('hashtag')
   })
 
   it('renders mobile timer', () => {
@@ -165,7 +207,9 @@ describe('Header', () => {
         searchQuery=""
         setSearchQuery={() => {}}
         timeFilter="all"
+        setTimeFilter={() => {}}
         sortBy="default"
+        setSortBy={() => {}}
       />
     )
     expect(screen.getByText('NEXT WAVE:')).toBeDefined()
