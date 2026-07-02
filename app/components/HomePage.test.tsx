@@ -216,8 +216,9 @@ describe('HomePage Integration', () => {
   it('renders footer links', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
     expect(screen.getByText('[ SUBMIT TOKEN ]')).toBeDefined()
-    expect(screen.getByText('[ ADVERTISE ]')).toBeDefined()
+    expect(screen.getByText('[ CONTACT ]')).toBeDefined()
     expect(screen.getByText('[ T&C ]')).toBeDefined()
+    expect(screen.getByText('[ LEGAL DISCLAIMER ]')).toBeDefined()
     expect(screen.getByText('[ PRIVACY ]')).toBeDefined()
   })
 

@@ -7,6 +7,7 @@ import FilteredSignals from './FilteredSignals'
 import Footer from './Footer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { SubscriptionTerminal } from './SubscriptionTerminal'
+import { LegalModal, LegalTab } from './LegalModal'
 
 interface HomePageProps {
   tokens: TokenWithHashtags[]
@@ -29,6 +30,19 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'yesterday'>('all')
   const [sortBy, setSortBy] = useState<'default' | 'score' | 'hashtag'>('default')
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+  const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
+
+  // Toy functions for footer actions
+  const playAudioFeedback = (type: string) => {
+    console.log('type', type);
+    console.log('isContactModalOpen', isContactModalOpen);
+    // No-op: audio feedback placeholder
+  }
+
+  const openSubmitModal = () => {
+    // No-op: submit modal placeholder
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -72,6 +86,12 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit pb-10 selection:bg-[#00E5D2]/30 selection:text-[#00E5D2] relative overflow-x-hidden">
+      {/* Legal Modal */}
+      <LegalModal
+        isOpen={legalModalTab !== null}
+        onClose={() => setLegalModalTab(null)}
+        initialTab={legalModalTab || 'tc'}
+      />
 
       <Header
         secondsLeft={secondsLeft}
@@ -105,7 +125,12 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
 
       <SubscriptionTerminal />
 
-      <Footer />
+      <Footer
+        playAudioFeedback={playAudioFeedback}
+        openSubmitModal={openSubmitModal}
+        setIsContactModalOpen={setIsContactModalOpen}
+        setLegalModalTab={setLegalModalTab}
+      />
 
     </div>
   )
