@@ -1,0 +1,131 @@
+          {/* Main Desktop View */}
+          <div className={`hidden lg:flex gap-x-6 items-start w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 relative'}`}>
+            <div className="flex-1 flex flex-col gap-y-3">
+              <CategoryBlock
+                title="NEW TECH PROJECTS"
+                tooltipText="The newest tokens of real tech projects that just hit the exchanges."
+                headerColor="#00F0FF"
+                tokensList={techProjectsList}
+                promotedList={promotedTechList}
+                limit={techLimit}
+                setLimit={setTechLimit}
+                skeletonPrefix="tech-skel"
+                isLoading={isLoading}
+                selectedToken={selectedToken}
+                setSelectedToken={setSelectedToken}
+                playAudioFeedback={playAudioFeedback}
+                handleTagClick={handleTagClick}
+              />
+              <CategoryBlock
+                title="LATEST RWA TOKENS"
+                tooltipText="Newest Real World Asset tokens launched on chain."
+                headerColor="#39FF14"
+                tokensList={rwaTokensList}
+                promotedList={promotedRwaList}
+                limit={rwaLimit}
+                setLimit={setRwaLimit}
+                skeletonPrefix="rwa-skel"
+                isLoading={isLoading}
+                selectedToken={selectedToken}
+                setSelectedToken={setSelectedToken}
+                playAudioFeedback={playAudioFeedback}
+                handleTagClick={handleTagClick}
+              />
+            </div>
+            <div className="flex-1 flex flex-col gap-y-3">
+              <CategoryBlock
+                title="NEW MEME COINS"
+                tooltipText="Community-driven culture tokens with high velocity."
+                headerColor="#FF00D6"
+                tokensList={memeCoinsList}
+                promotedList={promotedMemeList}
+                limit={memeLimit}
+                setLimit={setMemeLimit}
+                skeletonPrefix="meme-skel"
+                isLoading={isLoading}
+                selectedToken={selectedToken}
+                setSelectedToken={setSelectedToken}
+                playAudioFeedback={playAudioFeedback}
+                handleTagClick={handleTagClick}
+              />
+              <CategoryBlock
+                title="UPCOMING PRESALES"
+                tooltipText="Verified tier 1 presales opening soon."
+                headerColor="#F5A623"
+                tokensList={upcomingPresaleList}
+                promotedList={promotedPresaleList}
+                limit={presaleLimit}
+                setLimit={setPresaleLimit}
+                skeletonPrefix="presale-skel"
+                isLoading={isLoading}
+                selectedToken={selectedToken}
+                setSelectedToken={setSelectedToken}
+                playAudioFeedback={playAudioFeedback}
+                handleTagClick={handleTagClick}
+              />
+            </div>
+          </div>
+
+          {/* Main Mobile View */}
+          <div className={`flex lg:hidden flex-col gap-y-4 w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 relative'}`}>
+            <CategoryBlock
+              title="NEW TECH PROJECTS"
+              tooltipText="The newest tokens of real tech projects that just hit the exchanges."
+              headerColor="#00F0FF"
+              tokensList={techProjectsList}
+              promotedList={promotedTechList}
+              limit={techLimit}
+              setLimit={setTechLimit}
+              skeletonPrefix="tech-skel-mob"
+              isLoading={isLoading}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              playAudioFeedback={playAudioFeedback}
+              handleTagClick={handleTagClick}
+            />
+            <CategoryBlock
+              title="NEW MEME COINS"
+              tooltipText="Community-driven culture tokens with high velocity."
+              headerColor="#FF00D6"
+              tokensList={memeCoinsList}
+              promotedList={promotedMemeList}
+              limit={memeLimit}
+              setLimit={setMemeLimit}
+              skeletonPrefix="meme-skel-mob"
+              isLoading={isLoading}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              playAudioFeedback={playAudioFeedback}
+              handleTagClick={handleTagClick}
+            />
+            <CategoryBlock
+              title="LATEST RWA TOKENS"
+              tooltipText="Newest Real World Asset tokens launched on chain."
+              headerColor="#39FF14"
+              tokensList={rwaTokensList}
+              promotedList={promotedRwaList}
+              limit={rwaLimit}
+              setLimit={setRwaLimit}
+              skeletonPrefix="rwa-skel-mob"
+              isLoading={isLoading}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              playAudioFeedback={playAudioFeedback}
+              handleTagClick={handleTagClick}
+            />
+            <CategoryBlock
+              title="UPCOMING PRESALES"
+              tooltipText="Verified tier 1 presales opening soon."
+              headerColor="#F5A623"
+              tokensList={upcomingPresaleList}
+              promotedList={promotedPresaleList}
+              limit={presaleLimit}
+              setLimit={setPresaleLimit}
+              skeletonPrefix="presale-skel-mob"
+              isLoading={isLoading}
+              selectedToken={selectedToken}
+              setSelectedToken={setSelectedToken}
+              playAudioFeedback={playAudioFeedback}
+              handleTagClick={handleTagClick}
+            />
+          </div>
