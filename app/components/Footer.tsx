@@ -1,13 +1,20 @@
+import Image from 'next/image'
+
 export default function Footer() {
   return (
-    <footer className="w-full bg-[#0B0F19] font-mono mt-16 pb-12 pt-12 border-t border-cyan-400/10">
+    <footer className="w-full bg-[#0B0F19] font-mono mt-16 pb-12 border-t border-cyan-400/10">
       <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col items-center">
 
         {/* Brand Sign-off */}
         <div className="flex flex-col items-center mb-8 w-full">
-          <div className="border border-dashed border-slate-600 px-6 h-12 md:h-16 flex items-center justify-center mb-3 text-slate-500 tracking-widest text-xs md:text-sm text-center w-full max-w-sm">
-            [ LOGO IMAGE GOES HERE ]
-          </div>
+          <Image
+            src="/public-master.png"
+            alt="logo"
+            width={100}
+            height={100}
+            className="w-50 h-50 object-contain p-0.5"
+            unoptimized
+          />
           <div className="text-slate-500 text-xs tracking-widest text-center mt-2">
             [ YOUNGWHALE.IO <span className="text-green-400 animate-pulse">●</span> SONAR RADAR ACTIVE ]
           </div>
