@@ -6,7 +6,7 @@ describe('Footer', () => {
   it('renders brand sign-off', () => {
     render(<Footer />)
     expect(screen.getByText(/SONAR RADAR ACTIVE/)).toBeDefined()
-    expect(screen.getByText('[ LOGO IMAGE GOES HERE ]')).toBeDefined()
+    expect(screen.getByAltText('logo')).toBeDefined()
   })
 
   it('renders footer links', () => {
