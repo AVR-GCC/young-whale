@@ -35,7 +35,7 @@ export default function Footer() {
 
         {/* Compliance & Disclaimers */}
         <div className="max-w-4xl text-center text-xs leading-relaxed text-slate-500/40 mb-10 px-4 md:px-0">
-          All data provided is for informational purposes only and does not constitute financial advice. Tokens are displayed via a 24-hour TTL static snapshot. YoungWhale does not track live prices and is not an exchange. To prevent artificial hype and ensure algorithmic integrity, Sonar Scores are strictly capped at a maximum rating.
+            All data provided on youngwhale.io is for informational purposes only and does not constitute financial or investment advice. Users acknowledge that youngwhale.io is an independent data aggregator; we are not affiliated or associated, directly or indirectly, with any token, cryptocurrency project, or exchange. Token data is displayed via a 24-hour TTL static snapshot; youngwhale.io does not track live prices, nor do we operate as an exchange. To prevent artificial hype, Sonar Scores are strictly capped at a maximum rating and remain valid exclusively for the initial 24-hour period. Please note: Sonar Scores reflect automated activity metrics, not project legitimacy, safety, or endorsement.
         </div>
 
       </div>

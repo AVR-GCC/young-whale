@@ -24,7 +24,7 @@ describe('Footer', () => {
 
   it('renders disclaimer', () => {
     render(<Footer />)
-    expect(screen.getByText(/All data provided is for informational purposes/)).toBeDefined()
+    expect(screen.getByText(/All data provided on youngwhale.io is for informational purposes/)).toBeDefined()
   })
 
   it('renders footer element', () => {
