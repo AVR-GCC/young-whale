@@ -3,6 +3,14 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import HomePage from './HomePage'
 import type { TokenWithHashtags } from '@/shared/types'
 
+vi.mock('@/lib/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      insert: vi.fn(),
+    })),
+  },
+}))
+
 vi.mock('./CategoryContainer', () => ({
   default: ({ category, tokenCount, tokens }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[] }) => (
     <div data-testid={`category-${category.id}`} data-layout={category.id}>
@@ -171,7 +179,7 @@ describe('HomePage Integration', () => {
     expect(screen.getAllByTestId('category-Presale').length).toBeGreaterThanOrEqual(1)
 
     // Subscription terminal
-    expect(screen.getByText('SUBSCRIPTION TERMINAL PLACEHOLDER')).toBeDefined()
+    expect(screen.getByText('YOUNG WHALE CLUB')).toBeDefined()
 
     // Footer
     expect(screen.getByText(/SONAR RADAR ACTIVE/)).toBeDefined()

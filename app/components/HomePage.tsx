@@ -6,6 +6,7 @@ import CategoryGrid from './CategoryGrid'
 import FilteredSignals from './FilteredSignals'
 import Footer from './Footer'
 import type { TokenWithHashtags } from '@/shared/types'
+import { SubscriptionTerminal } from './SubscriptionTerminal'
 
 interface HomePageProps {
   tokens: TokenWithHashtags[]
@@ -14,17 +15,6 @@ interface HomePageProps {
 
 // --- Hardcoded values for example-app features with no current-app equivalent ---
 const INITIAL_SECONDS = 7200 // 2 hours in seconds
-
-// Simple SubscriptionTerminal placeholder matching example appearance
-function SubscriptionTerminal() {
-  return (
-    <div className="w-full max-w-7xl mx-auto px-4 mt-8">
-      <div className="bg-[#0B0F19] border border-[#1E293B]/40 rounded-xl p-6 text-center">
-        <span className="font-mono text-xs text-slate-500">SUBSCRIPTION TERMINAL PLACEHOLDER</span>
-      </div>
-    </div>
-  )
-}
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 const now = new Date()
