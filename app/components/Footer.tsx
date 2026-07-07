@@ -2,14 +2,12 @@ import Image from 'next/image'
 import type { LegalTab } from './LegalModal'
 
 interface FooterProps {
-  playAudioFeedback: (type: string) => void
   openSubmitModal: () => void
   setIsContactModalOpen: (value: boolean) => void
   setLegalModalTab: (tab: LegalTab) => void
 }
 
 export default function Footer({
-  playAudioFeedback,
   openSubmitModal,
   setIsContactModalOpen,
   setLegalModalTab,
@@ -36,11 +34,11 @@ export default function Footer({
         {/* System Routing / Links */}
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-8 text-xs md:text-sm tracking-widest">
             <a href="#" aria-label="X (Twitter)" className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer">[ 𝕏 ]</a>
-            <button onClick={(e) => { e.preventDefault(); playAudioFeedback('select'); openSubmitModal(); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer tracking-widest">[ SUBMIT TOKEN ]</button>
-            <button onClick={(e) => { e.preventDefault(); playAudioFeedback('select'); setIsContactModalOpen(true); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ CONTACT ]</button>
-            <button onClick={(e) => { e.preventDefault(); playAudioFeedback('select'); setLegalModalTab('tc'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ T&C ]</button>
-            <button onClick={(e) => { e.preventDefault(); playAudioFeedback('select'); setLegalModalTab('legal'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ LEGAL DISCLAIMER ]</button>
-            <button onClick={(e) => { e.preventDefault(); playAudioFeedback('select'); setLegalModalTab('privacy'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ PRIVACY ]</button>
+            <button onClick={(e) => { e.preventDefault(); openSubmitModal(); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer tracking-widest">[ SUBMIT TOKEN ]</button>
+            <button onClick={(e) => { e.preventDefault(); setIsContactModalOpen(true); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ CONTACT ]</button>
+            <button onClick={(e) => { e.preventDefault(); setLegalModalTab('tc'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ T&C ]</button>
+            <button onClick={(e) => { e.preventDefault(); setLegalModalTab('legal'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ LEGAL DISCLAIMER ]</button>
+            <button onClick={(e) => { e.preventDefault(); setLegalModalTab('privacy'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ PRIVACY ]</button>
           </div>
 
         {/* Compliance & Disclaimers */}

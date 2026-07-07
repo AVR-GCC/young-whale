@@ -33,13 +33,6 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
 
-  // Toy functions for footer actions
-  const playAudioFeedback = (type: string) => {
-    console.log('type', type);
-    console.log('isContactModalOpen', isContactModalOpen);
-    // No-op: audio feedback placeholder
-  }
-
   const openSubmitModal = () => {
     // No-op: submit modal placeholder
   }
@@ -126,7 +119,6 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
       <SubscriptionTerminal />
 
       <Footer
-        playAudioFeedback={playAudioFeedback}
         openSubmitModal={openSubmitModal}
         setIsContactModalOpen={setIsContactModalOpen}
         setLegalModalTab={setLegalModalTab}
