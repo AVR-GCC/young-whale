@@ -33,7 +33,7 @@ export default function Footer({
 
         {/* System Routing / Links */}
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6 mb-8 text-xs md:text-sm tracking-widest">
-            <a href="#" aria-label="X (Twitter)" className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer">[ 𝕏 ]</a>
+            <a href="https://x.com/YoungWhaleLabs" target="_blank" rel="noopener" aria-label="X (Twitter)" className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer">[ 𝕏 ]</a>
             <button onClick={(e) => { e.preventDefault(); openSubmitModal(); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_12px_#22d3ee80] cursor-pointer tracking-widest">[ SUBMIT TOKEN ]</button>
             <button onClick={(e) => { e.preventDefault(); setIsContactModalOpen(true); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ CONTACT ]</button>
             <button onClick={(e) => { e.preventDefault(); setLegalModalTab('tc'); }} className="text-slate-500 hover:text-cyan-400 transition-all duration-[120ms] hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] cursor-pointer tracking-widest">[ T&C ]</button>
