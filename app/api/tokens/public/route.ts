@@ -15,8 +15,8 @@ export async function GET() {
           hashtags(id, name, slug)
         )`
       )
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false })
+      .not('published_at', 'is', null)
+      .order('published_at', { ascending: false })
 
     if (error) {
       console.error('Failed to fetch public tokens:', error.message)

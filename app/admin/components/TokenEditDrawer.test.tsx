@@ -45,6 +45,7 @@ const mockToken: TokenWithHashtags = {
   supply: 1000000,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+    published_at: null,
   hashtags: [{ id: 'h1', name: 'defi', slug: 'defi', is_active: true, created_at: '2024-01-01' }],
   raw_token: {
     id: 'raw-1',

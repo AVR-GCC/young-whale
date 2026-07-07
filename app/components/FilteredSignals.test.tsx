@@ -35,6 +35,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 1000000,
     created_at: '2024-06-10T10:00:00Z',
     updated_at: '2024-06-10T10:00:00Z',
+    published_at: null,
     hashtags: [{ id: '1', name: 'defi', slug: 'defi', is_active: true, created_at: '2024-01-01' }],
   },
   {
@@ -68,6 +69,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 500000000,
     created_at: '2024-06-09T10:00:00Z',
     updated_at: '2024-06-09T10:00:00Z',
+    published_at: null,
     hashtags: [{ id: '2', name: 'meme', slug: 'meme', is_active: true, created_at: '2024-01-01' }],
   },
 ]

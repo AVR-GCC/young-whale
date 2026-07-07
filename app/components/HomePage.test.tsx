@@ -61,6 +61,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 1000000,
     created_at: '2024-06-10T10:00:00Z',
     updated_at: '2024-06-10T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -94,6 +95,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 500000000,
     created_at: '2024-06-09T10:00:00Z',
     updated_at: '2024-06-09T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -127,6 +129,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 10000000,
     created_at: '2024-06-08T10:00:00Z',
     updated_at: '2024-06-08T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -160,6 +163,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: null,
     created_at: '2024-06-07T10:00:00Z',
     updated_at: '2024-06-07T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
 ]
@@ -203,9 +207,16 @@ describe('HomePage Integration', () => {
   })
 
   it('renders countdown timer', () => {
+    // Mock date to 22:00 UTC so timer shows 02:00:00
+    const mockDate = new Date('2024-06-10T22:00:00Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(mockDate)
+
     render(<HomePage tokens={mockTokens} loading={false} />)
     const timers = screen.getAllByText('02:00:00')
     expect(timers.length).toBeGreaterThanOrEqual(1)
+
+    vi.useRealTimers()
   })
 
   it('renders search functionality', () => {

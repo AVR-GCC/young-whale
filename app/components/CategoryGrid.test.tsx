@@ -49,6 +49,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 1000000,
     created_at: '2024-06-10T10:00:00Z',
     updated_at: '2024-06-10T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -82,6 +83,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 500000000,
     created_at: '2024-06-09T10:00:00Z',
     updated_at: '2024-06-09T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -115,6 +117,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: 10000000,
     created_at: '2024-06-08T10:00:00Z',
     updated_at: '2024-06-08T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
   {
@@ -148,6 +151,7 @@ const mockTokens: TokenWithHashtags[] = [
     supply: null,
     created_at: '2024-06-07T10:00:00Z',
     updated_at: '2024-06-07T10:00:00Z',
+    published_at: null,
     hashtags: [],
   },
 ]

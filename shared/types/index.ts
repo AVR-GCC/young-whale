@@ -105,6 +105,7 @@ export interface Token {
   main_hashtag: string | null
   rating: number
   supply: number | null
+  published_at: string | null
   created_at: string
   updated_at: string
 }

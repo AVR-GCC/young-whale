@@ -15,7 +15,11 @@ interface HomePageProps {
 }
 
 // --- Hardcoded values for example-app features with no current-app equivalent ---
-const INITIAL_SECONDS = 7200 // 2 hours in seconds
+const getSecondsUntilMidnightUTC = () => {
+  const now = new Date()
+  const tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1))
+  return Math.floor((tomorrow.getTime() - now.getTime()) / 1000)
+}
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 const now = new Date()
@@ -24,7 +28,7 @@ const twoDayAgo = new Date(now.getTime() - ONE_DAY * 2)
 
 export default function HomePage({ tokens, loading }: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
-  const [secondsLeft, setSecondsLeft] = useState(INITIAL_SECONDS)
+  const [secondsLeft, setSecondsLeft] = useState(getSecondsUntilMidnightUTC)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'yesterday'>('all')
@@ -39,7 +43,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => (prev <= 1 ? INITIAL_SECONDS : prev - 1))
+      setSecondsLeft((prev) => (prev <= 1 ? getSecondsUntilMidnightUTC() : prev - 1))
     }, 1000)
     return () => clearInterval(interval)
   }, [])

@@ -41,6 +41,7 @@ const mockToken: TokenWithHashtags = {
   supply: 1000000,
   created_at: '2024-06-10T10:00:00Z',
   updated_at: '2024-06-10T10:00:00Z',
+    published_at: null,
   hashtags: [
     { id: '1', name: 'Test', slug: 'test', is_active: true, created_at: '2024-01-01T00:00:00Z' },
     { id: '2', name: 'DeFi', slug: 'defi', is_active: true, created_at: '2024-01-01T00:00:00Z' },
@@ -78,6 +79,7 @@ const mockTokenNoOptional: TokenWithHashtags = {
   supply: null,
   created_at: '2024-06-09T10:00:00Z',
   updated_at: '2024-06-09T10:00:00Z',
+    published_at: null,
   hashtags: [],
 }
 
