@@ -28,7 +28,7 @@ const twoDayAgo = new Date(now.getTime() - ONE_DAY * 2)
 
 export default function HomePage({ tokens, loading }: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
-  const [secondsLeft, setSecondsLeft] = useState(getSecondsUntilMidnightUTC)
+  const [secondsLeft, setSecondsLeft] = useState(0)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'yesterday'>('all')
@@ -42,6 +42,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   }
 
   useEffect(() => {
+    setSecondsLeft(getSecondsUntilMidnightUTC())
     const interval = setInterval(() => {
       setSecondsLeft((prev) => (prev <= 1 ? getSecondsUntilMidnightUTC() : prev - 1))
     }, 1000)
