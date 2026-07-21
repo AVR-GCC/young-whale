@@ -42,7 +42,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   }
 
   useEffect(() => {
-    setSecondsLeft(getSecondsUntilMidnightUTC())
+    setTimeout(() => setSecondsLeft(getSecondsUntilMidnightUTC()))
     const interval = setInterval(() => {
       setSecondsLeft((prev) => (prev <= 1 ? getSecondsUntilMidnightUTC() : prev - 1))
     }, 1000)
