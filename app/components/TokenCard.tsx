@@ -5,7 +5,7 @@ import Image from 'next/image'
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
 import { Pin } from 'lucide-react';
-import TokenCardExpanded from './TokenCardExpanded';
+import TokenTerminal from './TokenTerminal';
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 
@@ -329,7 +329,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         </div>
       </div>
 
-      <TokenCardExpanded token={token} themeColor={themeColor} isExpired={isExpired} isExpanded={isExpanded} />
+      <TokenTerminal token={token} themeColor={themeColor} isExpired={isExpired} isExpanded={isExpanded} />
       <div className="h-px w-full bg-[#1E293B] pointer-events-none flex-shrink-0 my-[2px]" />
     </div>
   )
