@@ -52,7 +52,7 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
-export default function TokenCardExpanded({ token, themeColor, isExpired, isExpanded }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean }) {
+export default function TokenTerminal({ token, themeColor, isExpired, isExpanded }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean }) {
   const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
   const pairs = getPairsList(token.exchange_links);
