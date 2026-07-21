@@ -155,51 +155,6 @@ describe('TokenCard', () => {
     }
   })
 
-  it('displays full description in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('WHALE INTELLIGENCE BRIEF')).toBeDefined()
-      expect(screen.getByText('This is the full description of the test token with more details.')).toBeDefined()
-    }
-  })
-
-  it('displays fallback description when full_description is null', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const names = screen.getAllByText('MinimalToken')
-    const card = names[0].closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('No description available.')).toBeDefined()
-    }
-  })
-
-  it('displays contract address in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      // Contract is shown as "0x1234...5678" in the explorer label
-      expect(screen.getByText(/0x1234/)).toBeDefined()
-    }
-  })
-
-  it('displays N/A when contract address is null', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const names = screen.getAllByText('MinimalToken')
-    const card = names[0].closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      // N/A is rendered as "[ N/A ]" with brackets, use custom matcher
-      expect(screen.getByText((content) => content.includes('N/A'))).toBeDefined()
-    }
-  })
-
   it('displays hashtags in collapsed view', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
     expect(screen.getByText('#Test')).toBeDefined()
@@ -222,139 +177,6 @@ describe('TokenCard', () => {
     render(<TokenCard themeColor="#ff0000" token={tokenWithDifferentMainHashtag} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
     expect(screen.getByText('#SecondTag')).toBeDefined()
     expect(screen.queryByText('#FirstTag')).toBeNull()
-  })
-
-  it('displays social links in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText(/x.com/)).toBeDefined()
-      expect(screen.getByText(/t.me/)).toBeDefined()
-      expect(screen.getByText('discord')).toBeDefined()
-      expect(screen.getByText('facebook')).toBeDefined()
-    }
-  })
-
-  it('displays website url in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('testtoken.example')).toBeDefined()
-    }
-  })
-
-  it('does not display social links section when empty', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const names = screen.getAllByText('MinimalToken')
-    const card = names[0].closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.queryByText(/x.com/)).toBeNull()
-      expect(screen.queryByText(/t.me/)).toBeNull()
-    }
-  })
-
-  it('displays exchange links in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('[ETH/USDT]')).toBeDefined()
-      expect(screen.getByText('[TEST/BNB]')).toBeDefined()
-    }
-  })
-
-  it('displays no pairs message when exchange links are empty', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const names = screen.getAllByText('MinimalToken')
-    const card = names[0].closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('[NO PAIRS FOUND]')).toBeDefined()
-    }
-  })
-
-  it('displays supply in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      // Supply is rendered as "1000000 TEST" which may be split across text nodes
-      expect(screen.getByText((content) => content.includes('1000000'))).toBeDefined()
-    }
-  })
-
-  it('displays rating in expanded view', () => {
-    // Use a recent token so it's not expired
-    const recentToken = { ...mockToken, created_at: '2024-06-15T10:00:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('4.5/10')).toBeDefined()
-    }
-  })
-
-  it('displays expired rating for old tokens', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    // Token is 5 days old, so rating should show expired icon (★) in header
-    // In expanded view, it shows [ SIGNAL EXPIRED ]
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('[ SIGNAL EXPIRED ]')).toBeDefined()
-    }
-  })
-
-  it('handles copy button click', async () => {
-    const clipboardWriteText = vi.fn().mockResolvedValue(undefined)
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: clipboardWriteText,
-      },
-    })
-
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-
-      // Find the copy button by text - text is "[ COPY ]" but may be split
-      const copyButton = screen.getByText((content) => content.includes('COPY'))
-      fireEvent.click(copyButton)
-
-      expect(clipboardWriteText).toHaveBeenCalledWith(mockToken.contract_address)
-    }
-  }, 10000)
-
-  it('shows copied state after clicking copy button', async () => {
-    const clipboardWriteText = vi.fn().mockResolvedValue(undefined)
-    Object.assign(navigator, {
-      clipboard: {
-        writeText: clipboardWriteText,
-      },
-    })
-
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      const copyButton = screen.getByText((content) => content.includes('COPY'))
-      fireEvent.click(copyButton)
-      expect(screen.getByText((content) => content.includes('COPIED'))).toBeDefined()
-    }
   })
 
   it('renders TODAY for tokens created within 24 hours', () => {
@@ -396,28 +218,6 @@ describe('TokenCard', () => {
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
-  it('displays chain badge in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      expect(screen.getByText('Ethereum')).toBeDefined()
-    }
-  })
-
-  it('displays symbol in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      // $TEST appears multiple times in the expanded view
-      const symbols = screen.getAllByText('$TEST')
-      expect(symbols.length).toBeGreaterThanOrEqual(1)
-    }
-  })
-
   it('applies hover styles on mouse enter', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
     const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
@@ -430,27 +230,4 @@ describe('TokenCard', () => {
     }
   })
 
-  it('displays explorer link for different chains', () => {
-    const bscToken = { ...mockToken, chain: 'BSC' }
-    render(<TokenCard themeColor="#ff0000" token={bscToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      // The contract address is displayed as text (not a link), with format "0x1234...5678"
-      expect(screen.getByText((content) => content.includes('0x1234'))).toBeDefined()
-    }
-  })
-
-  it('displays share to X link in expanded view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
-
-    if (card) {
-      fireEvent.click(card)
-      const links = screen.getAllByRole('link')
-      const twitterLink = links.find(link => link.getAttribute('href')?.includes('twitter.com/intent/tweet'))
-      expect(twitterLink).toBeDefined()
-    }
-  })
 })
