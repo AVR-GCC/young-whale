@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import HomePage from './HomePage'
 import type { TokenWithHashtags } from '@/shared/types'
 
@@ -213,6 +213,9 @@ describe('HomePage Integration', () => {
     vi.setSystemTime(mockDate)
 
     render(<HomePage tokens={mockTokens} loading={false} />)
+    act(() => {
+      vi.advanceTimersByTime(0)
+    })
     const timers = screen.getAllByText('02:00:00')
     expect(timers.length).toBeGreaterThanOrEqual(1)
 
