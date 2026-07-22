@@ -191,6 +191,83 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   const displayHashtag = (token.hashtags.find(h => h.slug === token.main_hashtag)?.name) || token.main_hashtag
 
+  const ratingBadge = isPromoted ? (
+    <div
+      id="pin-holder"
+      className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
+      style={{
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        color: 'rgba(255, 255, 255, 0.3)',
+        boxShadow: 'none',
+      }}
+    >
+      <Pin className="w-3.5 h-3.5" />
+    </div>
+  ) : isExpired ? (
+    <div
+      id="hourglass-holder"
+      className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
+      style={{
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        color: 'rgba(255, 255, 255, 0.3)',
+        boxShadow: 'none',
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-3.5 h-3.5"
+      >
+        <path d="M5 22h14" />
+        <path d="M5 2h14" />
+        <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
+        <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
+        <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
+      </svg>
+    </div>
+  ) : (
+    <div
+      id="rating-holder"
+      className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}
+      style={{
+        borderColor: '#FFFFFF',
+        color: '#FFFFFF',
+        boxShadow: (token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered ? `0 0 10px ${themeColor}60` : 'none'),
+      }}
+    >
+      {token.rating}
+    </div>
+  );
+
+  const descMaskStyle = {
+    WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)',
+    maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)'
+  };
+
+  const ratingTooltip = (
+    <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
+      <div className="flex-shrink-0 flex items-center justify-center w-7 ml-0 sm:ml-1 h-7">
+        {ratingBadge}
+      </div>
+    </CustomTooltip>
+  );
+
+  const timeLabelWrapper = (
+    <div
+      className="w-[42px] text-center md:text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0"
+      style={{
+        color: (!isPromoted && !isExpired) ? themeColor : '#94A3B8'
+      }}
+    >
+      {timeLabel}
+    </div>
+  );
+
   return (
     <div
       className={`
@@ -218,7 +295,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
       />
       {/* Collapsed / Header row */}
       <div
-        className="flex items-center h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
+        className="flex items-center h-auto md:h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
       >
         {/* Token Logo */}
         <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
@@ -232,14 +309,30 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
           {token.name}
         </span>
 
-        {/* Token Name - clickable link on mobile */}
-        <Link
-          href={`/token/${token.slug}`}
-          className="md:hidden font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate hover:underline"
-          onClick={(e) => e.stopPropagation()}
+        {/* Desktop Description */}
+        <div
+          className="hidden md:block flex-grow min-w-0 overflow-hidden text-[11px] text-[#CBD5E1] font-normal whitespace-nowrap text-left ml-1.5 md:ml-2 mr-1 md:mr-2"
+          style={descMaskStyle}
         >
-          {token.name}
-        </Link>
+          {token.short_description}
+        </div>
+
+        {/* Mobile: Name above Description */}
+        <div className="md:hidden flex flex-col flex-grow min-w-0">
+          <Link
+            href={`/token/${token.slug}`}
+            className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate hover:underline"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {token.name}
+          </Link>
+          <div
+            className="text-[11px] text-[#CBD5E1] font-normal truncate text-left"
+            style={descMaskStyle}
+          >
+            {token.short_description}
+          </div>
+        </div>
 
         {/* Hidden SEO link for crawlers */}
         <Link
@@ -251,19 +344,8 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
           {token.name}
         </Link>
 
-        {/* Description */}
-        <div
-          className="flex-grow min-w-0 overflow-hidden text-[11px] text-[#CBD5E1] font-normal whitespace-nowrap text-left ml-1.5 md:ml-2 mr-1 md:mr-2"
-          style={{
-            WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)',
-            maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)'
-          }}
-        >
-          {token.short_description}
-        </div>
-
         {/* Hashtag */}
-        <div className="hidden sm:block flex-shrink-0 mr-1 sm:mr-2">
+        <div className="hidden md:block flex-shrink-0 mr-1 md:mr-2">
           {token.main_hashtag && (
             <button
               key="main-hashtag"
@@ -283,69 +365,10 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
           )}
         </div>
 
-        {/* Rating */}
-        <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
-          <div className="flex-shrink-0 flex items-center justify-center w-7 mr-1 sm:mr-2 ml-0 sm:ml-1 h-7">
-            {isPromoted ? (
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
-                style={{
-                  borderColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                  boxShadow: 'none',
-                }}
-              >
-                <Pin className="w-3.5 h-3.5" />
-              </div>
-            ) : isExpired ? (
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
-                style={{
-                  borderColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                  boxShadow: 'none',
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3.5 h-3.5"
-                >
-                  <path d="M5 22h14" />
-                  <path d="M5 2h14" />
-                  <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
-                  <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
-                  <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
-                </svg>
-              </div>
-            ) : (
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}
-                style={{
-                  borderColor: '#FFFFFF',
-                  color: '#FFFFFF',
-                  boxShadow: (token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered ? `0 0 10px ${themeColor}60` : 'none'),
-                }}
-              >
-                {token.rating}
-              </div>
-            )}
-          </div>
-        </CustomTooltip>
-
-        {/* Time */}
-        <div
-          className="w-[42px] md:w-[48px] text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0"
-          style={{
-            color: (!isPromoted && !isExpired) ? themeColor : '#94A3B8'
-          }}
-        >
-          {timeLabel}
+        {/* Rating + Time */}
+        <div className="flex flex-col items-center gap-0.5 md:flex-row md:items-center md:gap-0">
+          {ratingTooltip}
+          {timeLabelWrapper}
         </div>
       </div>
 
