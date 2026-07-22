@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
 import { Pin } from 'lucide-react';
@@ -227,9 +228,13 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         </CustomTooltip>
 
         {/* Token Name */}
-        <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
+        <Link
+          href={`/token/${token.slug}`}
+          className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate hover:underline"
+          onClick={(e) => e.stopPropagation()}
+        >
           {token.name}
-        </span>
+        </Link>
 
         {/* Description */}
         <div

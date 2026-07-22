@@ -1,78 +1,117 @@
-'use client'
-
-import { useEffect, useState, useMemo } from 'react'
-import { useParams } from 'next/navigation'
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+import { supabaseService } from '@/lib/supabase/service'
 import TokenTerminal from '@/app/components/TokenTerminal'
-import type { TokenWithHashtags } from '@/shared/types'
 import { categories } from '@/app/lib/categories'
+import type { TokenWithHashtags } from '@/shared/types'
 
-const ONE_DAY = 24 * 60 * 60 * 1000
+interface TokenPageProps {
+  params: Promise<{ slug: string }>
+}
 
-export default function TokenPage() {
-  const params = useParams()
-  const slug = params.slug as string
-
-  const [token, setToken] = useState<TokenWithHashtags | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!slug) return
-
-    fetch(`/api/tokens/${slug}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Token not found')
-        return res.json()
-      })
-      .then((data) => {
-        setToken(data.token)
-        setLoading(false)
-      })
-      .catch((err) => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [slug])
-
-  const themeColor = useMemo(() => {
-    if (!token) return '#22D3EE'
-    const category = categories.find((c) => c.id === token.category)
-    return category?.color ?? '#22D3EE'
-  }, [token])
-
-  const [now] = useState(() => Date.now())
-
-  const isExpired = useMemo(() => {
-    if (!token) return false
-    const oneDayAgo = new Date(now - ONE_DAY)
-    return new Date(token.created_at) < oneDayAgo
-  }, [token, now])
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
-        <div className="text-[#94A3B8] font-mono text-sm animate-pulse">LOADING TOKEN DATA...</div>
-      </div>
+async function getToken(slug: string): Promise<TokenWithHashtags | null> {
+  const { data, error } = await supabaseService
+    .from('tokens')
+    .select(
+      `*,
+      token_hashtags(
+        hashtags(id, name, slug)
+      )`
     )
+    .eq('slug', slug)
+    .not('published_at', 'is', null)
+    .single()
+
+  if (error || !data) {
+    return null
   }
 
-  if (error || !token) {
-    return (
-      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-[#F97316] font-mono text-lg mb-2">ERROR</div>
-          <div className="text-[#94A3B8] font-mono text-sm">{error || 'Token not found'}</div>
-        </div>
-      </div>
-    )
+  return {
+    ...data,
+    hashtags:
+      data.token_hashtags?.map(
+        (th: { hashtags: { id: string; name: string; slug: string } }) => th.hashtags
+      ) ?? [],
+  }
+}
+
+export async function generateMetadata({ params }: TokenPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const token = await getToken(slug)
+
+  if (!token) {
+    return {
+      title: 'Token Not Found | Young Whale',
+      description: 'This token could not be found.',
+    }
+  }
+
+  const title = `${token.name} (${token.symbol}) on ${token.chain} | Young Whale`
+  const description = token.full_description || token.short_description || `Explore ${token.name} (${token.symbol}) token details on ${token.chain}.`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url: `https://youngwhale.io/token/${token.slug}`,
+      images: token.logo_url ? [token.logo_url] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: token.logo_url ? [token.logo_url] : [],
+    },
+  }
+}
+
+export default async function TokenPage({ params }: TokenPageProps) {
+  const { slug } = await params
+  const token = await getToken(slug)
+
+  if (!token) {
+    notFound()
+  }
+
+  const category = categories.find((c) => c.id === token.category)
+  const themeColor = category?.color ?? '#22D3EE'
+
+  const now = new Date()
+  const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+  const isExpired = new Date(token.created_at) < oneDayAgo
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${token.name} (${token.symbol})`,
+    description: token.full_description || token.short_description || '',
+    url: `https://youngwhale.io/token/${token.slug}`,
+    image: token.logo_url || undefined,
+    datePublished: token.published_at || token.created_at,
+    dateModified: token.updated_at,
+    mainEntity: {
+      '@type': 'Thing',
+      name: token.name,
+      identifier: token.contract_address || undefined,
+      additionalType: `Cryptocurrency on ${token.chain}`,
+    },
   }
 
   return (
-    <TokenTerminal
-      token={token}
-      themeColor={themeColor}
-      isExpired={isExpired}
-      isExpanded={true}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <TokenTerminal
+        token={token}
+        themeColor={themeColor}
+        isExpired={isExpired}
+        isExpanded={true}
+      />
+    </>
   )
 }
