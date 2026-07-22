@@ -101,7 +101,7 @@ describe('TokenCard', () => {
 
   it('renders short description when available', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    expect(screen.getByText('A test token for testing')).toBeDefined()
+    expect(screen.getAllByText('A test token for testing').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders time since creation for expired tokens', () => {
@@ -131,7 +131,7 @@ describe('TokenCard', () => {
 
   it('expands on click', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
     expect(card).toBeDefined()
 
     if (card) {
@@ -142,7 +142,7 @@ describe('TokenCard', () => {
 
   it('collapses on second click', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
       fireEvent.click(card)
@@ -220,7 +220,7 @@ describe('TokenCard', () => {
 
   it('applies hover styles on mouse enter', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    const card = screen.getByText('A test token for testing').closest('[class*="cursor-pointer"]')
+    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
       fireEvent.mouseEnter(card)
