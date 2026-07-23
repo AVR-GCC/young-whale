@@ -3,6 +3,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
 import { Pin } from 'lucide-react';
@@ -156,6 +157,16 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     setIsExpandedAction(!isExpanded);
   }, [isExpanded, setIsExpandedAction]);
 
+  const router = useRouter()
+
+  const handleClick = useCallback(() => {
+    if (window.innerWidth < 768) {
+      router.push(`/token/${token.slug}`)
+    } else {
+      toggle()
+    }
+  }, [router, token.slug, toggle])
+
   // const expand = useCallback(() => {
   //   setIsExpanded(true);
   // }, []);
@@ -283,7 +294,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={toggle}
+      onClick={handleClick}
     >
       {/* 2px Left vertical laser locked-on guides (on hover) */}
       <div
@@ -319,13 +330,9 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
         {/* Mobile: Name above Description */}
         <div className="md:hidden flex flex-col flex-grow min-w-0">
-          <Link
-            href={`/token/${token.slug}`}
-            className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate hover:underline"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate">
             {token.name}
-          </Link>
+          </span>
           <div
             className="text-[11px] text-[#CBD5E1] font-normal truncate text-left"
             style={descMaskStyle}
