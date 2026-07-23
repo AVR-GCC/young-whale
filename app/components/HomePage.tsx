@@ -121,14 +121,15 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         />
       </main>
 
-      <SubscriptionTerminal />
+      <div className="hidden md:block">
+        <SubscriptionTerminal />
 
-      <Footer
-        openSubmitModal={openSubmitModal}
-        setIsContactModalOpen={setIsContactModalOpen}
-        setLegalModalTab={setLegalModalTab}
-      />
-
+        <Footer
+          openSubmitModal={openSubmitModal}
+          setIsContactModalOpen={setIsContactModalOpen}
+          setLegalModalTab={setLegalModalTab}
+        />
+      </div>
     </div>
   )
 }
