@@ -3,6 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import TokenCard from './TokenCard'
 import type { TokenWithHashtags } from '@/shared/types'
 
+const mockPush = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}))
+
 const mockSetIsExpanded = vi.fn()
 
 const mockToken: TokenWithHashtags = {
