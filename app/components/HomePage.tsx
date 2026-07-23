@@ -113,12 +113,12 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           sortBy={sortBy}
         />
 
-        <FilteredSignals
-          activeFilter={activeFilter}
-          setActiveFilter={setActiveFilter}
-          loading={loading}
-          filteredTokens={filteredTokens}
-        />
+        {/* <FilteredSignals */}
+        {/*   activeFilter={activeFilter} */}
+        {/*   setActiveFilter={setActiveFilter} */}
+        {/*   loading={loading} */}
+        {/*   filteredTokens={filteredTokens} */}
+        {/* /> */}
       </main>
 
       <div className="hidden md:block">
