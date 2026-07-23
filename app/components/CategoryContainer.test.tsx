@@ -4,6 +4,11 @@ import CategoryContainer from './CategoryContainer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { categories } from '../lib/categories'
 
+const mockPush = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush }),
+}))
+
 const mockSetSelectedToken = vi.fn()
 
 const mockTokens: TokenWithHashtags[] = [
