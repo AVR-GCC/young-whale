@@ -1,9 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import CategoryContainer from './CategoryContainer'
 import { categories } from '../lib/categories'
-import type { TokenWithHashtags } from '@/shared/types'
 
 // Placeholder icon components for mobile footer
 const TechIcon = ({ color }: { color: string }) => (

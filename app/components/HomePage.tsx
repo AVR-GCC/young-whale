@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Header from './Header'
 import CategoryGrid from './CategoryGrid'
-import FilteredSignals from './FilteredSignals'
+// import FilteredSignals from './FilteredSignals'
 import Footer from './Footer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { SubscriptionTerminal } from './SubscriptionTerminal'
@@ -33,7 +33,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'yesterday'>('all')
   const [sortBy, setSortBy] = useState<'default' | 'score' | 'hashtag'>('default')
-  const [activeFilter, setActiveFilter] = useState<string | null>(null)
+  // const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
 
@@ -109,7 +109,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           loading={loading}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
-          activeFilter={activeFilter}
+          activeFilter={null}
           sortBy={sortBy}
         />
 
