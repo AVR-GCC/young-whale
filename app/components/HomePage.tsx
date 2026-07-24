@@ -121,7 +121,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         {/* /> */}
       </main>
 
-      <div className="hidden md:block">
+      <div className="hidden md:block" data-testid="desktop-footer-container">
         <SubscriptionTerminal />
 
         <Footer

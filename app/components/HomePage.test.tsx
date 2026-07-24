@@ -12,9 +12,9 @@ vi.mock('@/lib/supabase/client', () => ({
 }))
 
 vi.mock('./CategoryContainer', () => ({
-  default: ({ category, tokenCount, tokens }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[] }) => (
+  default: ({ category, tokenCount, tokens, renderTitle }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[]; renderTitle?: boolean }) => (
     <div data-testid={`category-${category.id}`} data-layout={category.id}>
-      <h3>{category.title}</h3>
+      {renderTitle !== false && <h3>{category.title}</h3>}
       <span>{tokenCount} tokens</span>
       <div data-testid="token-list">
         {tokens.map((token: TokenWithHashtags) => (
@@ -187,6 +187,54 @@ describe('HomePage Integration', () => {
 
     // Footer
     expect(screen.getByText(/SONAR RADAR ACTIVE/)).toBeDefined()
+  })
+
+  it('renders mobile page layout', () => {
+    // Mock mobile viewport (below md and lg breakpoints)
+    const originalInnerWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 375,
+    })
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('min-width') ? false : true,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    // Header
+    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
+
+    // Mobile shows a single category without a title (renderTitle=false)
+    const allCategories = screen.getAllByTestId(/category-/)
+    const categoriesWithoutTitle = allCategories.filter(cat => !cat.querySelector('h3'))
+    expect(categoriesWithoutTitle.length).toBe(1)
+
+    // Mobile category footer should be present
+    expect(screen.getByText('TECH')).toBeDefined()
+    expect(screen.getByText('MEME')).toBeDefined()
+    expect(screen.getByText('RWA')).toBeDefined()
+    expect(screen.getByText('PRESALE')).toBeDefined()
+
+    // Subscription terminal and footer should be hidden on mobile
+    const desktopContainer = screen.getByTestId('desktop-footer-container')
+    expect(desktopContainer.classList.contains('hidden')).toBe(true)
+
+    // Restore viewport
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: originalInnerWidth,
+    })
   })
 
   it('renders with empty tokens', () => {
