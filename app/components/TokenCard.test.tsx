@@ -92,6 +92,8 @@ describe('TokenCard', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2024-06-15T12:00:00Z'))
+    mockPush.mockClear()
+    mockSetIsExpanded.mockClear()
   })
 
   afterEach(() => {
@@ -233,6 +235,32 @@ describe('TokenCard', () => {
       // The component sets opacity to 1 on hover
       expect(card.getAttribute('style')).toContain('box-shadow')
     }
+  })
+
+  it('navigates to token page on mobile tap', () => {
+    // Mock mobile viewport
+    const originalInnerWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 375,
+    })
+
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(mockPush).toHaveBeenCalledWith('/token/testtoken')
+      expect(mockSetIsExpanded).not.toHaveBeenCalled()
+    }
+
+    // Restore viewport
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: originalInnerWidth,
+    })
   })
 
 })
