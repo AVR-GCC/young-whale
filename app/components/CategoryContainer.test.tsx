@@ -228,9 +228,25 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
+        renderTitle={true}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
+  })
+
+  it('does not render category title when renderTitle is false', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={5}
+        tokens={mockTokens.slice(0, 5)}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        renderTitle={false}
+      />
+    )
+    expect(screen.queryByText(categories[0].title)).toBeNull()
   })
 
   it('shows empty state when no tokens', () => {
@@ -242,6 +258,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
+        renderTitle={true}
       />
     )
     expect(
@@ -258,6 +275,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
+        renderTitle={true}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
@@ -274,6 +292,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
+        renderTitle={true}
       />
     )
     expect(screen.queryByText('+')).toBeNull()
@@ -298,6 +317,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
+        renderTitle={true}
       />
     )
 
@@ -319,6 +339,7 @@ describe('CategoryContainer', () => {
           selectedToken={null}
           setSelectedTokenAction={mockSetSelectedToken}
           loading={false}
+          renderTitle={true}
         />
       )
       expect(screen.getByText(category.title)).toBeDefined()
@@ -335,6 +356,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={true}
+        renderTitle={true}
       />
     )
     // Token names should not be visible while loading

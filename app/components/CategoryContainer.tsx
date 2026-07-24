@@ -14,6 +14,7 @@ interface CategoryContainerProps {
   selectedToken: string | null
   setSelectedTokenAction: (st: string | null) => void
   loading: boolean
+  renderTitle: boolean
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
@@ -25,6 +26,7 @@ const INITIAL_LIMIT = 5
 const LIMIT_STEP = 5
 
 export default function CategoryContainer({
+  renderTitle,
   category,
   tokens,
   selectedToken,
@@ -53,26 +55,28 @@ export default function CategoryContainer({
 
   return (
     <div className="flex flex-col bg-[#0B0F19] rounded-xl overflow-hidden border border-[#1E293B]/40 transition-colors break-inside-avoid">
-      <div className="px-5 pt-2 pb-1.5 bg-[#0B0F19] flex items-center justify-between border-b border-[#1E293B]/25">
-        <div className="flex items-center gap-2">
-          <h2
-            className="font-oxanium text-[13px] font-extrabold tracking-[2px]"
-            style={{ color: category.color }}
-          >
-            {category.title}
-          </h2>
-          <CustomTooltip content={category.tooltip} position="bottom" borderColor={category.color}>
-            <div
-              className="w-4 h-4 rounded-full flex items-center justify-center bg-[#1E293B] hover:text-[#0B0F19] font-bold font-serif text-[10px] cursor-default transition-colors leading-none italic pb-[1px]"
-              style={{ color: '#94A3B8' }}
-              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = category.color; e.currentTarget.style.color = '#0B0F19'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1E293B'; e.currentTarget.style.color = '#94A3B8'; }}
+      {renderTitle && (
+        <div className="px-5 pt-2 pb-1.5 bg-[#0B0F19] flex items-center justify-between border-b border-[#1E293B]/25">
+          <div className="flex items-center gap-2">
+            <h2
+              className="font-oxanium text-[13px] font-extrabold tracking-[2px]"
+              style={{ color: category.color }}
             >
-              i
-            </div>
-          </CustomTooltip>
+              {category.title}
+            </h2>
+            <CustomTooltip content={category.tooltip} position="bottom" borderColor={category.color}>
+              <div
+                className="w-4 h-4 rounded-full flex items-center justify-center bg-[#1E293B] hover:text-[#0B0F19] font-bold font-serif text-[10px] cursor-default transition-colors leading-none italic pb-[1px]"
+                style={{ color: '#94A3B8' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = category.color; e.currentTarget.style.color = '#0B0F19'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#1E293B'; e.currentTarget.style.color = '#94A3B8'; }}
+              >
+                i
+              </div>
+            </CustomTooltip>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="flex flex-col bg-[#0B0F19]">
         {loading ? (
