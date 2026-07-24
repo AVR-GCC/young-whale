@@ -18,7 +18,7 @@ const categoryLabels: Record<string, string> = {
 
 export default function MobileCategoryFooter({ selectedCategory, selectCategory }: { selectedCategory: string, selectCategory: (category: string) => void }) {
   return (
-    <div className="flex-shrink-0 bg-[#0B0F19] border-t border-[#1E293B]/60 px-2 py-2">
+    <div className="flex-shrink-0 bg-[#070A10] border-t border-[#1E293B]/60 px-2 py-2">
       <div className="flex items-center justify-around">
         {categories.map((category) => {
           const isActive = selectedCategory === category.id

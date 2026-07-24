@@ -83,7 +83,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   })
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit pb-10 selection:bg-[#00E5D2]/30 selection:text-[#00E5D2] relative overflow-x-hidden">
+    <div className="min-h-screen w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit selection:bg-[#00E5D2]/30 selection:text-[#00E5D2] relative overflow-x-hidden">
       {/* Legal Modal */}
       <LegalModal
         isOpen={legalModalTab !== null}
@@ -121,7 +121,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         {/* /> */}
       </main>
 
-      <div className="hidden md:block" data-testid="desktop-footer-container">
+      <div className="hidden md:block pb-10" data-testid="desktop-footer-container">
         <SubscriptionTerminal />
 
         <Footer
