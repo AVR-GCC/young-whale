@@ -61,11 +61,11 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
   return (
     <div
-      className={`w-full transition-all duration-300 ease-in-out relative ${isExpanded ? 'max-h-[800px] opacity-100 py-3 pb-6 bg-transparent border-t border-dashed border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
+      className={`w-full transition-all duration-300 ease-in-out relative ${isExpanded ? 'max-h-[800px] opacity-100 py-0 sm:py-3 pb-0 sm:pb-6 bg-transparent border-transparent sm:border-t sm:border-dashed sm:border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
     >
-      <div className="px-3 sm:px-5 pb-2">
+      <div className="px-0 sm:px-5 pb-0 sm:pb-2">
         <div
-          className="bg-[#0F1624] rounded-xl overflow-hidden font-mono shadow-2xl w-full relative"
+          className="bg-[#0F1624] rounded-none sm:rounded-xl overflow-hidden font-mono w-full relative"
           style={{
             boxShadow: `0 0 0 1px ${themeColor}10, 0 8px 32px -8px ${themeColor}20`
           }}
