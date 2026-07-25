@@ -212,7 +212,7 @@ describe('Header', () => {
         setSortBy={() => {}}
       />
     )
-    expect(screen.getByText('NEXT WAVE:')).toBeDefined()
+    expect(screen.getByText('NEXT WAVE')).toBeDefined()
     expect(screen.getAllByText('01:01:01').length).toBeGreaterThanOrEqual(1)
   })
 })

@@ -38,10 +38,10 @@ export default function Header({
   setSortBy,
 }: HeaderProps) {
   const title = (
-    <div className="flex-shrink-0 flex items-center">
+    <div className="flex-shrink-0 flex-1 flex items-center">
       <Link
         href="/"
-        className="font-oxanium font-bold text-xl tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300"
+        className="font-oxanium font-bold text-[10px] sm:text-xl tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300"
       >
         YoungWhale.io
       </Link>
@@ -80,7 +80,16 @@ export default function Header({
     </div>
   )
 
-  const searchAndMobileTimer = (
+  const mobileTimer = (
+    <div className="md:hidden py-1 px-2.5 flex-1 flex flex-col items-center">
+      <span className="font-oxanium text-[11px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE</span>
+      <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
+        {formatCountdown(secondsLeft)}
+      </span>
+    </div>
+  )
+
+  const buttons = (
     <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
       <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
         <button
@@ -121,24 +130,16 @@ export default function Header({
           </div>
         )}
       </div>
-
-      {/* Mobile Timer */}
-      <div className="md:hidden py-1 px-2.5 bg-[#0A0F1D]/85 rounded-sm border border-[#1E293B]/60 flex items-center gap-1.5">
-        <span className="font-oxanium text-[7px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE:</span>
-        <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
-          {formatCountdown(secondsLeft)}
-        </span>
-        <div className="w-1 h-1 rounded-full bg-[#94A3B8] animate-[sonar-pulse_3.5s_ease-in-out_infinite]" />
-      </div>
     </div>
   )
 
   return (
-    <header className="pt-2 pb-1.5 w-full border-b border-[#1E293B]/25 bg-[#070A10]/50 backdrop-blur-md sticky top-0 z-40">
+    <header className="pt-2 pb-1.5 w-full border-b border-[#1E293B]/25 bg-[#000000] backdrop-blur-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto w-full px-4 flex items-center justify-between gap-4 relative h-10 md:h-12">
         {title}
         {timer}
-        {searchAndMobileTimer}
+        {mobileTimer}
+        {buttons}
       </div>
     </header>
   )
