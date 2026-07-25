@@ -164,16 +164,16 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
           </div>
 
           {/* Token Header */}
-          <div className="flex flex-col gap-3 p-4 sm:p-6 font-mono">
+          <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
             <div className="text-[20px] sm:text-[22px] font-bold tracking-wide truncate flex items-center gap-2">
-              <span className="text-[#E2E8F0]">{token.name}</span>
-              <span style={{ color: themeColor }} className="text-[17px]">${symbol}</span>
-              <span className="px-1.5 py-0.5 rounded uppercase text-[10px] sm:text-[11px] font-bold tracking-wider bg-white/10 text-white/70 ml-2">
+              <span className="text-[#E2E8F0] hidden sm:inline">{token.name}</span>
+              <span style={{ color: themeColor }} className="text-[17px] hidden sm:inline">${symbol}</span>
+              <span className="px-1.5 py-0.5 rounded uppercase text-[10px] sm:text-[11px] font-bold tracking-wider bg-white/10 text-white/70 ml-2 hidden sm:inline-block">
                 {token.chain}
               </span>
             </div>
             <div className="mt-2 text-left">
-              <div className="text-[11px] tracking-widest uppercase flex items-center gap-2 mb-3 text-white/50 bg-white/5 inline-flex px-2 py-0.5 rounded">
+              <div className="text-[13px] sm:text-[11px] tracking-widest uppercase flex items-center gap-2 mb-3 text-white/50 bg-white/5 inline-flex px-2 py-0.5 rounded">
                 <Compass className="w-3.5 h-3.5" />
                 WHALE INTELLIGENCE BRIEF
               </div>
@@ -186,8 +186,8 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
           {/* Shell */}
           <div className="p-4 sm:p-6 pt-0 flex flex-col gap-2.5 font-mono">
             {/* Socials Section */}
-            <div className="flex items-start px-1 leading-snug transition-colors group relative">
-              <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative">
+              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
@@ -196,7 +196,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                 </div>
               </div>
 
-              <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-[14px] border-l border-white/5 content-start">
+              <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start">
                 {token.website_url && (
                   <a href={token.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
                     {token.website_url.replace(/^https?:\/\//, '')}
@@ -226,8 +226,8 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             </div>
 
             {/* Trade Row */}
-            <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
@@ -235,7 +235,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                   <span className="mr-1 font-bold">:</span>
                 </div>
               </div>
-              <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-[14px] border-l border-white/5 content-start">
+              <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start">
                 {pairs.length > 0 ? pairs.map((pair, idx) => (
                   <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
                     [{pair.name}]
@@ -247,8 +247,8 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             </div>
 
             {/* Contract Row */}
-            <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
@@ -256,7 +256,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                   <span className="mr-1 font-bold">:</span>
                 </div>
               </div>
-              <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-[14px] border-l border-white/5 content-start">
+              <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start">
                 <span className="text-[14px] font-mono text-white/90">
                   [ {explorer.label} ]
                 </span>
@@ -265,8 +265,8 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             </div>
 
             {/* Supply Row */}
-            <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
@@ -274,7 +274,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                   <span className="mr-1 font-bold">:</span>
                 </div>
               </div>
-              <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-[14px] border-l border-white/5 content-start">
+              <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start">
                 <span className="text-[14px] font-mono text-white/90">
                   {token.supply} {symbol.toUpperCase()}
                 </span>
@@ -283,7 +283,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
             {/* Cursor */}
             <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
-              <div className="flex shrink-0 min-w-[180px] w-40 mr-4 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
+              <div className="flex shrink-0 min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left" style={keyStyle}>
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
@@ -291,7 +291,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                   <span className="mr-1 font-bold">:</span>
                 </div>
               </div>
-              <div className="flex-1 flex items-center mt-0.5 pl-[14px] border-l border-white/5 content-start">
+              <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start">
                 {isExpired ? (
                   <span className="text-[14px] font-mono tracking-wide text-slate-400 whitespace-nowrap">
                     [ SIGNAL EXPIRED ]
