@@ -6,8 +6,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
-import { Pin } from 'lucide-react';
 import TokenTerminal from './TokenTerminal';
+import RatingBadge from './RatingBadge';
 
 const ONE_DAY = 24 * 60 * 60 * 1000
 
@@ -206,71 +206,24 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   const displayHashtag = (token.hashtags.find(h => h.slug === token.main_hashtag)?.name) || token.main_hashtag
 
-  const ratingBadge = isPromoted ? (
-    <div
-      id="pin-holder"
-      className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
-      style={{
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        color: 'rgba(255, 255, 255, 0.3)',
-        boxShadow: 'none',
-      }}
-    >
-      <Pin className="w-3.5 h-3.5" />
-    </div>
-  ) : isExpired ? (
-    <div
-      id="hourglass-holder"
-      className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
-      style={{
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        color: 'rgba(255, 255, 255, 0.3)',
-        boxShadow: 'none',
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-3.5 h-3.5"
-      >
-        <path d="M5 22h14" />
-        <path d="M5 2h14" />
-        <path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22" />
-        <path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" />
-        <path d="M7 22v-4.172a2 2 0 0 1 .586-1.414L12 12l4.414 4.414a2 2 0 0 1 .586 1.414V22H7z" fill="currentColor" stroke="none" />
-      </svg>
-    </div>
-  ) : (
-    <div
-      id="rating-holder"
-      className={`w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300 ${isHovered ? 'scale-105' : ''}`}
-      style={{
-        borderColor: '#FFFFFF',
-        color: '#FFFFFF',
-        boxShadow: (token.rating && token.rating >= 9) ? `0 0 12px ${themeColor}40` : (isHovered ? `0 0 10px ${themeColor}60` : 'none'),
-      }}
-    >
-      {token.rating}
-    </div>
+  const ratingAndTooltip = (
+    <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
+      <div className="flex-shrink-0 flex items-center justify-center w-7 ml-0 sm:ml-1 h-7">
+        <RatingBadge
+          isPromoted={isPromoted}
+          isExpired={isExpired}
+          isHovered={isHovered}
+          rating={token.rating}
+          themeColor={themeColor}
+        />
+      </div>
+    </CustomTooltip>
   );
 
   const descMaskStyle = {
     WebkitMaskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)',
     maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)'
   };
-
-  const ratingAndTooltip = (
-    <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
-      <div className="flex-shrink-0 flex items-center justify-center w-7 ml-0 sm:ml-1 h-7">
-        {ratingBadge}
-      </div>
-    </CustomTooltip>
-  );
 
   const timeLabelWrapper = (
     <div
