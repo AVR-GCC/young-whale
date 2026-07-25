@@ -150,7 +150,7 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
   )
 }
 
-export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void }) {
+export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction, onMobileClick }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void, onMobileClick?: () => void }) {
   const [isHovered, setIsHovered] = useState(false)
 
   const toggle = useCallback(() => {
@@ -161,11 +161,15 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   const handleClick = useCallback(() => {
     if (window.innerWidth < 768) {
-      router.push(`/token/${token.slug}`)
+      if (onMobileClick) {
+        onMobileClick()
+      } else {
+        router.push(`/token/${token.slug}`)
+      }
     } else {
       toggle()
     }
-  }, [router, token.slug, toggle])
+  }, [router, token.slug, toggle, onMobileClick])
 
   // const expand = useCallback(() => {
   //   setIsExpanded(true);

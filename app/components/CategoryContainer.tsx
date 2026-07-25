@@ -15,6 +15,7 @@ interface CategoryContainerProps {
   setSelectedTokenAction: (st: string | null) => void
   loading: boolean
   renderTitle: boolean
+  onMobileTokenClick?: (tokenId: string, categoryId: string) => void
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
@@ -31,7 +32,8 @@ export default function CategoryContainer({
   tokens,
   selectedToken,
   loading,
-  setSelectedTokenAction
+  setSelectedTokenAction,
+  onMobileTokenClick
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
 
@@ -95,6 +97,7 @@ export default function CategoryContainer({
                       themeColor={category.color}
                       isExpanded={selectedToken === token.id}
                       setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
+                      onMobileClick={() => onMobileTokenClick?.(token.id, category.id)}
                     />
                   ))}
               </div>
@@ -158,6 +161,7 @@ export default function CategoryContainer({
                     themeColor={category.color}
                     isExpanded={selectedToken === token.id}
                     setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
+                    onMobileClick={() => onMobileTokenClick?.(token.id, category.id)}
                   />
               ))}
             </>
