@@ -95,27 +95,35 @@ export default function Header({
   const buttons = (
     <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
       <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-        {/* <div */}
-        {/*   style={{ */}
-        {/*     width: 30, */}
-        {/*     height: 30, */}
-        {/*     maskImage: `url(/whale-trans.svg)`, */}
-        {/*     WebkitMaskImage: `url(/whale-trans.svg)`, */}
-        {/*     maskSize: 'contain', */}
-        {/*     WebkitMaskSize: 'contain', */}
-        {/*     maskRepeat: 'no-repeat', */}
-        {/*     WebkitMaskRepeat: 'no-repeat', */}
-        {/*     maskPosition: 'center', */}
-        {/*     WebkitMaskPosition: 'center', */}
-        {/*     backgroundColor: isActive ?  : '#64748B', */}
-        {/*   }} */}
-        {/* /> */}
-        <span
-          className={`text-[16px] transition-all duration-[50ms] select-none flex items-center justify-center w-5 h-5 leading-none ${isInviteModalOpen ? 'opacity-100 grayscale-0 drop-shadow-[0_0_8px_#22d3ee]' : 'grayscale opacity-60 hover:opacity-100'}`}
-          onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+        <div
+          style={{
+            filter: isInviteModalOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
+          }}
         >
-          🐋
-        </span>
+          <div
+            onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+            style={{
+              width: 24,
+              height: 35,
+              maskImage: `url(/whale-trans.svg)`,
+              WebkitMaskImage: `url(/whale-trans.svg)`,
+              maskSize: 'contain',
+              WebkitMaskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              WebkitMaskPosition: 'center',
+              backgroundColor: isInviteModalOpen ? '#33FFFF' : '#94A3B8',
+            }}
+            className='sm:hidden'
+          />
+        </div>
+        {/* <span */}
+        {/*   className={`text-[16px] transition-all duration-[50ms] select-none flex items-center justify-center w-5 h-5 leading-none ${isInviteModalOpen ? 'opacity-100 grayscale-0 drop-shadow-[0_0_8px_#22d3ee]' : 'grayscale opacity-60 hover:opacity-100'}`} */}
+        {/*   onClick={() => setIsInviteModalOpen(!isInviteModalOpen)} */}
+        {/* > */}
+        {/*   🐋 */}
+        {/* </span> */}
         <div className="w-3" />
         <button
           type="button"
