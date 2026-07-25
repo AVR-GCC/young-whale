@@ -1,160 +1,102 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import CategoryGrid from './CategoryGrid'
-import type { TokenWithHashtags } from '@/shared/types'
+import type { TokenWithHashtags, TokenCategory } from '@/shared/types'
 
 vi.mock('./CategoryContainer', () => ({
-  default: ({ category, tokenCount, tokens }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[] }) => (
+  default: ({ category, tokenCount, tokens, onMobileTokenClick }: {
+    category: { id: string; title: string };
+    tokenCount: number;
+    tokens: TokenWithHashtags[];
+    onMobileTokenClick?: (tokenId: string, categoryId: string) => void;
+  }) => (
     <div data-testid={`category-${category.id}`} data-layout={category.id}>
       <h3>{category.title}</h3>
       <span>{tokenCount} tokens</span>
       <div data-testid="token-list">
         {tokens.map((token: TokenWithHashtags) => (
-          <div key={token.id}>{token.name}</div>
+          <button
+            key={token.id}
+            data-testid={`token-${token.id}`}
+            onClick={() => onMobileTokenClick?.(token.id, category.id)}
+          >
+            {token.name}
+          </button>
         ))}
       </div>
     </div>
   ),
 }))
 
+vi.mock('./TokenTerminal', () => ({
+  default: ({ token }: { token: TokenWithHashtags }) => (
+    <div data-testid="token-terminal">{token.name}</div>
+  ),
+}))
+
+vi.mock('./MobileCategoryFooter', () => ({
+  default: ({ selectedCategory, selectCategory }: { selectedCategory: string; selectCategory: (category: string) => void }) => (
+    <div data-testid="mobile-category-footer">
+      {['Tech', 'Meme', 'RWA', 'Presale'].map((cat) => (
+        <button
+          key={cat}
+          data-testid={`footer-category-${cat}`}
+          data-active={selectedCategory === cat}
+          onClick={() => selectCategory(cat)}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  ),
+}))
+
+const createMockToken = (id: string, name: string, category: TokenCategory, createdAt: string): TokenWithHashtags => ({
+  id,
+  name,
+  symbol: 'TT',
+  chain: 'Ethereum',
+  contract_address: null,
+  unique_key: `${id}-eth`,
+  slug: name.toLowerCase().replace(/\s/g, ''),
+  category,
+  short_description: `${name} description`,
+  full_description: 'Full description',
+  logo_url: null,
+  logo_storage_path: null,
+  website_url: null,
+  social_links: {},
+  exchange_links: [],
+  preferred_exchange: null,
+  start_date: null,
+  end_date: null,
+  source_type: null,
+  source_url: null,
+  confidence: null,
+  raw_token_id: null,
+  status: 'approved',
+  is_promoted: false,
+  is_verified: false,
+  main_hashtag: null,
+  rating: 0,
+  supply: 1000000,
+  created_at: createdAt,
+  updated_at: createdAt,
+  published_at: null,
+  hashtags: [],
+})
+
 const mockTokens: TokenWithHashtags[] = [
-  {
-    id: '1',
-    name: 'TechToken1',
-    symbol: 'TT1',
-    chain: 'Ethereum',
-    contract_address: null,
-    unique_key: 'tt1-eth',
-    slug: 'techtoken1',
-    category: 'Tech',
-    short_description: 'Tech token 1',
-    full_description: 'Full description',
-    logo_url: null,
-    logo_storage_path: null,
-    website_url: null,
-    social_links: {},
-    exchange_links: [],
-    preferred_exchange: null,
-    start_date: null,
-    end_date: null,
-    source_type: null,
-    source_url: null,
-    confidence: null,
-    raw_token_id: null,
-    status: 'approved',
-    is_promoted: false,
-    is_verified: false,
-    main_hashtag: null,
-    rating: 0,
-    supply: 1000000,
-    created_at: '2024-06-10T10:00:00Z',
-    updated_at: '2024-06-10T10:00:00Z',
-    published_at: null,
-    hashtags: [],
-  },
-  {
-    id: '2',
-    name: 'MemeToken1',
-    symbol: 'MT1',
-    chain: 'Solana',
-    contract_address: null,
-    unique_key: 'mt1-sol',
-    slug: 'memetoken1',
-    category: 'Meme',
-    short_description: 'Meme token 1',
-    full_description: 'Full description',
-    logo_url: null,
-    logo_storage_path: null,
-    website_url: null,
-    social_links: {},
-    exchange_links: [],
-    preferred_exchange: null,
-    start_date: null,
-    end_date: null,
-    source_type: null,
-    source_url: null,
-    confidence: null,
-    raw_token_id: null,
-    status: 'approved',
-    is_promoted: false,
-    is_verified: false,
-    main_hashtag: null,
-    rating: 0,
-    supply: 500000000,
-    created_at: '2024-06-09T10:00:00Z',
-    updated_at: '2024-06-09T10:00:00Z',
-    published_at: null,
-    hashtags: [],
-  },
-  {
-    id: '3',
-    name: 'RWAToken1',
-    symbol: 'RT1',
-    chain: 'Base',
-    contract_address: null,
-    unique_key: 'rt1-base',
-    slug: 'rwatoken1',
-    category: 'RWA',
-    short_description: 'RWA token 1',
-    full_description: 'Full description',
-    logo_url: null,
-    logo_storage_path: null,
-    website_url: null,
-    social_links: {},
-    exchange_links: [],
-    preferred_exchange: null,
-    start_date: null,
-    end_date: null,
-    source_type: null,
-    source_url: null,
-    confidence: null,
-    raw_token_id: null,
-    status: 'approved',
-    is_promoted: false,
-    is_verified: false,
-    main_hashtag: null,
-    rating: 0,
-    supply: 10000000,
-    created_at: '2024-06-08T10:00:00Z',
-    updated_at: '2024-06-08T10:00:00Z',
-    published_at: null,
-    hashtags: [],
-  },
-  {
-    id: '4',
-    name: 'PresaleToken1',
-    symbol: 'PT1',
-    chain: 'Ethereum',
-    contract_address: null,
-    unique_key: 'pt1-eth',
-    slug: 'presaletoken1',
-    category: 'Presale',
-    short_description: 'Presale token 1',
-    full_description: 'Full description',
-    logo_url: null,
-    logo_storage_path: null,
-    website_url: null,
-    social_links: {},
-    exchange_links: [],
-    preferred_exchange: null,
-    start_date: null,
-    end_date: null,
-    source_type: null,
-    source_url: null,
-    confidence: null,
-    raw_token_id: null,
-    status: 'approved',
-    is_promoted: false,
-    is_verified: false,
-    main_hashtag: null,
-    rating: 0,
-    supply: null,
-    created_at: '2024-06-07T10:00:00Z',
-    updated_at: '2024-06-07T10:00:00Z',
-    published_at: null,
-    hashtags: [],
-  },
+  createMockToken('1', 'TechToken1', 'Tech', '2024-06-10T10:00:00Z'),
+  createMockToken('2', 'TechToken2', 'Tech', '2024-06-09T10:00:00Z'),
+  createMockToken('3', 'TechToken3', 'Tech', '2024-06-08T10:00:00Z'),
+  createMockToken('4', 'MemeToken1', 'Meme', '2024-06-10T10:00:00Z'),
+  createMockToken('5', 'MemeToken2', 'Meme', '2024-06-09T10:00:00Z'),
+  createMockToken('6', 'RWAToken1', 'RWA', '2024-06-10T10:00:00Z'),
+  createMockToken('7', 'PresaleToken1', 'Presale', '2024-06-10T10:00:00Z'),
 ]
+
+const getOverlay = () => screen.queryByTestId('mobile-overlay')
 
 describe('CategoryGrid', () => {
   it('renders all 4 category containers', () => {
@@ -225,9 +167,11 @@ describe('CategoryGrid', () => {
       />
     )
 
-    // All categories have 1 token each, but rendered twice (desktop + mobile)
-    const tokenCounts = screen.getAllByText('1 tokens')
-    expect(tokenCounts.length).toBeGreaterThanOrEqual(4)
+    // Tech has 3 tokens, Meme has 2, RWA has 1, Presale has 1
+    // But rendered twice (desktop + mobile)
+    expect(screen.getAllByText('3 tokens').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('2 tokens').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('1 tokens').length).toBeGreaterThanOrEqual(2)
   })
 
   it('renders loading state', () => {
@@ -279,6 +223,181 @@ describe('CategoryGrid', () => {
     techCategories.forEach(cat => {
       expect(cat.textContent).toContain('TechToken1')
       expect(cat.textContent).not.toContain('MemeToken1')
+    })
+  })
+
+  describe('mobile overlay', () => {
+    it('opens TokenTerminal overlay when clicking a token on mobile', () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Click on a token in the mobile layout (Tech category is default)
+      const tokenButton = screen.getAllByTestId('token-1')[0]
+      fireEvent.click(tokenButton)
+
+      // Overlay should show TokenTerminal with the clicked token
+      const overlay = getOverlay()
+      expect(overlay).toBeTruthy()
+      expect(overlay?.textContent).toContain('TechToken1')
+    })
+
+    it('navigates to next token on swipe left', async () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Open overlay with first token
+      const tokenButton = screen.getAllByTestId('token-1')[0]
+      fireEvent.click(tokenButton)
+      expect(getOverlay()?.textContent).toContain('TechToken1')
+
+      // Swipe left (touch start at x=200, end at x=100 = distance 100 > 50)
+      const overlay = getOverlay()
+      if (!overlay) throw new Error('Overlay not found')
+
+      fireEvent.touchStart(overlay, { targetTouches: [{ clientX: 200 }] })
+      fireEvent.touchMove(overlay, { targetTouches: [{ clientX: 100 }] })
+      fireEvent.touchEnd(overlay)
+
+      // Should navigate to next token after transition
+      await waitFor(() => {
+        expect(getOverlay()?.textContent).toContain('TechToken2')
+      }, { timeout: 300 })
+    })
+
+    it('navigates to previous token on swipe right', async () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Open overlay with second token (index 1)
+      const tokenButton = screen.getAllByTestId('token-2')[0]
+      fireEvent.click(tokenButton)
+      expect(getOverlay()?.textContent).toContain('TechToken2')
+
+      // Swipe right (touch start at x=100, end at x=200 = distance -100 < -50)
+      const overlay = getOverlay()
+      if (!overlay) throw new Error('Overlay not found')
+
+      fireEvent.touchStart(overlay, { targetTouches: [{ clientX: 100 }] })
+      fireEvent.touchMove(overlay, { targetTouches: [{ clientX: 200 }] })
+      fireEvent.touchEnd(overlay)
+
+      // Should navigate to previous token after transition
+      await waitFor(() => {
+        expect(getOverlay()?.textContent).toContain('TechToken1')
+      }, { timeout: 300 })
+    })
+
+    it('does not navigate past last token on swipe left', async () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Open overlay with last Tech token (index 2, TechToken3)
+      const tokenButton = screen.getAllByTestId('token-3')[0]
+      fireEvent.click(tokenButton)
+      expect(getOverlay()?.textContent).toContain('TechToken3')
+
+      // Swipe left
+      const overlay = getOverlay()
+      if (!overlay) throw new Error('Overlay not found')
+
+      fireEvent.touchStart(overlay, { targetTouches: [{ clientX: 200 }] })
+      fireEvent.touchMove(overlay, { targetTouches: [{ clientX: 100 }] })
+      fireEvent.touchEnd(overlay)
+
+      // Should stay on TechToken3
+      await waitFor(() => {
+        expect(getOverlay()?.textContent).toContain('TechToken3')
+      }, { timeout: 300 })
+    })
+
+    it('does not navigate past first token on swipe right', async () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Open overlay with first token
+      const tokenButton = screen.getAllByTestId('token-1')[0]
+      fireEvent.click(tokenButton)
+      expect(getOverlay()?.textContent).toContain('TechToken1')
+
+      // Swipe right
+      const overlay = getOverlay()
+      if (!overlay) throw new Error('Overlay not found')
+
+      fireEvent.touchStart(overlay, { targetTouches: [{ clientX: 100 }] })
+      fireEvent.touchMove(overlay, { targetTouches: [{ clientX: 200 }] })
+      fireEvent.touchEnd(overlay)
+
+      // Should stay on TechToken1
+      await waitFor(() => {
+        expect(getOverlay()?.textContent).toContain('TechToken1')
+      }, { timeout: 300 })
+    })
+
+    it('closes overlay when switching categories', async () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+        />
+      )
+
+      // Open overlay
+      const tokenButton = screen.getAllByTestId('token-1')[0]
+      fireEvent.click(tokenButton)
+      expect(getOverlay()).toBeTruthy()
+
+      // Switch category via mobile footer
+      const memeButton = screen.getByTestId('footer-category-Meme')
+      fireEvent.click(memeButton)
+
+      // Overlay should close
+      await waitFor(() => {
+        expect(getOverlay()).toBeNull()
+      })
     })
   })
 })

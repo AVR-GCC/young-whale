@@ -178,6 +178,7 @@ export default function CategoryGrid({
       {/* Mobile Token Overlay */}
       {mobileOverlayOpen && currentOverlayToken && (
         <div
+          data-testid="mobile-overlay"
           className="fixed inset-x-0 bottom-[81px] top-[80px] z-30 flex flex-col bg-[#0B0F19] lg:hidden"
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}

@@ -263,4 +263,38 @@ describe('TokenCard', () => {
     })
   })
 
+  it('calls onMobileClick instead of navigating on mobile tap when provided', () => {
+    const originalInnerWidth = window.innerWidth
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 375,
+    })
+
+    const mockOnMobileClick = vi.fn()
+    render(
+      <TokenCard
+        themeColor="#ff0000"
+        token={mockToken}
+        isExpanded={false}
+        setIsExpandedAction={mockSetIsExpanded}
+        onMobileClick={mockOnMobileClick}
+      />
+    )
+    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
+
+    if (card) {
+      fireEvent.click(card)
+      expect(mockOnMobileClick).toHaveBeenCalled()
+      expect(mockPush).not.toHaveBeenCalled()
+      expect(mockSetIsExpanded).not.toHaveBeenCalled()
+    }
+
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: originalInnerWidth,
+    })
+  })
+
 })
