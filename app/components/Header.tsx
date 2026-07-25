@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Search } from 'lucide-react'
+import { Search, Settings } from 'lucide-react'
 import { CustomTooltip } from './CustomTooltip'
+import { useState } from 'react'
 
 function formatCountdown(totalSeconds: number) {
   const hrs = Math.floor(totalSeconds / 3600)
@@ -37,6 +38,8 @@ export default function Header({
   sortBy,
   setSortBy,
 }: HeaderProps) {
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
   const title = (
     <div className="flex-shrink-0 flex-1 flex items-center">
       <Link
@@ -92,13 +95,46 @@ export default function Header({
   const buttons = (
     <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
       <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
+        {/* <div */}
+        {/*   style={{ */}
+        {/*     width: 30, */}
+        {/*     height: 30, */}
+        {/*     maskImage: `url(/whale-trans.svg)`, */}
+        {/*     WebkitMaskImage: `url(/whale-trans.svg)`, */}
+        {/*     maskSize: 'contain', */}
+        {/*     WebkitMaskSize: 'contain', */}
+        {/*     maskRepeat: 'no-repeat', */}
+        {/*     WebkitMaskRepeat: 'no-repeat', */}
+        {/*     maskPosition: 'center', */}
+        {/*     WebkitMaskPosition: 'center', */}
+        {/*     backgroundColor: isActive ?  : '#64748B', */}
+        {/*   }} */}
+        {/* /> */}
+        <span
+          className={`text-[16px] transition-all duration-[50ms] select-none flex items-center justify-center w-5 h-5 leading-none ${isInviteModalOpen ? 'opacity-100 grayscale-0 drop-shadow-[0_0_8px_#22d3ee]' : 'grayscale opacity-60 hover:opacity-100'}`}
+          onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+        >
+          🐋
+        </span>
+        <div className="w-3" />
         <button
           type="button"
           onClick={() => setIsSearchOpen(!isSearchOpen)}
           className="p-1 focus:outline-none flex-shrink-0"
           aria-label="Toggle search"
         >
-          <Search className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+          <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+        </button>
+        <div className="w-2" />
+        <button
+          type="button"
+          onClick={() => {
+            console.log('open settings');
+          }}
+          className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
+          aria-label="Toggle settings"
+        >
+          <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
         </button>
         {isSearchOpen && (
           <div className="flex items-center gap-2 md:gap-3 pl-1">

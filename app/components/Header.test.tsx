@@ -8,6 +8,7 @@ vi.mock('./CustomTooltip', () => ({
 
 vi.mock('lucide-react', () => ({
   Search: () => <svg data-testid="search-icon" />,
+  Settings: () => <svg data-testid="settings-icon" />,
 }))
 
 describe('Header', () => {
@@ -78,7 +79,7 @@ describe('Header', () => {
         setSortBy={() => {}}
       />
     )
-    expect(screen.getByRole('button', { name: /toggle search/i })).toBeDefined()
+    expect(screen.getByTestId('search-icon').closest('button')).toBeDefined()
   })
 
   it('toggles search input on click', () => {
@@ -101,7 +102,7 @@ describe('Header', () => {
     expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
     
     // Click to open
-    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    const searchButton = screen.getByTestId('search-icon').closest('button')!
     fireEvent.click(searchButton)
     expect(setIsSearchOpen).toHaveBeenCalledWith(true)
 
