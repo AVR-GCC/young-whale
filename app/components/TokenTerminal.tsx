@@ -5,6 +5,7 @@ import type { TokenWithHashtags } from '@/shared/types'
 import { TokenIcon } from './TokenCard'
 import { CustomTooltip } from './CustomTooltip'
 import { Compass, Zap } from 'lucide-react'
+import RatingBadge from './RatingBadge'
 
 const CopyButton = ({ address }: { address: string }) => {
   const [copied, setCopied] = useState(false);
@@ -120,8 +121,41 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
           {/* Title bar */}
           <div className="py-2.5 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 gap-2 sm:gap-0 z-10 relative">
-            {labelAndLiveIndicator}
-            <div className="flex items-center gap-2 shrink-0 z-10 self-end sm:self-auto">
+            <div className="hidden sm:block">
+              {labelAndLiveIndicator}
+            </div>
+
+            {/* Mobile layout */}
+            <div className="flex sm:hidden items-center justify-between w-full">
+              <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={80} />
+              <div className="flex flex-col flex-1 items-center">
+                <span
+                  className="text-white text-[26px] sm:text-[102px] font-bold tracking-tight leading-none"
+                >
+                  ${token.symbol}
+                </span>
+                <div className="h-1" />
+                <span className="font-mono text-[13px] sm:text-[11px] font-bold tracking-widest text-[#E2E8F0]/70 uppercase">
+                  #{token.main_hashtag || 'DEFI'}
+                </span>
+              </div>
+              <div className="flex flex-col items-end gap-2 shrink-0 z-10">
+                <div className="flex items-center gap-2">
+                  {buttons}
+                </div>
+                <div className="h-1" />
+                <RatingBadge
+                  isPromoted={token.is_promoted}
+                  isExpired={isExpired}
+                  isHovered={false}
+                  rating={token.rating}
+                  themeColor={themeColor}
+                />
+              </div>
+            </div>
+
+            {/* Desktop layout */}
+            <div className="hidden sm:flex items-center gap-2 shrink-0 z-10 self-end sm:self-auto">
               {buttons}
               <div className="shrink-0 ml-2 sm:ml-3">
                 <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={64} />

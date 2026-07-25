@@ -164,7 +164,7 @@ describe('TokenCard', () => {
 
   it('displays hashtags in collapsed view', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
-    expect(screen.getByText('#Test')).toBeDefined()
+    expect(screen.getAllByText('#Test').length).toBeGreaterThanOrEqual(1)
   })
 
   it('does not display hashtags when empty', () => {
