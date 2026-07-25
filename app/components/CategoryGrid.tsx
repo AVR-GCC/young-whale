@@ -190,7 +190,7 @@ export default function CategoryGrid({
               style={{ transform: `translateX(${slideOffset}%)` }}
             >
               {/* Previous Token */}
-              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+              <div className="w-full flex-shrink-0 h-full">
                 {prevToken ? (
                   <TokenTerminal
                     token={prevToken}
@@ -204,7 +204,7 @@ export default function CategoryGrid({
               </div>
 
               {/* Current Token */}
-              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+              <div className="w-full flex-shrink-0 h-full">
                 <TokenTerminal
                   token={currentOverlayToken}
                   themeColor={overlayThemeColor}
@@ -214,7 +214,7 @@ export default function CategoryGrid({
               </div>
 
               {/* Next Token */}
-              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+              <div className="w-full flex-shrink-0 h-full">
                 {nextToken ? (
                   <TokenTerminal
                     token={nextToken}

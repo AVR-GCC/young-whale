@@ -104,11 +104,11 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
   return (
     <div
-      className={`w-full transition-all duration-300 ease-in-out relative ${isExpanded ? 'max-h-[800px] opacity-100 py-0 sm:py-3 pb-0 sm:pb-6 bg-transparent border-transparent sm:border-t sm:border-dashed sm:border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
+      className={`w-full transition-all duration-300 ease-in-out relative max-sm:h-full ${isExpanded ? 'max-h-[800px] opacity-100 py-0 sm:py-3 pb-0 sm:pb-6 bg-transparent border-transparent sm:border-t sm:border-dashed sm:border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
     >
-      <div className="px-0 sm:px-5 pb-0 sm:pb-2">
+      <div className="px-0 sm:px-5 pb-0 sm:pb-2 max-sm:h-full">
           <div
-            className="bg-[#0F1624] max-sm:bg-black rounded-none sm:rounded-xl overflow-hidden font-mono w-full relative"
+            className="bg-[#0F1624] max-sm:bg-black rounded-none sm:rounded-xl sm:overflow-hidden font-mono w-full relative max-sm:flex max-sm:flex-col max-sm:h-full"
           style={{
             boxShadow: `0 0 0 1px ${themeColor}10, 0 8px 32px -8px ${themeColor}20`
           }}
@@ -120,7 +120,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
           />
 
           {/* Title bar */}
-          <div className="py-2.5 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 gap-2 sm:gap-0 z-10 relative">
+          <div className="py-2.5 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 gap-2 sm:gap-0 z-10 relative max-sm:shrink-0">
             <div className="hidden sm:block">
               {labelAndLiveIndicator}
             </div>
@@ -162,6 +162,8 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
               </div>
             </div>
           </div>
+
+          <div className="max-sm:overflow-y-auto max-sm:flex-1">
 
           {/* Token Header */}
           <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
@@ -304,6 +306,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                 {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
               </div>
             </div>
+          </div>
           </div>
         </div>
       </div>
