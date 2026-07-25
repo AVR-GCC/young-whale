@@ -264,7 +264,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     maskImage: 'linear-gradient(to right, rgba(0,0,0,1) 97%, rgba(0,0,0,0) 100%)'
   };
 
-  const ratingTooltip = (
+  const ratingAndTooltip = (
     <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
       <div className="flex-shrink-0 flex items-center justify-center w-7 ml-0 sm:ml-1 h-7">
         {ratingBadge}
@@ -378,7 +378,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
         {/* Rating + Time */}
         <div className="flex flex-col items-center gap-0.5 md:flex-row md:items-center md:gap-0">
-          {ratingTooltip}
+          {ratingAndTooltip}
           {timeLabelWrapper}
         </div>
       </div>
