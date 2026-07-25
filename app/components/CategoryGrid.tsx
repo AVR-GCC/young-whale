@@ -29,11 +29,22 @@ export default function CategoryGrid({
   const [mobileOverlayTokenIndex, setMobileOverlayTokenIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [slideOffset, setSlideOffset] = useState(-100)
 
   // Close overlay when switching categories
   useEffect(() => {
     setTimeout(() => setMobileOverlayOpen(false))
   }, [selectedCategory])
+
+  useEffect(() => {
+    if (mobileOverlayOpen) {
+      setTimeout(() => {
+        setSlideOffset(-100)
+        setIsTransitioning(false)
+      })
+    }
+  }, [mobileOverlayOpen])
 
   const minSwipeDistance = 50
 
@@ -73,31 +84,48 @@ export default function CategoryGrid({
   }, [])
 
   const onTouchEnd = useCallback(() => {
-    if (!touchStart || !touchEnd) return
+    if (!touchStart || !touchEnd || isTransitioning) return
     const distance = touchStart - touchEnd
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
 
     const categoryTokens = getCategoryTokens(selectedCategory)
     if (isLeftSwipe && mobileOverlayTokenIndex < categoryTokens.length - 1) {
-      setMobileOverlayTokenIndex(prev => prev + 1)
+      setIsTransitioning(true)
+      setSlideOffset(-200)
+      setTimeout(() => {
+        setMobileOverlayTokenIndex(prev => prev + 1)
+        setIsTransitioning(false)
+        setSlideOffset(-100)
+      }, 300)
     }
     if (isRightSwipe && mobileOverlayTokenIndex > 0) {
-      setMobileOverlayTokenIndex(prev => prev - 1)
+      setIsTransitioning(true)
+      setSlideOffset(0)
+      setTimeout(() => {
+        setMobileOverlayTokenIndex(prev => prev - 1)
+        setIsTransitioning(false)
+        setSlideOffset(-100)
+      }, 300)
     }
-  }, [touchStart, touchEnd, selectedCategory, mobileOverlayTokenIndex, getCategoryTokens])
+  }, [touchStart, touchEnd, selectedCategory, mobileOverlayTokenIndex, getCategoryTokens, isTransitioning])
 
   const overlayTokens = useMemo(() => {
     return getCategoryTokens(selectedCategory)
   }, [selectedCategory, getCategoryTokens])
 
   const currentOverlayToken = overlayTokens[mobileOverlayTokenIndex]
+  const prevToken = overlayTokens[mobileOverlayTokenIndex - 1]
+  const nextToken = overlayTokens[mobileOverlayTokenIndex + 1]
   const overlayCategory = categories.find(c => c.id === selectedCategory)
   const overlayThemeColor = overlayCategory?.color ?? '#22D3EE'
 
   const now = new Date()
   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
-  const isOverlayExpired = currentOverlayToken ? new Date(currentOverlayToken.created_at) < oneDayAgo : false
+  const isExpired = (token: TokenWithHashtags | undefined) => {
+    if (!token) return false
+    return new Date(token.created_at) < oneDayAgo
+  }
 
   const renderCategory = (category: typeof categories[0], renderTitle: boolean = true) => {
     const categoryTokens = tokens
@@ -155,13 +183,49 @@ export default function CategoryGrid({
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="flex-1 overflow-y-auto">
-            <TokenTerminal
-              token={currentOverlayToken}
-              themeColor={overlayThemeColor}
-              isExpired={isOverlayExpired}
-              isExpanded={true}
-            />
+          <div className="flex-1 overflow-hidden">
+            <div
+              className={`flex h-full ${isTransitioning ? 'transition-transform duration-300 ease-out' : ''}`}
+              style={{ transform: `translateX(${slideOffset}%)` }}
+            >
+              {/* Previous Token */}
+              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+                {prevToken ? (
+                  <TokenTerminal
+                    token={prevToken}
+                    themeColor={overlayThemeColor}
+                    isExpired={isExpired(prevToken)}
+                    isExpanded={true}
+                  />
+                ) : (
+                  <div className="w-full h-full" />
+                )}
+              </div>
+
+              {/* Current Token */}
+              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+                <TokenTerminal
+                  token={currentOverlayToken}
+                  themeColor={overlayThemeColor}
+                  isExpired={isExpired(currentOverlayToken)}
+                  isExpanded={true}
+                />
+              </div>
+
+              {/* Next Token */}
+              <div className="w-full flex-shrink-0 h-full overflow-y-auto">
+                {nextToken ? (
+                  <TokenTerminal
+                    token={nextToken}
+                    themeColor={overlayThemeColor}
+                    isExpired={isExpired(nextToken)}
+                    isExpanded={true}
+                  />
+                ) : (
+                  <div className="w-full h-full" />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
