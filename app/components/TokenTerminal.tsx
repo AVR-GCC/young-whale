@@ -59,6 +59,48 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
   const socials = token.social_links;
   const keyStyle = { color: `${themeColor}99`, textShadow: `0 0 12px ${themeColor}1a` };
 
+  const labelAndLiveIndicator = (
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="text-[8px] sm:text-[9px] font-bold tracking-[0.16em] text-white/50 uppercase bg-white/5 border border-white/5 rounded-full px-2 sm:px-3 py-1 text-center truncate">
+        YOUNGWHALE TERMINAL
+      </div>
+      {!isExpired && (
+        <div className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-bold tracking-[0.12em] uppercase shrink-0" style={{ color: themeColor }}>
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }}></div>
+          LIVE
+        </div>
+      )}
+    </div>
+  );
+
+  const buttons = (
+    <>
+      <CustomTooltip content="Share to X" position="bottom" borderColor={themeColor}>
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${token.name} on The Next Wave!\n\n#${token.chain.replace(/\s+/g,'')} #${(token.main_hashtag || 'Crypto').replace(/\s+/g,'')}`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 fill-white/50 group-hover:fill-white transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+        </a>
+      </CustomTooltip>
+
+      <CustomTooltip content="Token creator or early backer? Promote this project in the homepage featured zone for 30 days." position="bottom-end" borderColor={themeColor}>
+        <div
+          className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
+          onClick={(e) => {
+            e.stopPropagation();
+            alert('Promote sequence initiated. Gateway connection pending...');
+          }}
+        >
+          <Zap className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+        </div>
+      </CustomTooltip>
+    </>
+  );
+
   return (
     <div
       className={`w-full transition-all duration-300 ease-in-out relative ${isExpanded ? 'max-h-[800px] opacity-100 py-0 sm:py-3 pb-0 sm:pb-6 bg-transparent border-transparent sm:border-t sm:border-dashed sm:border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
@@ -78,43 +120,9 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
           {/* Title bar */}
           <div className="py-2.5 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 gap-2 sm:gap-0 z-10 relative">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="text-[8px] sm:text-[9px] font-bold tracking-[0.16em] text-white/50 uppercase bg-white/5 border border-white/5 rounded-full px-2 sm:px-3 py-1 text-center truncate">
-                YOUNGWHALE TERMINAL
-              </div>
-              {!isExpired && (
-                <div className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-bold tracking-[0.12em] uppercase shrink-0" style={{ color: themeColor }}>
-                  <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }}></div>
-                  LIVE
-                </div>
-              )}
-            </div>
-
+            {labelAndLiveIndicator}
             <div className="flex items-center gap-2 shrink-0 z-10 self-end sm:self-auto">
-              <CustomTooltip content="Share to X" position="bottom" borderColor={themeColor}>
-                <a
-                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${token.name} on The Next Wave!\n\n#${token.chain.replace(/\s+/g,'')} #${(token.main_hashtag || 'Crypto').replace(/\s+/g,'')}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 fill-white/50 group-hover:fill-white transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
-                </a>
-              </CustomTooltip>
-
-              <CustomTooltip content="Token creator or early backer? Promote this project in the homepage featured zone for 30 days." position="bottom-end" borderColor={themeColor}>
-                <div
-                  className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    alert('Promote sequence initiated. Gateway connection pending...');
-                  }}
-                >
-                  <Zap className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-                </div>
-              </CustomTooltip>
-
+              {buttons}
               <div className="shrink-0 ml-2 sm:ml-3">
                 <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={64} />
               </div>
