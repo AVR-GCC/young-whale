@@ -185,7 +185,7 @@ export default function CategoryGrid({
         >
           <div className="flex-1 overflow-hidden">
             <div
-              className={'flex h-full transition-transform duration-200 ease-out'}
+              className={`flex h-full ${isTransitioning ? 'transition-transform duration-200 ease-out' : ''}`}
               style={{ transform: `translateX(${slideOffset}%)` }}
             >
               {/* Previous Token */}
