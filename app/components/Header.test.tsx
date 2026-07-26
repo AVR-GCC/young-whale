@@ -24,6 +24,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
@@ -41,6 +42,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
     // Timer appears twice (desktop + mobile) so use getAllByText
@@ -60,6 +62,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
@@ -77,6 +80,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
     expect(screen.getByTestId('search-icon').closest('button')).toBeDefined()
@@ -95,6 +99,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
 
@@ -118,6 +123,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
 
@@ -141,6 +147,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
 
@@ -163,6 +170,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="hashtag"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
 
@@ -187,6 +195,7 @@ describe('Header', () => {
         setTimeFilter={setTimeFilter}
         sortBy="default"
         setSortBy={setSortBy}
+        isMobileOverlayOpen={false}
       />
     )
 
@@ -211,6 +220,7 @@ describe('Header', () => {
         setTimeFilter={() => {}}
         sortBy="default"
         setSortBy={() => {}}
+        isMobileOverlayOpen={false}
       />
     )
     expect(screen.getByText('NEXT WAVE')).toBeDefined()

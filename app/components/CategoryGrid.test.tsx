@@ -108,6 +108,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -127,6 +128,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -146,6 +148,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -164,6 +167,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -183,6 +187,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
     // Categories should still render even when loading
@@ -198,6 +203,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter="defi"
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -215,6 +221,7 @@ describe('CategoryGrid', () => {
         setSelectedToken={() => {}}
         activeFilter={null}
         sortBy="default"
+        setIsMobileOverlayOpen={() => {}}
       />
     )
 
@@ -236,6 +243,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 
@@ -258,6 +266,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 
@@ -289,6 +298,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 
@@ -320,6 +330,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 
@@ -351,6 +362,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 
@@ -382,6 +394,7 @@ describe('CategoryGrid', () => {
           setSelectedToken={() => {}}
           activeFilter={null}
           sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
         />
       )
 

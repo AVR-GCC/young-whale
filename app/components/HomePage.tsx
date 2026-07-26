@@ -36,6 +36,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   // const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
+  const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false)
 
   const openSubmitModal = () => {
     // No-op: submit modal placeholder
@@ -101,6 +102,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         setTimeFilter={setTimeFilter}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        isMobileOverlayOpen={isMobileOverlayOpen}
       />
 
       <main className="max-w-7xl mx-auto w-full px-4 pt-2 flex flex-col gap-4">
@@ -111,6 +113,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           setSelectedToken={setSelectedToken}
           activeFilter={null}
           sortBy={sortBy}
+          setIsMobileOverlayOpen={setIsMobileOverlayOpen}
         />
 
         {/* <FilteredSignals */}

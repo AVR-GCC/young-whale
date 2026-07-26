@@ -14,6 +14,7 @@ interface CategoryGridProps {
   setSelectedToken: (token: string | null) => void
   activeFilter: string | null
   sortBy: 'default' | 'score' | 'hashtag'
+  setIsMobileOverlayOpen: (open: boolean) => void
 }
 
 export default function CategoryGrid({
@@ -23,6 +24,7 @@ export default function CategoryGrid({
   setSelectedToken,
   activeFilter,
   sortBy,
+  setIsMobileOverlayOpen,
 }: CategoryGridProps) {
   const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [mobileOverlayOpen, setMobileOverlayOpen] = useState(false)
@@ -34,8 +36,11 @@ export default function CategoryGrid({
 
   // Close overlay when switching categories
   useEffect(() => {
-    setTimeout(() => setMobileOverlayOpen(false))
-  }, [selectedCategory])
+    setTimeout(() => {
+      setMobileOverlayOpen(false)
+      setIsMobileOverlayOpen(false)
+    })
+  }, [selectedCategory, setIsMobileOverlayOpen])
 
   useEffect(() => {
     if (mobileOverlayOpen) {
@@ -71,8 +76,9 @@ export default function CategoryGrid({
     if (index !== -1) {
       setMobileOverlayTokenIndex(index)
       setMobileOverlayOpen(true)
+      setIsMobileOverlayOpen(true)
     }
-  }, [getCategoryTokens])
+  }, [getCategoryTokens, setIsMobileOverlayOpen])
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     setTouchEnd(null)

@@ -25,6 +25,7 @@ interface HeaderProps {
   setTimeFilter: (filter: 'all' | 'today' | 'yesterday') => void
   sortBy: 'default' | 'score' | 'hashtag'
   setSortBy: (sort: 'default' | 'score' | 'hashtag') => void
+  isMobileOverlayOpen: boolean
 }
 
 export default function Header({
@@ -37,8 +38,10 @@ export default function Header({
   setTimeFilter,
   sortBy,
   setSortBy,
+  isMobileOverlayOpen,
 }: HeaderProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  console.log('isMobileOverlayOpen', isMobileOverlayOpen);
 
   const title = (
     <div className="flex-shrink-0 flex-1 flex items-center">
