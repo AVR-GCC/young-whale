@@ -173,7 +173,7 @@ export const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onBack, isModal })
       {content}
     </div>
   ) : (
-    <div className="min-h-screen bg-deep text-[#F8FAFC] font-outfit p-6 md:p-12 selection:bg-cyan-400/30 selection:text-cyan-400">
+    <div className="min-h-dvh bg-deep text-[#F8FAFC] font-outfit p-6 md:p-12 selection:bg-cyan-400/30 selection:text-cyan-400">
       {content}
     </div>
   );
