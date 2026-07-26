@@ -43,10 +43,10 @@ export default function Header({
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const title = (
-    <div className={`flex-shrink-0 flex-1 flex items-center transition-all duration-500 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 -translate-x-4 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
+    <div className={`flex-shrink-0 flex-1 flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 -translate-x-4 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
       <Link
         href="/"
-        className="font-oxanium font-bold text-[10px] sm:text-xl tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-300"
+        className="font-oxanium font-bold text-[10px] sm:text-xl tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-600"
       >
         YoungWhale.io
       </Link>
@@ -54,7 +54,7 @@ export default function Header({
   )
 
   const timer = (
-    <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:block transition-all duration-500 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+    <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 hidden md:block transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
       <div className="relative py-1 px-4.5 bg-[#0A0F1D]/85 min-w-[240px] select-none text-center rounded-sm">
         {/* Custom Corner Brackets */}
         <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-[#51c9e2]/60" />
@@ -86,7 +86,7 @@ export default function Header({
   )
 
   const mobileTimer = (
-    <div className={`md:hidden py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-500 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+    <div className={`md:hidden py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
       <span className="font-oxanium text-[11px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE</span>
       <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
         {formatCountdown(secondsLeft)}
@@ -185,7 +185,7 @@ export default function Header({
         {title}
 
         {/* Whale on left - fades in overlay mode */}
-        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-500 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
+        <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
           {whaleIcon}
         </div>
 
@@ -196,7 +196,7 @@ export default function Header({
         {mobileTimer}
 
         {/* Terminal Pill - fades in overlay mode */}
-        <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 transition-all duration-500 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+        <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           {terminalPill}
         </div>
 
@@ -204,7 +204,7 @@ export default function Header({
         <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
           <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
             {/* Whale in buttons - fades out in overlay mode */}
-            <div className={`sm:hidden flex items-center transition-all duration-500 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+            <div className={`sm:hidden flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
               {whaleIcon}
               <div className="w-3" />
             </div>
