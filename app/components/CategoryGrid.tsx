@@ -6,6 +6,7 @@ import { categories } from '../lib/categories'
 import type { TokenWithHashtags } from '@/shared/types'
 import MobileCategoryFooter from './MobileCategoryFooter'
 import TokenTerminal from './TokenTerminal'
+import MobileSettingsMenu from './MobileSettingsMenu'
 
 interface CategoryGridProps {
   tokens: TokenWithHashtags[]
@@ -15,6 +16,10 @@ interface CategoryGridProps {
   activeFilter: string | null
   sortBy: 'default' | 'score' | 'hashtag'
   setIsMobileOverlayOpen: (open: boolean) => void
+  setSettingsOpen: (val: boolean) => void
+  isSettingsOpen: boolean
+  setSettingsView: (view: string) => void
+  settingsView: string
 }
 
 export default function CategoryGrid({
@@ -25,6 +30,10 @@ export default function CategoryGrid({
   activeFilter,
   sortBy,
   setIsMobileOverlayOpen,
+  setSettingsOpen,
+  isSettingsOpen,
+  setSettingsView,
+  settingsView
 }: CategoryGridProps) {
   const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [mobileOverlayOpen, setMobileOverlayOpen] = useState(false)
@@ -39,8 +48,9 @@ export default function CategoryGrid({
     setTimeout(() => {
       setMobileOverlayOpen(false)
       setIsMobileOverlayOpen(false)
+      setSettingsOpen(false)
     })
-  }, [selectedCategory, setIsMobileOverlayOpen])
+  }, [selectedCategory, setIsMobileOverlayOpen, setSettingsOpen])
 
   useEffect(() => {
     if (mobileOverlayOpen) {
@@ -162,6 +172,7 @@ export default function CategoryGrid({
       />
     )
   }
+  console.log('setSettingsView', setSettingsView);
 
   return (
     <>
@@ -181,6 +192,17 @@ export default function CategoryGrid({
         <MobileCategoryFooter selectCategory={selectCategory} selectedCategory={selectedCategory} />
       </div>
 
+      {/* Mobile Settings */}
+      {isSettingsOpen && settingsView && (
+        <div
+          data-testid="mobile-overlay"
+          className="fixed inset-x-0 bottom-[81px] top-[54px] z-30 flex flex-col bg-[#0B0F19] lg:hidden"
+        >
+          <div className="flex-1 overflow-hidden">
+            <MobileSettingsMenu view={settingsView} setView={setSettingsView} />
+          </div>
+        </div>
+      )}
       {/* Mobile Token Overlay */}
       {mobileOverlayOpen && currentOverlayToken && (
         <div

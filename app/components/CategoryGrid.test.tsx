@@ -34,6 +34,12 @@ vi.mock('./TokenTerminal', () => ({
   ),
 }))
 
+vi.mock('./MobileSettingsMenu', () => ({
+  default: ({ view }: { view: string }) => (
+    <div data-testid="mobile-settings-menu">Settings: {view}</div>
+  ),
+}))
+
 vi.mock('./MobileCategoryFooter', () => ({
   default: ({ selectedCategory, selectCategory }: { selectedCategory: string; selectCategory: (category: string) => void }) => (
     <div data-testid="mobile-category-footer">
@@ -109,6 +115,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -129,6 +139,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -149,6 +163,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -168,6 +186,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -188,6 +210,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
     // Categories should still render even when loading
@@ -204,6 +230,10 @@ describe('CategoryGrid', () => {
         activeFilter="defi"
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -222,6 +252,10 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
+        setSettingsOpen={() => {}}
+        isSettingsOpen={false}
+        setSettingsView={() => {}}
+        settingsView=""
       />
     )
 
@@ -244,6 +278,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -267,6 +305,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -299,6 +341,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -331,6 +377,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -363,6 +413,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -386,6 +440,7 @@ describe('CategoryGrid', () => {
     })
 
     it('closes overlay when switching categories', async () => {
+      const setSettingsOpen = vi.fn()
       render(
         <CategoryGrid
           tokens={mockTokens}
@@ -395,6 +450,10 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={setSettingsOpen}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView=""
         />
       )
 
@@ -411,6 +470,78 @@ describe('CategoryGrid', () => {
       await waitFor(() => {
         expect(getOverlay()).toBeNull()
       })
+
+      // Settings should also be closed
+      await waitFor(() => {
+        expect(setSettingsOpen).toHaveBeenCalledWith(false)
+      })
+    })
+  })
+
+  describe('settings overlay', () => {
+    it('renders MobileSettingsMenu when isSettingsOpen and settingsView are set', () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={true}
+          setSettingsView={() => {}}
+          settingsView="directory"
+        />
+      )
+
+      const overlay = getOverlay()
+      expect(overlay).toBeTruthy()
+      expect(screen.getByTestId('mobile-settings-menu')).toBeDefined()
+    })
+
+    it('does not render settings overlay when isSettingsOpen is false', () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={false}
+          setSettingsView={() => {}}
+          settingsView="directory"
+        />
+      )
+
+      const overlays = screen.queryAllByTestId('mobile-overlay')
+      // Should only have token overlays, not settings overlay
+      expect(overlays.length).toBe(0)
+    })
+
+    it('does not render settings overlay when settingsView is empty', () => {
+      render(
+        <CategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
+          setSettingsOpen={() => {}}
+          isSettingsOpen={true}
+          setSettingsView={() => {}}
+          settingsView=""
+        />
+      )
+
+      const overlays = screen.queryAllByTestId('mobile-overlay')
+      expect(overlays.length).toBe(0)
     })
   })
 })

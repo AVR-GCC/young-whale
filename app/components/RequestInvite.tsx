@@ -1,0 +1,77 @@
+import React, { useState } from 'react';
+
+export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?: boolean }) => {
+  const [email, setEmail] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState(false);
+
+  const isValidEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isValidEmail) {
+      setError(false);
+      setIsProcessing(true);
+      setTimeout(() => {
+        setIsProcessing(false);
+        setIsSubmitted(true);
+      }, 500);
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="space-y-6 relative">
+      <div className="flex justify-center mb-14">
+        <div className="w-[117px] h-[117px] rounded-full bg-[#131A26] border border-[#1E293B] flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest font-bold">
+          LOGO
+        </div>
+      </div>
+      {!isSubmitted ? (
+        <>
+          {!hideHeader && <h2 className="text-xl text-white font-oxanium font-extrabold tracking-[2px] uppercase mb-12 text-center text-shadow-sm">
+            [REQUEST INVITE]
+          </h2>}
+          <form onSubmit={handleSubmit} className="w-full relative group font-mono" noValidate>
+            <div className="flex flex-col">
+              <input
+                id="email_invite"
+                type="email"
+                value={email}
+                disabled={isProcessing}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(false);
+                }}
+                placeholder="[ Enter Email ]"
+                className={`w-full bg-black text-slate-400 placeholder-slate-600 border ${(error && !email) ? 'border-red-500/50' : 'border-slate-700'} p-3 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-mono text-sm`}
+                spellCheck={false}
+                autoComplete="off"
+                required
+              />
+            </div>
+            
+            <button
+              type="submit"
+              disabled={isProcessing || !isValidEmail}
+              className="w-full py-3 mt-8 bg-cyan-400 text-black hover:bg-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all font-bold tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? 'EXECUTING...' : '> REQUEST_INVITE'}
+            </button>
+          </form>
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-48 font-mono">
+          <div className="text-green-400 animate-pulse text-lg tracking-widest font-bold">
+            [ REQUEST LOGGED ✓ ]
+          </div>
+          <div className="text-slate-400 text-sm tracking-widest mt-2">
+            You&apos;re on the waiting list
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

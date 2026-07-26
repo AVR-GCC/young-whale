@@ -27,7 +27,7 @@ export const SubmitTokenModal: React.FC<SubmitTokenModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
 
-  const handleNext = (e: React.FormEvent) => {
+  const handleNext = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email && (promoteTokenName || url)) {
       setStep(2);

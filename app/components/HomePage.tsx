@@ -37,6 +37,9 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
   const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false)
+  const [isSettingsOpen, setSettingsOpen] = useState(false);
+  const [settingsView, setSettingsView] = useState('directory');
+
 
   const openSubmitModal = () => {
     // No-op: submit modal placeholder
@@ -103,6 +106,10 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         sortBy={sortBy}
         setSortBy={setSortBy}
         isMobileOverlayOpen={isMobileOverlayOpen}
+        isSettingsOpen={isSettingsOpen}
+        setSettingsOpen={setSettingsOpen}
+        settingsView={settingsView}
+        setSettingsView={setSettingsView}
       />
 
       <main className="max-w-7xl mx-auto w-full px-4 pt-2 flex flex-col gap-4">
@@ -114,6 +121,10 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           activeFilter={null}
           sortBy={sortBy}
           setIsMobileOverlayOpen={setIsMobileOverlayOpen}
+          setSettingsOpen={setSettingsOpen}
+          isSettingsOpen={isSettingsOpen}
+          setSettingsView={setSettingsView}
+          settingsView={settingsView}
         />
 
         {/* <FilteredSignals */}

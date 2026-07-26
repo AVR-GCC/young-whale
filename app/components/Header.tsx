@@ -3,8 +3,6 @@
 import Link from 'next/link'
 import { Search, Settings } from 'lucide-react'
 import { CustomTooltip } from './CustomTooltip'
-import { useState } from 'react'
-
 function formatCountdown(totalSeconds: number) {
   const hrs = Math.floor(totalSeconds / 3600)
   const mins = Math.floor((totalSeconds % 3600) / 60)
@@ -26,6 +24,10 @@ interface HeaderProps {
   sortBy: 'default' | 'score' | 'hashtag'
   setSortBy: (sort: 'default' | 'score' | 'hashtag') => void
   isMobileOverlayOpen: boolean
+  isSettingsOpen: boolean
+  setSettingsOpen: (val: boolean) => void
+  settingsView: string
+  setSettingsView: (view: string) => void
 }
 
 export default function Header({
@@ -39,8 +41,12 @@ export default function Header({
   sortBy,
   setSortBy,
   isMobileOverlayOpen,
+  isSettingsOpen,
+  setSettingsOpen,
+  settingsView,
+  setSettingsView,
 }: HeaderProps) {
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen;
 
   const title = (
     <div className={`flex-shrink-0 flex-1 flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 -translate-x-4 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
@@ -101,7 +107,10 @@ export default function Header({
       }}
     >
       <div
-        onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+        onClick={() => {
+          setSettingsOpen(true);
+          setSettingsView('invite');
+        }}
         style={{
           width: 24,
           height: 35,
@@ -133,9 +142,13 @@ export default function Header({
       <button
         type="button"
         onClick={() => {
-          console.log('open settings');
+          setSettingsOpen(true);
+          setSettingsView('directory');
         }}
         className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
+        style={{
+          filter: !isInviteModalOpen && isSettingsOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
+        }}
         aria-label="Toggle settings"
       >
         <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
@@ -181,29 +194,22 @@ export default function Header({
   return (
     <header className="pt-2 pb-1.5 w-full sm:border-b border-[#1E293B]/25 bg-[#000000] sm:bg-[#070A10]/50 backdrop-blur-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto w-full px-4 flex items-center justify-between gap-4 relative h-10 md:h-12">
-        {/* Title - fades out in overlay mode */}
         {title}
 
-        {/* Whale on left - fades in overlay mode */}
         <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
           {whaleIcon}
         </div>
 
-        {/* Desktop Timer - fades out in overlay mode */}
         {timer}
 
-        {/* Mobile Timer - fades out in overlay mode */}
         {mobileTimer}
 
-        {/* Terminal Pill - fades in overlay mode */}
         <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           {terminalPill}
         </div>
 
-        {/* Right side buttons */}
         <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
           <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-            {/* Whale in buttons - fades out in overlay mode */}
             <div className={`sm:hidden flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
               {whaleIcon}
               <div className="w-3" />

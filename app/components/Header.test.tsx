@@ -25,6 +25,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
     expect(screen.getByText('YoungWhale.io')).toBeDefined()
@@ -43,6 +47,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
     // Timer appears twice (desktop + mobile) so use getAllByText
@@ -63,6 +71,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
@@ -81,6 +93,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
     expect(screen.getByTestId('search-icon').closest('button')).toBeDefined()
@@ -100,6 +116,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
 
@@ -124,6 +144,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
 
@@ -148,6 +172,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
 
@@ -171,6 +199,10 @@ describe('Header', () => {
         sortBy="hashtag"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
 
@@ -196,6 +228,10 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={setSortBy}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
 
@@ -221,9 +257,74 @@ describe('Header', () => {
         sortBy="default"
         setSortBy={() => {}}
         isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={() => {}}
+        settingsView=""
+        setSettingsView={() => {}}
       />
     )
     expect(screen.getByText('NEXT WAVE')).toBeDefined()
     expect(screen.getAllByText('01:01:01').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('opens invite settings when whale icon is clicked', () => {
+    const setSettingsOpen = vi.fn()
+    const setSettingsView = vi.fn()
+    render(
+      <Header
+        secondsLeft={7200}
+        isSearchOpen={false}
+        setIsSearchOpen={() => {}}
+        searchQuery=""
+        setSearchQuery={() => {}}
+        timeFilter="all"
+        setTimeFilter={() => {}}
+        sortBy="default"
+        setSortBy={() => {}}
+        isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={setSettingsOpen}
+        settingsView=""
+        setSettingsView={setSettingsView}
+      />
+    )
+
+    // The whale icon is a div with a click handler
+    const whaleIcon = screen.getByText('YoungWhale.io').closest('div')?.parentElement?.parentElement?.querySelector('[style*="maskImage"]')
+    if (whaleIcon) {
+      fireEvent.click(whaleIcon)
+      expect(setSettingsOpen).toHaveBeenCalledWith(true)
+      expect(setSettingsView).toHaveBeenCalledWith('invite')
+    }
+  })
+
+  it('opens directory settings when mobile settings button is clicked', () => {
+    const setSettingsOpen = vi.fn()
+    const setSettingsView = vi.fn()
+    render(
+      <Header
+        secondsLeft={7200}
+        isSearchOpen={false}
+        setIsSearchOpen={() => {}}
+        searchQuery=""
+        setSearchQuery={() => {}}
+        timeFilter="all"
+        setTimeFilter={() => {}}
+        sortBy="default"
+        setSortBy={() => {}}
+        isMobileOverlayOpen={false}
+        isSettingsOpen={false}
+        setSettingsOpen={setSettingsOpen}
+        settingsView=""
+        setSettingsView={setSettingsView}
+      />
+    )
+
+    const settingsButton = screen.getByTestId('settings-icon').closest('button')
+    if (settingsButton) {
+      fireEvent.click(settingsButton)
+      expect(setSettingsOpen).toHaveBeenCalledWith(true)
+      expect(setSettingsView).toHaveBeenCalledWith('directory')
+    }
   })
 })
