@@ -41,7 +41,6 @@ export default function Header({
   isMobileOverlayOpen,
 }: HeaderProps) {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  console.log('isMobileOverlayOpen', isMobileOverlayOpen);
 
   const title = (
     <div className="flex-shrink-0 flex-1 flex items-center">
@@ -95,99 +94,130 @@ export default function Header({
     </div>
   )
 
-  const buttons = (
+  const whaleIcon = (
+    <div
+      style={{
+        filter: isInviteModalOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
+      }}
+    >
+      <div
+        onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
+        style={{
+          width: 24,
+          height: 35,
+          maskImage: `url(/whale-trans.svg)`,
+          WebkitMaskImage: `url(/whale-trans.svg)`,
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+          backgroundColor: isInviteModalOpen ? '#33FFFF' : '#94A3B8',
+        }}
+      />
+    </div>
+  )
+
+  const searchSettings = (
+    <>
+      <div className="w-3" />
+      <button
+        type="button"
+        onClick={() => setIsSearchOpen(!isSearchOpen)}
+        className="p-1 focus:outline-none flex-shrink-0"
+        aria-label="Toggle search"
+      >
+        <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+      </button>
+      <div className="w-2" />
+      <button
+        type="button"
+        onClick={() => {
+          console.log('open settings');
+        }}
+        className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
+        aria-label="Toggle settings"
+      >
+        <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+      </button>
+      {isSearchOpen && (
+        <div className="flex items-center gap-2 md:gap-3 pl-1">
+          <input
+            autoFocus
+            type="text"
+            placeholder="SEARCH..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-16 md:w-28 placeholder-[#475569] pb-[1px]"
+          />
+          <select
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value as 'all' | 'today' | 'yesterday')}
+            className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
+          >
+            <option value="all">TIME: ALL</option>
+            <option value="today">TODAY</option>
+            <option value="yesterday">1D AGO</option>
+          </select>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as 'default' | 'score' | 'hashtag')}
+            className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
+          >
+            <option value="default">SORT: DFLT</option>
+            <option value="hashtag">HASHTAG</option>
+          </select>
+        </div>
+      )}
+    </>
+  )
+
+  const normalButtons = (
     <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
       <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-        <div
-          style={{
-            filter: isInviteModalOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
-          }}
-        >
-          <div
-            onClick={() => setIsInviteModalOpen(!isInviteModalOpen)}
-            style={{
-              width: 24,
-              height: 35,
-              maskImage: `url(/whale-trans.svg)`,
-              WebkitMaskImage: `url(/whale-trans.svg)`,
-              maskSize: 'contain',
-              WebkitMaskSize: 'contain',
-              maskRepeat: 'no-repeat',
-              WebkitMaskRepeat: 'no-repeat',
-              maskPosition: 'center',
-              WebkitMaskPosition: 'center',
-              backgroundColor: isInviteModalOpen ? '#33FFFF' : '#94A3B8',
-            }}
-            className='sm:hidden'
-          />
+        <div className="sm:hidden">
+          {whaleIcon}
         </div>
-        {/* <span */}
-        {/*   className={`text-[16px] transition-all duration-[50ms] select-none flex items-center justify-center w-5 h-5 leading-none ${isInviteModalOpen ? 'opacity-100 grayscale-0 drop-shadow-[0_0_8px_#22d3ee]' : 'grayscale opacity-60 hover:opacity-100'}`} */}
-        {/*   onClick={() => setIsInviteModalOpen(!isInviteModalOpen)} */}
-        {/* > */}
-        {/*   🐋 */}
-        {/* </span> */}
-        <div className="w-3" />
-        <button
-          type="button"
-          onClick={() => setIsSearchOpen(!isSearchOpen)}
-          className="p-1 focus:outline-none flex-shrink-0"
-          aria-label="Toggle search"
-        >
-          <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
-        </button>
-        <div className="w-2" />
-        <button
-          type="button"
-          onClick={() => {
-            console.log('open settings');
-          }}
-          className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
-          aria-label="Toggle settings"
-        >
-          <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
-        </button>
-        {isSearchOpen && (
-          <div className="flex items-center gap-2 md:gap-3 pl-1">
-            <input
-              autoFocus
-              type="text"
-              placeholder="SEARCH..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-16 md:w-28 placeholder-[#475569] pb-[1px]"
-            />
-            <select
-              value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value as 'all' | 'today' | 'yesterday')}
-              className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
-            >
-              <option value="all">TIME: ALL</option>
-              <option value="today">TODAY</option>
-              <option value="yesterday">1D AGO</option>
-            </select>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'default' | 'score' | 'hashtag')}
-              className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
-            >
-              <option value="default">SORT: DFLT</option>
-              <option value="hashtag">HASHTAG</option>
-            </select>
-          </div>
-        )}
+        {searchSettings}
+      </div>
+    </div>
+  )
+
+  const overlayButtons = (
+    <div className="flex items-center gap-4 justify-end flex-1 md:flex-none">
+      <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
+        {searchSettings}
+      </div>
+    </div>
+  )
+
+  const terminalPill = (
+    <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
+      <div className="px-4 py-1 rounded-full bg-[#1E293B] border border-[#334155] text-[#F8FAFC] font-oxanium text-xs font-semibold tracking-wide">
+        YoungWhale Terminal
       </div>
     </div>
   )
 
   return (
     <header className="pt-2 pb-1.5 w-full sm:border-b border-[#1E293B]/25 bg-[#000000] sm:bg-[#070A10]/50 backdrop-blur-md sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto w-full px-4 flex items-center justify-between gap-4 relative h-10 md:h-12">
-        {title}
-        {timer}
-        {mobileTimer}
-        {buttons}
-      </div>
+      {isMobileOverlayOpen ? (
+        <div className="max-w-7xl mx-auto w-full px-4 flex items-center justify-between gap-4 relative h-10 md:h-12">
+          <div className="flex-shrink-0">
+            {whaleIcon}
+          </div>
+          {terminalPill}
+          {overlayButtons}
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto w-full px-4 flex items-center justify-between gap-4 relative h-10 md:h-12">
+          {title}
+          {timer}
+          {mobileTimer}
+          {normalButtons}
+        </div>
+      )}
     </header>
   )
 }
