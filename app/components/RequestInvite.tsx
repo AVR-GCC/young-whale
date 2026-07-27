@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEmailSubscription } from '@/app/hooks/useEmailSubscription';
+import { SubmitButton } from './SubmitButton';
 
 export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?: boolean }) => {
   const {
@@ -49,13 +50,9 @@ export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?
                 Invalid email — try again.
               </div>
             )}
-            <button
-              type="submit"
-              disabled={isProcessing || !isValidEmail}
-              className="w-full py-3 mt-8 bg-cyan-400 text-black hover:bg-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all font-bold tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <SubmitButton disabled={isProcessing || !isValidEmail}>
               {isProcessing ? 'EXECUTING...' : '> REQUEST_INVITE'}
-            </button>
+            </SubmitButton>
           </form>
         </>
       ) : (

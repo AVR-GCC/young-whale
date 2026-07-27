@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Pin } from 'lucide-react';
+import { SubmitButton } from './SubmitButton';
 
 export const SubmitToken = ({ promoteTokenName }: { promoteTokenName?: string | null, onClose: () => void }) => {
   const [step, setStep] = useState(1);
@@ -70,12 +71,9 @@ export const SubmitToken = ({ promoteTokenName }: { promoteTokenName?: string | 
               placeholder="Your email [ operator@... ]"
               className="w-full bg-black text-slate-400 placeholder-slate-600 border border-slate-700 p-3 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-mono text-sm"
             />
-            <button
-              type="submit"
-              className="w-full py-3 mt-4 text-cyan-400 border border-cyan-400 hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all font-bold tracking-widest uppercase"
-            >
+            <SubmitButton>
               [ NEXT ]
-            </button>
+            </SubmitButton>
           </form>
         </div>
       );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SubmitButton } from './SubmitButton';
 
 export const ContactForm = ({ onClose, hideHeader }: { onClose: () => void, hideHeader?: boolean }) => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -80,13 +81,9 @@ export const ContactForm = ({ onClose, hideHeader }: { onClose: () => void, hide
               className="w-full bg-black text-slate-400 placeholder-slate-600 border border-slate-700 p-3 resize-none h-32 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-mono text-sm"
             />
           </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 mt-4 bg-cyan-400 text-black hover:bg-cyan-300 hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] transition-all font-bold tracking-widest uppercase disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+          <SubmitButton disabled={isSubmitting}>
             {isSubmitting ? 'EXECUTING...' : '> EXECUTE_MESSAGE'}
-          </button>
+          </SubmitButton>
         </form>
       )}
     </>
