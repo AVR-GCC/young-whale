@@ -59,9 +59,9 @@ const LegalModalContent: React.FC<LegalModalContentProps> = ({ onClose, initialT
 
         {/* Content area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
-          {activeTab === 'tc' && <TermsAndConditions onBack={onClose} isModal />}
-          {activeTab === 'legal' && <LegalDisclaimer onBack={onClose} isModal />}
-          {activeTab === 'privacy' && <PrivacyNotice onBack={onClose} isModal />}
+          {activeTab === 'tc' && <TermsAndConditions />}
+          {activeTab === 'legal' && <LegalDisclaimer />}
+          {activeTab === 'privacy' && <PrivacyNotice />}
         </div>
       </div>
     </div>

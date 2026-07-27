@@ -1,11 +1,6 @@
 import React from 'react';
 
-interface PrivacyNoticeProps {
-  onBack: () => void;
-  isModal?: boolean;
-}
-
-export const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onBack, isModal }) => {
+export const PrivacyNotice: React.FC = () => {
   const content = (
     <>
       <div className="max-w-3xl mx-auto">
@@ -18,15 +13,7 @@ export const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onBack, isModal })
             <p className="font-outfit text-sm text-slate-400">
               Last Updated: June 2026
             </p>
-          </div>
-          {!isModal && (
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 py-2 px-4 rounded font-mono text-xs font-bold bg-[#1E293B] hover:bg-[#334155] text-white transition-colors flex-shrink-0 ml-4"
-            >
-              ← BACK TO APP
-            </button>
-          )}
+        </div>
         </div>
 
         {/* Content */}
@@ -168,12 +155,8 @@ export const PrivacyNotice: React.FC<PrivacyNoticeProps> = ({ onBack, isModal })
     </>
   );
 
-  return isModal ? (
+  return (
     <div className="text-slate-50 font-outfit selection:bg-cyan-400/30 selection:text-cyan-400">
-      {content}
-    </div>
-  ) : (
-    <div className="min-h-dvh bg-deep text-[#F8FAFC] font-outfit p-6 md:p-12 selection:bg-cyan-400/30 selection:text-cyan-400">
       {content}
     </div>
   );

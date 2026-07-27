@@ -1,38 +1,25 @@
 import React from 'react';
 
-interface LegalDisclaimerProps {
-  onBack: () => void;
-  isModal?: boolean;
-}
-
-export const LegalDisclaimer: React.FC<LegalDisclaimerProps> = ({ onBack, isModal }) => {
+export const LegalDisclaimer: React.FC = () => {
   const content = (
     <>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#1E293B] pb-6 mb-10">
-          <div>
-            <h1 className="font-outfit text-3xl font-bold tracking-tight text-[#F1F5F9] mb-2">
-              Legal Disclaimer and Terms of Use Notice
+          <div className="w-full text-center sm:text-left">
+            <h1 className="text-xl text-white font-oxanium font-extrabold tracking-[2px] uppercase mb-2 text-shadow-sm">
+              Legal Disclaimer
             </h1>
             <p className="font-outfit text-sm text-slate-400">
               Last updated: June 2026
             </p>
-          </div>
-          {!isModal && (
-            <button
-              onClick={onBack}
-              className="flex items-center gap-2 py-2 px-4 rounded font-mono text-xs font-bold bg-[#1E293B] hover:bg-[#334155] text-white transition-colors flex-shrink-0 ml-4"
-            >
-              ← BACK TO APP
-            </button>
-          )}
+        </div>
         </div>
 
         {/* Content */}
         <div className="space-y-10 leading-relaxed text-[#94A3B8] text-left">
           <p>
-            By accessing and using youngwhale.io (the &quot;Website&quot;), you unconditionally agree to be bound by this Disclaimer, as well as our Terms &amp; Conditions and Privacy Policy. If you do not agree, you must immediately cease using the Website.
+            By accessing and using youngwhale.io (the "Website"), you unconditionally agree to be bound by this Disclaimer, as well as our Terms &amp; Conditions and Privacy Policy. If you do not agree, you must immediately cease using the Website.
           </p>
 
           <section>
@@ -67,7 +54,7 @@ export const LegalDisclaimer: React.FC<LegalDisclaimerProps> = ({ onBack, isModa
               All token data and related information displayed on youngwhale.io is collected daily from public blockchains and various external web sources by our automated systems. We do not host user-generated content.
             </p>
             <p className="mb-3">
-              <strong className="text-[#CBD5E1]">As-Is Information:</strong> All information is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, express or implied.
+              <strong className="text-[#CBD5E1]">As-Is Information:</strong> All information is provided on an "as is" and "as available" basis without warranties of any kind, express or implied.
             </p>
             <p>
               <strong className="text-[#CBD5E1]">Do Your Own Research (DYOR):</strong> youngwhale.io does not vet, audit, or guarantee the accuracy, timeliness, reliability, or completeness of any project information, contract addresses, whitepapers, or marketing claims pulled from the blockchain or web. It is of the utmost importance that you conduct your own due diligence and verify all facts independently before interacting with any digital asset.
@@ -142,12 +129,8 @@ export const LegalDisclaimer: React.FC<LegalDisclaimerProps> = ({ onBack, isModa
     </>
   );
 
-  return isModal ? (
+  return (
     <div className="text-slate-50 font-outfit selection:bg-cyan-400/30 selection:text-cyan-400">
-      {content}
-    </div>
-  ) : (
-    <div className="min-h-dvh bg-deep text-[#F8FAFC] font-outfit p-6 md:p-12 selection:bg-cyan-400/30 selection:text-cyan-400">
       {content}
     </div>
   );

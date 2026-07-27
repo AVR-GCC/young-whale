@@ -34,9 +34,9 @@ export default function MobileSettingsMenu({
     invite: <RequestInvite onClose={setToDirectory} hideHeader />,
     promote: <SubmitToken onClose={setToDirectory} />, // promoteTokenName={promoteTokenName} />,
     contact: <ContactForm onClose={setToDirectory} hideHeader />,
-    tc: <TermsAndConditions onBack={setToDirectory} isModal={true} />,
-    legal: <LegalDisclaimer onBack={setToDirectory} isModal={true} />,
-    privacy: <PrivacyNotice onBack={setToDirectory} isModal={true} />
+    tc: <TermsAndConditions />,
+    legal: <LegalDisclaimer />,
+    privacy: <PrivacyNotice />
   }
 
   return (
