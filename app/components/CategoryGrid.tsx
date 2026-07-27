@@ -197,7 +197,7 @@ export default function CategoryGrid({
           data-testid="mobile-overlay"
           className="fixed inset-x-0 bottom-[81px] top-[54px] z-31 flex flex-col bg-[#0B0F19] lg:hidden"
         >
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto">
             <MobileSettingsMenu view={settingsView} setView={setSettingsView} />
           </div>
         </div>
