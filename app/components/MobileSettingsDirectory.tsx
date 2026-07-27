@@ -113,7 +113,7 @@ export default function MobileSettingsDirectory({
             </div>
           </div>
         </button>
-        <button onClick={() => setView('tc')} className="relative w-full cursor-pointer select-none flex flex-col rounded mb-1 border border-transparent transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.06] group text-left">
+        <button onClick={() => setView('tc')} className="relative w-full cursor-pointer select-none flex flex-col rounded mb-2 border border-transparent transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.06] group text-left">
           <div className="flex items-center w-full px-3 py-1.5 gap-2 z-10 bg-transparent rounded">
             <div className="flex-shrink-0 relative">
               <div className="w-7 h-7 rounded-full border border-white/60 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors bg-black">
@@ -147,7 +147,7 @@ export default function MobileSettingsDirectory({
               </div>
             </div>
             <div className="flex flex-col items-end flex-shrink-0 justify-center gap-1.5">
-              <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-white transition-colors" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500 group-hover:text-white transition-colors" />
             </div>
           </div>
         </button>
