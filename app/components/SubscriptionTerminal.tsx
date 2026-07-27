@@ -1,33 +1,16 @@
-import React, { useState } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import React from 'react';
+import { useEmailSubscription } from '@/app/hooks/useEmailSubscription';
 
 export const SubscriptionTerminal = () => {
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(false);
-
-  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError(false);
-      setIsProcessing(true);
-
-      const { error: insertError } = await supabase
-        .from('email_subscriptions')
-        .insert({ email });
-
-      setIsProcessing(false);
-
-      if (insertError) {
-        setError(true);
-      } else {
-        setIsSubmitted(true);
-      }
-    } else {
-      setError(true);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    isSubmitted,
+    isProcessing,
+    error,
+    handleSubmit,
+    clearError,
+  } = useEmailSubscription();
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-16 mb-8 px-4">
@@ -52,7 +35,7 @@ export const SubscriptionTerminal = () => {
                   disabled={isProcessing}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (error) setError(false);
+                    if (error) clearError();
                   }}
                   className={`w-full bg-black/40 border ${error ? 'border-red-500' : 'border-slate-700'} rounded text-white px-4 py-3 outline-none transition-all placeholder:text-slate-500/0 focus:ring-1 focus:ring-[#00E5D2] focus:border-[#00E5D2] disabled:opacity-50`}
                   spellCheck={false}

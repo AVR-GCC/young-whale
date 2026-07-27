@@ -1,26 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useEmailSubscription } from '@/app/hooks/useEmailSubscription';
 
 export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?: boolean }) => {
-  const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState(false);
-
-  const isValidEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isValidEmail) {
-      setError(false);
-      setIsProcessing(true);
-      setTimeout(() => {
-        setIsProcessing(false);
-        setIsSubmitted(true);
-      }, 500);
-    } else {
-      setError(true);
-    }
-  };
+  const {
+    email,
+    setEmail,
+    isSubmitted,
+    isProcessing,
+    error,
+    isValidEmail,
+    handleSubmit,
+    clearError,
+  } = useEmailSubscription();
 
   return (
     <div className="space-y-6 relative">
@@ -43,7 +34,7 @@ export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?
                 disabled={isProcessing}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (error) setError(false);
+                  if (error) clearError();
                 }}
                 placeholder="[ Enter Email ]"
                 className={`w-full bg-black text-slate-400 placeholder-slate-600 border ${(error && !email) ? 'border-red-500/50' : 'border-slate-700'} p-3 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-mono text-sm`}
@@ -53,6 +44,11 @@ export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?
               />
             </div>
             
+            {error && (
+              <div className="text-red-400 text-sm mt-2">
+                Invalid email — try again.
+              </div>
+            )}
             <button
               type="submit"
               disabled={isProcessing || !isValidEmail}

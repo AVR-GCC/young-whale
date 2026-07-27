@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { SubscriptionTerminal } from './SubscriptionTerminal'
+import { RequestInvite } from './RequestInvite'
 
 const mockFetch = vi.fn()
 
-describe('SubscriptionTerminal', () => {
+describe('RequestInvite', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     global.fetch = mockFetch
@@ -14,57 +14,69 @@ describe('SubscriptionTerminal', () => {
     })
   })
 
-  it('renders the terminal with title', () => {
-    render(<SubscriptionTerminal />)
-    expect(screen.getByText('YOUNG WHALE CLUB')).toBeDefined()
-  })
-
   it('renders email input and submit button', () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     expect(screen.getByRole('textbox')).toBeDefined()
-    expect(screen.getByRole('button', { name: /request invite/i })).toBeDefined()
+    expect(screen.getByRole('button', { name: /request_invite/i })).toBeDefined()
   })
 
-  it('shows simulated placeholder when email is empty', () => {
-    render(<SubscriptionTerminal />)
-    expect(screen.getByText('Email')).toBeDefined()
+  it('shows header by default', () => {
+    render(<RequestInvite onClose={() => {}} />)
+    expect(screen.getByText(/request invite/i)).toBeDefined()
   })
 
-  it('hides placeholder when email is typed', () => {
-    render(<SubscriptionTerminal />)
-    const input = screen.getByRole('textbox') as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'test@example.com' } })
-    expect(screen.queryByText('Email')).toBeNull()
-    expect(input.value).toBe('test@example.com')
+  it('hides header when hideHeader is true', () => {
+    render(<RequestInvite onClose={() => {}} hideHeader />)
+    expect(screen.queryByText(/request invite/i)).toBeNull()
   })
 
-  it('shows error for invalid email', () => {
-    render(<SubscriptionTerminal />)
+  it('disables button when email is invalid', () => {
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i }) as HTMLButtonElement
 
     fireEvent.change(input, { target: { value: 'invalid-email' } })
-    fireEvent.click(button)
-
-    expect(screen.getByText('Invalid email — try again.')).toBeDefined()
+    expect(button.disabled).toBe(true)
   })
 
-  it('shows error for empty email', () => {
-    render(<SubscriptionTerminal />)
-    const button = screen.getByRole('button', { name: /request invite/i })
+  it('disables button when email is empty', () => {
+    render(<RequestInvite onClose={() => {}} />)
+    const button = screen.getByRole('button', { name: /request_invite/i }) as HTMLButtonElement
 
-    fireEvent.click(button)
+    expect(button.disabled).toBe(true)
+  })
+
+  it('enables button when email is valid', () => {
+    render(<RequestInvite onClose={() => {}} />)
+    const input = screen.getByRole('textbox')
+    const button = screen.getByRole('button', { name: /request_invite/i }) as HTMLButtonElement
+
+    fireEvent.change(input, { target: { value: 'test@example.com' } })
+    expect(button.disabled).toBe(false)
+  })
+
+  it('shows error when submitting invalid email via form', () => {
+    render(<RequestInvite onClose={() => {}} />)
+    const form = document.querySelector('form')
+    const input = screen.getByRole('textbox')
+
+    fireEvent.change(input, { target: { value: 'invalid-email' } })
+    if (form) {
+      fireEvent.submit(form)
+    }
 
     expect(screen.getByText('Invalid email — try again.')).toBeDefined()
   })
 
   it('clears error when user starts typing after error', () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
+    const form = document.querySelector('form')
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
 
     fireEvent.change(input, { target: { value: 'invalid' } })
-    fireEvent.click(button)
+    if (form) {
+      fireEvent.submit(form)
+    }
     expect(screen.getByText('Invalid email — try again.')).toBeDefined()
 
     fireEvent.change(input, { target: { value: 'valid@example.com' } })
@@ -72,9 +84,9 @@ describe('SubscriptionTerminal', () => {
   })
 
   it('calls fetch with email on valid submit', async () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
@@ -91,24 +103,24 @@ describe('SubscriptionTerminal', () => {
   it('shows processing state during submission', async () => {
     mockFetch.mockImplementation(() => new Promise(() => {}))
 
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
 
     await waitFor(() => {
-      expect(screen.getByText('[ AUTHENTICATING... ]')).toBeDefined()
+      expect(screen.getByText('EXECUTING...')).toBeDefined()
     })
   })
 
   it('disables input and button during processing', async () => {
     mockFetch.mockImplementation(() => new Promise(() => {}))
 
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox') as HTMLInputElement
-    const button = screen.getByRole('button', { name: /request invite/i }) as HTMLButtonElement
+    const button = screen.getByRole('button', { name: /request_invite/i }) as HTMLButtonElement
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
@@ -120,9 +132,9 @@ describe('SubscriptionTerminal', () => {
   })
 
   it('shows success message after successful submission', async () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
@@ -139,9 +151,9 @@ describe('SubscriptionTerminal', () => {
       json: () => Promise.resolve({ error: 'Server error' }),
     })
 
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
@@ -152,23 +164,23 @@ describe('SubscriptionTerminal', () => {
   })
 
   it('hides form after successful submission', async () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@example.com' } })
     fireEvent.click(button)
 
     await waitFor(() => {
       expect(screen.queryByRole('textbox')).toBeNull()
-      expect(screen.queryByRole('button', { name: /request invite/i })).toBeNull()
+      expect(screen.queryByRole('button', { name: /request_invite/i })).toBeNull()
     })
   })
 
   it('accepts email with plus sign', async () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test+tag@example.com' } })
     fireEvent.click(button)
@@ -183,9 +195,9 @@ describe('SubscriptionTerminal', () => {
   })
 
   it('accepts email with subdomain', async () => {
-    render(<SubscriptionTerminal />)
+    render(<RequestInvite onClose={() => {}} />)
     const input = screen.getByRole('textbox')
-    const button = screen.getByRole('button', { name: /request invite/i })
+    const button = screen.getByRole('button', { name: /request_invite/i })
 
     fireEvent.change(input, { target: { value: 'test@mail.example.com' } })
     fireEvent.click(button)
