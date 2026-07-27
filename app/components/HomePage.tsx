@@ -144,6 +144,14 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           setLegalModalTab={setLegalModalTab}
         />
       </div>
+
+      {/* Mobile SEO Footer - always rendered but visually hidden, ensuring crawlers see the links in initial HTML */}
+      <div className="md:hidden sr-only" aria-hidden="true">
+        <a href="/terms">Terms and Conditions</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/legal">Legal Disclaimer</a>
+        <a href="https://x.com/YoungWhaleLabs" target="_blank" rel="noopener">Follow on X</a>
+      </div>
     </div>
   )
 }
