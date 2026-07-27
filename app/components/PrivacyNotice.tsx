@@ -6,14 +6,14 @@ export const PrivacyNotice: React.FC = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#1E293B] pb-6 mb-10">
-          <div>
-            <h1 className="font-outfit text-3xl font-bold tracking-tight text-[#F1F5F9] mb-2">
-              Privacy Notice for youngwhale.io
+          <div className="w-full text-center sm:text-left">
+            <h1 className="text-xl text-white font-oxanium font-extrabold tracking-[2px] uppercase mb-2 text-shadow-sm">
+              Privacy Notice
             </h1>
             <p className="font-outfit text-sm text-slate-400">
               Last Updated: June 2026
             </p>
-        </div>
+          </div>
         </div>
 
         {/* Content */}
@@ -43,7 +43,7 @@ export const PrivacyNotice: React.FC = () => {
             </p>
             <p className="mb-3">
               <span className="text-[#CBD5E1]">Purpose of Processing:</span> To send you requested updates, respond to your inquiries, or provide customer assistance.<br />
-              <span className="text-[#CBD5E1]">Legal Basis:</span> We rely on your consent. You may withdraw your consent at any time by clicking &quot;unsubscribe&quot; in our emails or by contacting us.
+              <span className="text-[#CBD5E1]">Legal Basis:</span> We rely on your consent. You may withdraw your consent at any time by clicking "unsubscribe" in our emails or by contacting us.
             </p>
             <p className="mb-3">
               <strong className="text-[#CBD5E1]">Personal Data Collected Automatically</strong><br />
@@ -63,7 +63,7 @@ export const PrivacyNotice: React.FC = () => {
           <section>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-4">3. Use of Cookies</h2>
             <p className="mb-3">
-              We use cookies and similar tools to enhance your user experience, ensure our Services function correctly, and understand how users navigate our site. Depending on applicable laws in your region, a cookie banner on your browser will allow you to accept or refuse non-essential cookies. You can adapt your choices in your browser&apos;s cookie preference settings at any time.
+              We use cookies and similar tools to enhance your user experience, ensure our Services function correctly, and understand how users navigate our site. Depending on applicable laws in your region, a cookie banner on your browser will allow you to accept or refuse non-essential cookies. You can adapt your choices in your browser's cookie preference settings at any time.
             </p>
           </section>
 
@@ -122,7 +122,7 @@ export const PrivacyNotice: React.FC = () => {
               <strong className="text-[#CBD5E1]">Right to Erase:</strong> You may request the deletion of your email address from our records at any time.
             </p>
             <p className="mb-3">
-              <strong className="text-[#CBD5E1]">Right to Withdraw Consent / Opt-Out:</strong> You can withdraw your consent for email communications at any time by clicking &quot;unsubscribe&quot; or contacting us. We do not &quot;sell&quot; or &quot;share&quot; your personal information for targeted third-party advertising.
+              <strong className="text-[#CBD5E1]">Right to Withdraw Consent / Opt-Out:</strong> You can withdraw your consent for email communications at any time by clicking "unsubscribe" or contacting us. We do not "sell" or "share" your personal information for targeted third-party advertising.
             </p>
             <p>
               <strong className="text-[#CBD5E1]">Submit a Privacy Request:</strong><br />
