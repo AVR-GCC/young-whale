@@ -27,19 +27,19 @@ export const TermsAndConditions: React.FC = () => {
               1.2 youngwhale.io provides the following Services:
             </p>
             <ul className="list-disc pl-6 space-y-2 mb-3">
-              <li>1.2.1 An automated Platform where cryptocurrency token data is collected daily from public blockchains and various external web sources by our proprietary systems and displayed on our interface (the "Website").</li>
-              <li>1.2.2 Algorithmic traction tracking, featuring point-in-time metrics known as "Sonar Scores" to evaluate automated token activity metrics.</li>
-              <li>1.2.3 Optional user registration features, allowing natural persons to create an Account to manage personalized tracking metrics or watchlists (a "User").</li>
+              <li>1.2.1 An automated Platform where cryptocurrency token data is collected daily from public blockchains and various external web sources by our proprietary systems and displayed on our interface (the &quot;Website&quot;).</li>
+              <li>1.2.2 Algorithmic traction tracking, featuring point-in-time metrics known as &quot;Sonar Scores&quot; to evaluate automated token activity metrics.</li>
+              <li>1.2.3 Optional user registration features, allowing natural persons to create an Account to manage personalized tracking metrics or watchlists (a &quot;User&quot;).</li>
               <li>1.2.4 Advertising services through explicitly marked banners on the Website and dedicated promoted or sponsored spots for third-party crypto projects.</li>
             </ul>
             <p className="mb-3">
               1.3 youngwhale.io does not vet, audit, verify, or monitor any of the listed tokens or third-party external data sources. Token listings on the Website are for general informational and educational purposes only. youngwhale.io does not provide any financial advice, act as a financial services provider or broker, or in any other way facilitate or aid in the execution of any transactions in cryptocurrency or otherwise.
             </p>
             <p className="mb-3">
-              1.4 The market for digital assets, including cryptocurrency as tracked on the Website, is highly volatile, unpredictable, unregulated, and speculative. Digital assets rely entirely on technology and market trust, and may experience rapid price collapses or become completely worthless. Furthermore, tokens listed on the platform could potentially be fraudulent or malicious projects ("Scams") designed to induce market participants to invest financial resources that will be irretrievably lost. Each User assumes sole responsibility for conducting their own research (Do Your Own Research / DYOR) before interacting with any digital asset.
+              1.4 The market for digital assets, including cryptocurrency as tracked on the Website, is highly volatile, unpredictable, unregulated, and speculative. Digital assets rely entirely on technology and market trust, and may experience rapid price collapses or become completely worthless. Furthermore, tokens listed on the platform could potentially be fraudulent or malicious projects (&quot;Scams&quot;) designed to induce market participants to invest financial resources that will be irretrievably lost. Each User assumes sole responsibility for conducting their own research (Do Your Own Research / DYOR) before interacting with any digital asset.
             </p>
             <p>
-              1.5 These Terms and Conditions ("Terms"), along with our Privacy Policy, constitute a legally binding agreement made between the User (whether personally or on behalf of a legal entity) and youngwhale.io concerning your access to and use of the Website, platform, or associated tools.
+              1.5 These Terms and Conditions (&quot;Terms&quot;), along with our Privacy Policy, constitute a legally binding agreement made between the User (whether personally or on behalf of a legal entity) and youngwhale.io concerning your access to and use of the Website, platform, or associated tools.
             </p>
           </section>
 
@@ -56,10 +56,10 @@ export const TermsAndConditions: React.FC = () => {
               3.1 All data displayed on the platform is gathered automatically from public ledgers and third-party web indexes. youngwhale.io does not host, permit, or accept user-generated project listings or crowd-sourced content submissions.
             </p>
             <p className="mb-3">
-              3.2 youngwhale.io is the exclusive owner of all intellectual property rights vesting in and relating to the Services, including but not limited to the visual layout, design, text, proprietary analytics, Sonar Score algorithms, compilation methods, database structures, graphics, and trademarks ("Platform Content").
+              3.2 youngwhale.io is the exclusive owner of all intellectual property rights vesting in and relating to the Services, including but not limited to the visual layout, design, text, proprietary analytics, Sonar Score algorithms, compilation methods, database structures, graphics, and trademarks (&quot;Platform Content&quot;).
             </p>
             <p>
-              3.3 Users are granted a non-transferable, non-sublicensable, non-exclusive, and revocable license for fair personal use of the platform. Any unauthorized copying, commercial extraction, data mining, web scraping, automated redistribution, or mirroring of the Website's content is strictly prohibited without prior written consent.
+              3.3 Users are granted a non-transferable, non-sublicensable, non-exclusive, and revocable license for fair personal use of the platform. Any unauthorized copying, commercial extraction, data mining, web scraping, automated redistribution, or mirroring of the Website&apos;s content is strictly prohibited without prior written consent.
             </p>
           </section>
 
@@ -69,7 +69,7 @@ export const TermsAndConditions: React.FC = () => {
               4.1 When using the Services of youngwhale.io, the User represents, warrants, and agrees to refrain from:
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>4.1.1 Using the Website or Services in any way that damages, disables, or overburdens the platform's infrastructure.</li>
+              <li>4.1.1 Using the Website or Services in any way that damages, disables, or overburdens the platform&apos;s infrastructure.</li>
               <li>4.1.2 Engaging in any automated use of the system, including but not limited to deploying data mining tools, robots, scrapers, or automated script queries.</li>
               <li>4.1.3 Attempting to bypass, reverse-engineer, or manipulate the predefined maximum rating caps built into the Sonar Score algorithm.</li>
               <li>4.1.4 Using any information obtained from the platform to perpetrate, facilitate, or promote financial fraud, market manipulation, or illegal activities.</li>
@@ -90,7 +90,7 @@ export const TermsAndConditions: React.FC = () => {
           <section>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-4">6. Advertisements and Paid Promotions</h2>
             <p className="mb-3">
-              6.1 youngwhale.io offers banner advertisement spots and promoted token positions ("Paid Content"). We maintain a strict operational boundary between objective aggregated data and advertising. We never mix organic data or listings with promoted content.
+              6.1 youngwhale.io offers banner advertisement spots and promoted token positions (&quot;Paid Content&quot;). We maintain a strict operational boundary between objective aggregated data and advertising. We never mix organic data or listings with promoted content.
             </p>
             <p>
               6.2 Any paid or sponsored listing will always be clearly and explicitly marked as such. Paid listings are subject to the same strict disclaimers as organic listings; they are unverified by youngwhale.io, do not constitute endorsements, and may be removed or blocked immediately if flagged for security or legal compliance violations.
@@ -113,7 +113,7 @@ export const TermsAndConditions: React.FC = () => {
           <section>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-4">8. Disclaimers</h2>
             <p className="mb-3">
-              8.1 youngwhale.io provides all services and content on an "as is" and "as available" basis without warranties of any kind, express or implied.
+              8.1 youngwhale.io provides all services and content on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, express or implied.
             </p>
             <p className="mb-3">
               8.2 We make no representations or warranties regarding the accuracy, timeliness, reliability, completeness, security, or continuous availability of any blockchain tracking data, contract addresses, or Sonar Scores displayed on the platform.
@@ -139,7 +139,7 @@ export const TermsAndConditions: React.FC = () => {
           <section>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-4">10. Indemnification</h2>
             <p>
-              10.1 The User agrees to indemnify, defend, and hold harmless youngwhale.io and its personnel from any third-party claims, liabilities, losses, damages, or costs (including legal fees) arising from the User's violation of these Terms, misutilization of platform services, or infringement of any intellectual property or regulatory law.
+              10.1 The User agrees to indemnify, defend, and hold harmless youngwhale.io and its personnel from any third-party claims, liabilities, losses, damages, or costs (including legal fees) arising from the User&apos;s violation of these Terms, misutilization of platform services, or infringement of any intellectual property or regulatory law.
             </p>
           </section>
 
