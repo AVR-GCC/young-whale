@@ -19,7 +19,7 @@ export const LegalDisclaimer: React.FC = () => {
         {/* Content */}
         <div className="space-y-10 leading-relaxed text-[#94A3B8] text-left">
           <p>
-            By accessing and using youngwhale.io (the "Website"), you unconditionally agree to be bound by this Disclaimer, as well as our Terms &amp; Conditions and Privacy Policy. If you do not agree, you must immediately cease using the Website.
+            By accessing and using youngwhale.io (the &quot;Website&quot;), you unconditionally agree to be bound by this Disclaimer, as well as our Terms &amp; Conditions and Privacy Policy. If you do not agree, you must immediately cease using the Website.
           </p>
 
           <section>
@@ -54,7 +54,7 @@ export const LegalDisclaimer: React.FC = () => {
               All token data and related information displayed on youngwhale.io is collected daily from public blockchains and various external web sources by our automated systems. We do not host user-generated content.
             </p>
             <p className="mb-3">
-              <strong className="text-[#CBD5E1]">As-Is Information:</strong> All information is provided on an "as is" and "as available" basis without warranties of any kind, express or implied.
+              <strong className="text-[#CBD5E1]">As-Is Information:</strong> All information is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, express or implied.
             </p>
             <p>
               <strong className="text-[#CBD5E1]">Do Your Own Research (DYOR):</strong> youngwhale.io does not vet, audit, or guarantee the accuracy, timeliness, reliability, or completeness of any project information, contract addresses, whitepapers, or marketing claims pulled from the blockchain or web. It is of the utmost importance that you conduct your own due diligence and verify all facts independently before interacting with any digital asset.
