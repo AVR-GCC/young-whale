@@ -42,7 +42,7 @@ export default function MobileSettingsMenu({
   return (
     <div id="system-directory" className="flex-1 flex flex-col font-mono text-left pt-0 pb-0 px-4 bg-[#0B0F19] overflow-hidden">
       {view !== 'directory' && (
-        <button onClick={setToDirectory} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors pb-4 w-full text-left uppercase font-bold text-sm tracking-widest font-outfit">
+        <button onClick={setToDirectory} className="flex items-center gap-2 mt-4 mb-1 text-slate-400 hover:text-white transition-colors pb-4 w-full text-left uppercase font-bold text-sm tracking-widest font-outfit">
           <ChevronLeft className="w-5 h-5" />
           {titles[view]}
         </button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { useEmailSubscription } from '@/app/hooks/useEmailSubscription';
 import { SubmitButton } from './SubmitButton';
 
@@ -13,13 +14,12 @@ export const RequestInvite = ({ hideHeader }: { onClose: () => void, hideHeader?
     handleSubmit,
     clearError,
   } = useEmailSubscription();
+  const logoSize = 130
 
   return (
     <div className="space-y-6 relative">
-      <div className="flex justify-center mb-14">
-        <div className="w-[117px] h-[117px] rounded-full bg-[#131A26] border border-[#1E293B] flex items-center justify-center text-slate-500 font-mono text-sm tracking-widest font-bold">
-          LOGO
-        </div>
+      <div className="flex justify-center mb-10">
+        <Image src="/mobile%20logo.svg" alt="Logo" width={logoSize} height={logoSize} className="rounded-full bg-[#131A26] border border-[#1E293B]" />
       </div>
       {!isSubmitted ? (
         <>
