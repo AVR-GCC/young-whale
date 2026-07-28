@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X } from 'lucide-react';
 import { SubmitButton } from './SubmitButton';
 
 export const ContactForm = ({ onClose, hideHeader }: { onClose: () => void, hideHeader?: boolean }) => {
@@ -15,10 +16,14 @@ export const ContactForm = ({ onClose, hideHeader }: { onClose: () => void, hide
     setIsSubmitting(true);
     
     try {
-      await fetch('/api/contact', {
+      await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          content: formData.message
+        })
       });
       setIsSuccess(true);
       setTimeout(() => {
@@ -87,5 +92,42 @@ export const ContactForm = ({ onClose, hideHeader }: { onClose: () => void, hide
         </form>
       )}
     </>
+  );
+};
+
+interface ContactFormModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const ContactFormModal: React.FC<ContactFormModalProps> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-deep/90 backdrop-blur-sm animate-in fade-in duration-200">
+      <div
+        className="w-full max-w-lg bg-[#0B0F19] border border-slate-800 rounded-xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-800 p-4">
+          <h2 className="text-xl text-white font-oxanium font-extrabold tracking-[2px] uppercase text-shadow-sm">
+            [CONTACT US]
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-white transition-colors rounded hover:bg-white/10"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+          <ContactForm onClose={onClose} hideHeader />
+        </div>
+      </div>
+    </div>
   );
 };

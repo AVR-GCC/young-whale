@@ -8,6 +8,7 @@ import Footer from './Footer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { SubscriptionTerminal } from './SubscriptionTerminal'
 import { LegalModal, LegalTab } from './LegalModal'
+import { ContactFormModal } from './ContactForm'
 
 interface HomePageProps {
   tokens: TokenWithHashtags[]
@@ -93,6 +94,12 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         isOpen={legalModalTab !== null}
         onClose={() => setLegalModalTab(null)}
         initialTab={legalModalTab || 'tc'}
+      />
+
+      {/* Contact Modal */}
+      <ContactFormModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
       />
 
       <Header
