@@ -51,7 +51,7 @@ export default function MobileSettingsDirectory({
             </div>
           </div>
         </button>
-        <a href="#" className="relative w-full cursor-pointer select-none flex flex-col rounded mb-2 border border-transparent transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.06] group text-left">
+        <a href="https://x.com/YoungWhaleLabs" target="_blank" className="relative w-full cursor-pointer select-none flex flex-col rounded mb-2 border border-transparent transition-all duration-300 bg-white/[0.03] hover:bg-white/[0.06] active:bg-white/[0.06] group text-left">
           <div className="flex items-center w-full px-3 py-2 gap-2 z-10 bg-transparent rounded">
             <div className="flex-shrink-0 relative">
               <div className="w-7 h-7 rounded-full border border-white/60 flex items-center justify-center text-slate-400 group-hover:text-white transition-colors bg-black">
