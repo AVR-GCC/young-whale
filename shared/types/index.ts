@@ -217,6 +217,16 @@ export interface Log {
   created_at: string
 }
 
+export interface Message {
+  id: string
+  name: string
+  email: string
+  content: string
+  is_read: boolean
+  created_at: string
+  updated_at: string
+}
+
 // ---------------------------
 // AI Processing payload
 // Intermediate shape returned by Fireworks AI
