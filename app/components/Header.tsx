@@ -108,8 +108,16 @@ export default function Header({
     >
       <div
         onClick={() => {
-          setSettingsOpen(true);
-          setSettingsView('invite');
+          if (!isSettingsOpen) {
+            setSettingsOpen(true);
+            setSettingsView('invite');
+            return;
+          }
+          if (settingsView !== 'invite') {
+            setSettingsView('invite');
+            return;
+          }
+          setSettingsOpen(false);
         }}
         style={{
           width: 24,
@@ -142,8 +150,16 @@ export default function Header({
       <button
         type="button"
         onClick={() => {
-          setSettingsOpen(true);
-          setSettingsView('directory');
+          if (!isSettingsOpen) {
+            setSettingsOpen(true);
+            setSettingsView('directory');
+            return;
+          }
+          if (settingsView !== 'directory') {
+            setSettingsView('directory');
+            return;
+          }
+          setSettingsOpen(false);
         }}
         className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
         style={{
