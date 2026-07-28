@@ -15,8 +15,12 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }))
 
-// Mock tokens API calls to prevent unhandled fetch requests in tests
+// Mock components that fetch data on mount to prevent unhandled fetch requests in tests
 vi.mock('./components/TokensSection', () => ({
+  default: () => null,
+}))
+
+vi.mock('./components/MessagesSection', () => ({
   default: () => null,
 }))
 
