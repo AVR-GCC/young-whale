@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 export async function GET(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const { searchParams } = new URL(request.url)
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))

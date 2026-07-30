@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 const AI_CONFIG_KEYS = [
   'ai_model',
@@ -13,6 +14,9 @@ const AI_CONFIG_KEYS = [
 ]
 
 export async function GET() {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const { data, error } = await supabaseService
       .from('platform_config')
@@ -38,6 +42,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const body = await request.json()
 

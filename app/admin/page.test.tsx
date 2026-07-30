@@ -5,6 +5,18 @@ import Admin from './page'
 const mockFetch = vi.fn()
 global.fetch = mockFetch
 
+vi.mock('@/lib/admin-auth', () => ({
+  requireAdmin: vi.fn(() => Promise.resolve({ id: 'admin-1', email: 'admin@test.com', role: 'admin' })),
+}))
+
+vi.mock('@/lib/supabase/client', () => ({
+  supabase: {
+    auth: {
+      signOut: vi.fn(() => Promise.resolve({ error: null })),
+    },
+  },
+}))
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -35,8 +47,9 @@ describe('Admin page', () => {
     vi.useRealTimers()
   })
 
-  it('renders title and buttons', () => {
-    render(<Admin />)
+  it('renders title and buttons', async () => {
+    const Page = await Admin()
+    render(Page)
 
     expect(screen.getByText('Young Whale admin')).toBeDefined()
     expect(screen.getByRole('button', { name: 'Run Process' })).toBeDefined()
@@ -53,7 +66,8 @@ describe('Admin page', () => {
         json: async () => ({ status: 'completed', processed: 5, failed: 1 }),
       })
 
-    render(<Admin />)
+    const Page = await Admin()
+    render(Page)
     const button = screen.getByRole('button', { name: 'Run Process' })
     fireEvent.click(button)
 
@@ -78,7 +92,8 @@ describe('Admin page', () => {
       json: async () => ({ error: 'Database error' }),
     })
 
-    render(<Admin />)
+    const Page = await Admin()
+    render(Page)
     const button = screen.getByRole('button', { name: 'Run Process' })
     fireEvent.click(button)
 
@@ -102,7 +117,8 @@ describe('Admin page', () => {
         json: async () => ({ status: 'completed', processed: 3, failed: 0 }),
       })
 
-    render(<Admin />)
+    const Page = await Admin()
+    render(Page)
     const button = screen.getByRole('button', { name: 'Run Process' })
     fireEvent.click(button)
 

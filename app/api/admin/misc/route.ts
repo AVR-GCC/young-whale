@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
+
 export async function GET() {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
   const { data, error } = await supabaseService
     .from('raw_tokens')
     .select('id')

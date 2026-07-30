@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 import type { RawToken } from '@/shared/types'
 
 export const maxDuration = 60
 
 export async function GET(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const { searchParams } = new URL(request.url)
 

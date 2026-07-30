@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { GET, PATCH, DELETE } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 
+vi.mock('@/lib/admin-auth', () => ({
+  requireAdminApi: vi.fn(() => Promise.resolve({ id: 'admin-1', email: 'admin@test.com', role: 'admin' })),
+}))
+
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
     from: vi.fn(() => ({

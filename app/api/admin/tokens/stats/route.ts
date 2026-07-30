@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 export async function GET() {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     // Fetch all tokens and count in memory - more reliable than head/count combo
     const { data: allTokens, error: totalError } = await supabaseService

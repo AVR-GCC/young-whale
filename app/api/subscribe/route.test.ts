@@ -3,7 +3,7 @@ import { POST } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 
 // Create a mock builder that chains methods
-function createMockBuilder(result: any) {
+function createMockBuilder(result: { data: unknown; error: unknown }) {
   const builder = {
     select: vi.fn(() => builder),
     eq: vi.fn(() => builder),
@@ -65,8 +65,8 @@ describe('POST /api/subscribe', () => {
     let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation(() => {
       callCount++
-      if (callCount === 1) return checkBuilder as any
-      return insertBuilder as any
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
     })
 
     const response = await POST(createRequest({ email: 'test@example.com' }))
@@ -91,8 +91,8 @@ describe('POST /api/subscribe', () => {
     let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation(() => {
       callCount++
-      if (callCount === 1) return checkBuilder as any
-      return updateBuilder as any
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return updateBuilder as unknown as ReturnType<typeof supabaseService.from>
     })
 
     const response = await POST(createRequest({ email: 'test@example.com' }))
@@ -109,7 +109,7 @@ describe('POST /api/subscribe', () => {
       error: null,
     })
 
-    vi.mocked(supabaseService.from).mockReturnValue(builder as any)
+    vi.mocked(supabaseService.from).mockReturnValue(builder as unknown as ReturnType<typeof supabaseService.from>)
 
     const response = await POST(createRequest({ email: 'test@example.com' }))
     const json = await response.json()
@@ -128,7 +128,7 @@ describe('POST /api/subscribe', () => {
     const insertBuilder = {
       select: vi.fn(() => insertBuilder),
       eq: vi.fn(() => insertBuilder),
-      insert: vi.fn(function(this: any, data: any) {
+      insert: vi.fn((data: unknown) => {
         // Capture the insert data
         insertBuilder._insertedData = data
         return insertBuilder
@@ -137,18 +137,18 @@ describe('POST /api/subscribe', () => {
         data: { id: 'sub-1', email: 'test@example.com', is_active: true },
         error: null,
       })),
-      _insertedData: null as any,
+      _insertedData: null as unknown,
     }
 
     let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation(() => {
       callCount++
-      if (callCount === 1) return checkBuilder as any
-      return insertBuilder as any
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
     })
 
     const response = await POST(createRequest({ email: 'Test@Example.COM' }))
-    const json = await response.json()
+    await response.json()
 
     expect(response.status).toBe(201)
     expect(insertBuilder._insertedData).toEqual({ email: 'test@example.com', is_active: true })
@@ -160,7 +160,7 @@ describe('POST /api/subscribe', () => {
       error: { code: 'PGRST999', message: 'Database connection failed' },
     })
 
-    vi.mocked(supabaseService.from).mockReturnValue(builder as any)
+    vi.mocked(supabaseService.from).mockReturnValue(builder as unknown as ReturnType<typeof supabaseService.from>)
 
     const response = await POST(createRequest({ email: 'test@example.com' }))
     const json = await response.json()
@@ -183,8 +183,8 @@ describe('POST /api/subscribe', () => {
     let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation(() => {
       callCount++
-      if (callCount === 1) return checkBuilder as any
-      return insertBuilder as any
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
     })
 
     const response = await POST(createRequest({ email: 'test@example.com' }))
@@ -208,8 +208,8 @@ describe('POST /api/subscribe', () => {
     let callCount = 0
     vi.mocked(supabaseService.from).mockImplementation(() => {
       callCount++
-      if (callCount === 1) return checkBuilder as any
-      return updateBuilder as any
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return updateBuilder as unknown as ReturnType<typeof supabaseService.from>
     })
 
     const response = await POST(createRequest({ email: 'test@example.com' }))

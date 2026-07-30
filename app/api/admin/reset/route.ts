@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 export const maxDuration = 60
 
 export async function GET() {
-  // if (process.env.NODE_ENV !== 'development') {
-  //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  // }
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
 
   try {
     const results: Record<string, { success: boolean; error?: string; count?: number }> = {}

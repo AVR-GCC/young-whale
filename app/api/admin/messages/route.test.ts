@@ -4,6 +4,10 @@ import { GET as GET_READ } from './read/route'
 import { PATCH } from './[id]/read/route'
 import { supabaseService } from '@/lib/supabase/service'
 
+vi.mock('@/lib/admin-auth', () => ({
+  requireAdminApi: vi.fn(() => Promise.resolve({ id: 'admin-1', email: 'admin@test.com', role: 'admin' })),
+}))
+
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
     from: vi.fn(),

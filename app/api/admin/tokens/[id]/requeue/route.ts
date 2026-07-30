@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 export const maxDuration = 60
 
@@ -7,6 +8,9 @@ export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const { id } = await params
 

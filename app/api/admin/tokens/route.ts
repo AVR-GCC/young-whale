@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
+import { requireAdminApi } from '@/lib/admin-auth'
 import type { Token, TokenStatus, TokenCategory, Confidence, SourceType } from '@/shared/types'
 
 export const maxDuration = 60
@@ -94,6 +95,9 @@ function buildTokenQuery(
 }
 
 export async function GET(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const { searchParams } = new URL(request.url)
 
@@ -147,6 +151,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const body = await request.json()
 
@@ -248,6 +255,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const authResult = await requireAdminApi()
+  if (authResult instanceof NextResponse) return authResult
+
   try {
     const body = await request.json()
     const ids: string[] = body.ids

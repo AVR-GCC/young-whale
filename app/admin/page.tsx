@@ -1,11 +1,14 @@
 import { Suspense } from 'react'
+import { requireAdmin } from '@/lib/admin-auth'
 import AdminActions from './components/AdminActions'
 import AIConfigSection from './components/AIConfigSection'
 import FailedTokensSection from './components/FailedTokensSection'
 import MessagesSection from './components/MessagesSection'
 import TokensSection from './components/TokensSection'
 
-export default function Admin() {
+export default async function Admin() {
+  const admin = await requireAdmin()
+
   return (
     <div className="flex flex-col flex-1 w-full bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full flex-col py-8 px-16 bg-white dark:bg-black gap-8">
@@ -14,7 +17,7 @@ export default function Admin() {
             Young Whale admin
           </h1>
 
-          <AdminActions />
+          <AdminActions userEmail={admin.email} />
         </div>
 
         <AIConfigSection />
