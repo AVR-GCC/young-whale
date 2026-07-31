@@ -115,7 +115,7 @@ export function SearchButton({
   setSearchQueryAction: (query: string) => void
 }) {
   return (
-    <>
+    <div className="flex">
       <button
         type="button"
         onClick={() => setIsSearchOpenAction(!isSearchOpen)}
@@ -132,11 +132,11 @@ export function SearchButton({
             placeholder="SEARCH..."
             value={searchQuery}
             onChange={(e) => setSearchQueryAction(e.target.value)}
-            className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-16 md:w-28 placeholder-[#475569] pb-[1px]"
+            className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-full md:w-28 placeholder-[#475569] pb-[1px]"
           />
         </div>
       )}
-    </>
+    </div>
   )
 }
 

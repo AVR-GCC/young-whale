@@ -38,7 +38,7 @@ export default function DesktopHeader({
       </div>
 
       <div className="flex items-center gap-4 justify-end flex-none">
-        <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
+        <div className={`flex items-center border-b w-70 ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
           <SearchButton
             isSearchOpen={isSearchOpen}
             setIsSearchOpenAction={setIsSearchOpenAction}
