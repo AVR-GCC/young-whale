@@ -172,8 +172,8 @@ describe('HomePage Integration', () => {
   it('renders complete page layout', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
 
-    // Header
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    // Header (both desktop and mobile versions render in DOM)
+    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
 
     // Categories
@@ -210,8 +210,8 @@ describe('HomePage Integration', () => {
 
     render(<HomePage tokens={mockTokens} loading={false} />)
 
-    // Header
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    // Header (both desktop and mobile versions render in DOM)
+    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
 
     // Mobile shows a single category without a title (renderTitle=false)
@@ -240,15 +240,15 @@ describe('HomePage Integration', () => {
   it('renders with empty tokens', () => {
     render(<HomePage tokens={[]} loading={false} />)
 
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders loading state', () => {
     render(<HomePage tokens={mockTokens} loading={true} />)
 
-    // Header still renders
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    // Header still renders (both desktop and mobile versions)
+    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
 
     // Categories still render (with skeletons inside)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
@@ -272,7 +272,7 @@ describe('HomePage Integration', () => {
 
   it('renders search functionality', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
-    expect(screen.getByRole('button', { name: /toggle search/i })).toBeDefined()
+    expect(screen.getAllByRole('button', { name: /toggle search/i }).length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders footer links', () => {
@@ -373,10 +373,10 @@ describe('HomePage Integration', () => {
   it('filters tokens by search query', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
 
-    const searchButton = screen.getByRole('button', { name: /toggle search/i })
+    const searchButton = screen.getAllByRole('button', { name: /toggle search/i })[0]
     fireEvent.click(searchButton)
 
-    const searchInput = screen.getByPlaceholderText('SEARCH...')
+    const searchInput = screen.getAllByPlaceholderText('SEARCH...')[0]
     fireEvent.change(searchInput, { target: { value: 'Meme' } })
 
     // Only MemeToken1 should appear in results
