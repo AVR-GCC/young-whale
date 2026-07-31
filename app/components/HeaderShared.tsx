@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Search, Settings } from 'lucide-react'
+import { useRef, useEffect } from 'react'
 
 export function formatCountdown(totalSeconds: number) {
   const hrs = Math.floor(totalSeconds / 3600)
@@ -114,8 +115,24 @@ export function SearchButton({
   searchQuery: string
   setSearchQueryAction: (query: string) => void
 }) {
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!isSearchOpen) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('[data-search-container]')) {
+        setIsSearchOpenAction(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isSearchOpen, setIsSearchOpenAction])
+
   return (
-    <div className="flex">
+    <div ref={containerRef} className="flex" data-search-container>
       <button
         type="button"
         onClick={() => setIsSearchOpenAction(!isSearchOpen)}
