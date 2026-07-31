@@ -1,18 +1,18 @@
 'use client'
 
-import { HeaderProps, formatCountdown, WhaleIcon, SearchSettings, TerminalPill, HeaderTitle } from './HeaderShared'
+import { HeaderProps, formatCountdown, WhaleIcon, SettingsButton, SearchButton, TerminalPill, HeaderTitle } from './HeaderShared'
 
 export default function MobileHeader({
   secondsLeft,
   isSearchOpen,
-  setIsSearchOpen,
+  setIsSearchOpenAction,
   searchQuery,
-  setSearchQuery,
+  setSearchQueryAction,
   isMobileOverlayOpen,
   isSettingsOpen,
-  setSettingsOpen,
+  setSettingsOpenAction,
   settingsView,
-  setSettingsView,
+  setSettingsViewAction,
 }: HeaderProps) {
   const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen
 
@@ -23,17 +23,17 @@ export default function MobileHeader({
       <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
         <WhaleIcon
           isInviteModalOpen={isInviteModalOpen}
-          onClick={() => {
+          onClickAction={() => {
             if (!isSettingsOpen) {
-              setSettingsOpen(true)
-              setSettingsView('invite')
+              setSettingsOpenAction(true)
+              setSettingsViewAction('invite')
               return
             }
             if (settingsView !== 'invite') {
-              setSettingsView('invite')
+              setSettingsViewAction('invite')
               return
             }
-            setSettingsOpen(false)
+            setSettingsOpenAction(false)
           }}
         />
       </div>
@@ -54,31 +54,34 @@ export default function MobileHeader({
           <div className={`flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
             <WhaleIcon
               isInviteModalOpen={isInviteModalOpen}
-              onClick={() => {
+              onClickAction={() => {
                 if (!isSettingsOpen) {
-                  setSettingsOpen(true)
-                  setSettingsView('invite')
+                  setSettingsOpenAction(true)
+                  setSettingsViewAction('invite')
                   return
                 }
                 if (settingsView !== 'invite') {
-                  setSettingsView('invite')
+                  setSettingsViewAction('invite')
                   return
                 }
-                setSettingsOpen(false)
+                setSettingsOpenAction(false)
               }}
             />
             <div className="w-3" />
           </div>
-          <SearchSettings
-            isSearchOpen={isSearchOpen}
-            setIsSearchOpen={setIsSearchOpen}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
+          <SettingsButton
             isInviteModalOpen={isInviteModalOpen}
             isSettingsOpen={isSettingsOpen}
-            setSettingsOpen={setSettingsOpen}
+            setSettingsOpenAction={setSettingsOpenAction}
             settingsView={settingsView}
-            setSettingsView={setSettingsView}
+            setSettingsViewAction={setSettingsViewAction}
+          />
+          <div className="w-2" />
+          <SearchButton
+            isSearchOpen={isSearchOpen}
+            setIsSearchOpenAction={setIsSearchOpenAction}
+            searchQuery={searchQuery}
+            setSearchQueryAction={setSearchQueryAction}
           />
         </div>
       </div>

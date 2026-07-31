@@ -105,18 +105,18 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
       <Header
         secondsLeft={secondsLeft}
         isSearchOpen={isSearchOpen}
-        setIsSearchOpen={setIsSearchOpen}
+        setIsSearchOpenAction={setIsSearchOpen}
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
+        setSearchQueryAction={setSearchQuery}
         timeFilter={timeFilter}
-        setTimeFilter={setTimeFilter}
+        setTimeFilterAction={setTimeFilter}
         sortBy={sortBy}
-        setSortBy={setSortBy}
+        setSortByAction={setSortBy}
         isMobileOverlayOpen={isMobileOverlayOpen}
         isSettingsOpen={isSettingsOpen}
-        setSettingsOpen={setSettingsOpen}
+        setSettingsOpenAction={setSettingsOpen}
         settingsView={settingsView}
-        setSettingsView={setSettingsView}
+        setSettingsViewAction={setSettingsView}
       />
 
       <main className="max-w-7xl mx-auto w-full px-4 pt-2 flex flex-col gap-4">
@@ -128,9 +128,9 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           activeFilter={null}
           sortBy={sortBy}
           setIsMobileOverlayOpen={setIsMobileOverlayOpen}
-          setSettingsOpen={setSettingsOpen}
+          setSettingsOpenAction={setSettingsOpen}
           isSettingsOpen={isSettingsOpen}
-          setSettingsView={setSettingsView}
+          setSettingsViewAction={setSettingsView}
           settingsView={settingsView}
         />
 

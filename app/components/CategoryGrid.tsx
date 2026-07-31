@@ -16,9 +16,9 @@ interface CategoryGridProps {
   activeFilter: string | null
   sortBy: 'default' | 'score' | 'hashtag'
   setIsMobileOverlayOpen: (open: boolean) => void
-  setSettingsOpen: (val: boolean) => void
+  setSettingsOpenAction: (val: boolean) => void
   isSettingsOpen: boolean
-  setSettingsView: (view: string) => void
+  setSettingsViewAction: (view: string) => void
   settingsView: string
 }
 
@@ -30,9 +30,9 @@ export default function CategoryGrid({
   activeFilter,
   sortBy,
   setIsMobileOverlayOpen,
-  setSettingsOpen,
+  setSettingsOpenAction,
   isSettingsOpen,
-  setSettingsView,
+  setSettingsViewAction,
   settingsView
 }: CategoryGridProps) {
   const [selectedCategory, selectCategory] = useState(categories[0].id)
@@ -48,9 +48,9 @@ export default function CategoryGrid({
     setTimeout(() => {
       setMobileOverlayOpen(false)
       setIsMobileOverlayOpen(false)
-      setSettingsOpen(false)
+      setSettingsOpenAction(false)
     })
-  }, [selectedCategory, setIsMobileOverlayOpen, setSettingsOpen])
+  }, [selectedCategory, setIsMobileOverlayOpen, setSettingsOpenAction])
 
   useEffect(() => {
     if (mobileOverlayOpen) {
@@ -198,7 +198,7 @@ export default function CategoryGrid({
           className="fixed inset-x-0 bottom-[81px] top-[54px] z-31 flex flex-col bg-[#0B0F19] lg:hidden"
         >
           <div className="flex-1 overflow-y-auto">
-            <MobileSettingsMenu view={settingsView} setView={setSettingsView} />
+            <MobileSettingsMenu view={settingsView} setView={setSettingsViewAction} />
           </div>
         </div>
       )}

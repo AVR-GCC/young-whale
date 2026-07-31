@@ -16,26 +16,26 @@ export function formatCountdown(totalSeconds: number) {
 export interface HeaderProps {
   secondsLeft: number
   isSearchOpen: boolean
-  setIsSearchOpen: (open: boolean) => void
+  setIsSearchOpenAction: (open: boolean) => void
   searchQuery: string
-  setSearchQuery: (query: string) => void
+  setSearchQueryAction: (query: string) => void
   timeFilter: 'all' | 'today' | 'yesterday'
-  setTimeFilter: (filter: 'all' | 'today' | 'yesterday') => void
+  setTimeFilterAction: (filter: 'all' | 'today' | 'yesterday') => void
   sortBy: 'default' | 'score' | 'hashtag'
-  setSortBy: (sort: 'default' | 'score' | 'hashtag') => void
+  setSortByAction: (sort: 'default' | 'score' | 'hashtag') => void
   isMobileOverlayOpen: boolean
   isSettingsOpen: boolean
-  setSettingsOpen: (val: boolean) => void
+  setSettingsOpenAction: (val: boolean) => void
   settingsView: string
-  setSettingsView: (view: string) => void
+  setSettingsViewAction: (view: string) => void
 }
 
 export function WhaleIcon({
   isInviteModalOpen,
-  onClick,
+  onClickAction,
 }: {
   isInviteModalOpen: boolean
-  onClick?: () => void
+  onClickAction?: () => void
 }) {
   return (
     <div
@@ -44,7 +44,7 @@ export function WhaleIcon({
       }}
     >
       <div
-        onClick={onClick}
+        onClick={onClickAction}
         style={{
           width: 24,
           height: 35,
@@ -57,62 +57,68 @@ export function WhaleIcon({
           maskPosition: 'center',
           WebkitMaskPosition: 'center',
           backgroundColor: isInviteModalOpen ? '#33FFFF' : '#94A3B8',
-          cursor: onClick ? 'pointer' : 'default',
+          cursor: onClickAction ? 'pointer' : 'default',
         }}
       />
     </div>
   )
 }
 
-export function SearchSettings({
-  isSearchOpen,
-  setIsSearchOpen,
-  searchQuery,
-  setSearchQuery,
+export function SettingsButton({
   isInviteModalOpen,
   isSettingsOpen,
-  setSettingsOpen,
+  setSettingsOpenAction,
   settingsView,
-  setSettingsView,
+  setSettingsViewAction,
 }: {
-  isSearchOpen: boolean
-  setIsSearchOpen: (open: boolean) => void
-  searchQuery: string
-  setSearchQuery: (query: string) => void
   isInviteModalOpen: boolean
   isSettingsOpen: boolean
-  setSettingsOpen: (val: boolean) => void
+  setSettingsOpenAction: (val: boolean) => void
   settingsView: string
-  setSettingsView: (view: string) => void
+  setSettingsViewAction: (view: string) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (!isSettingsOpen) {
+          setSettingsOpenAction(true)
+          setSettingsViewAction('directory')
+          return
+        }
+        if (settingsView !== 'directory') {
+          setSettingsViewAction('directory')
+          return
+        }
+        setSettingsOpenAction(false)
+      }}
+      className="flex p-1 focus:outline-none flex-shrink-0"
+      style={{
+        filter: !isInviteModalOpen && isSettingsOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
+      }}
+      aria-label="Toggle settings"
+    >
+      <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+    </button>
+  )
+}
+
+export function SearchButton({
+  isSearchOpen,
+  setIsSearchOpenAction,
+  searchQuery,
+  setSearchQueryAction,
+}: {
+  isSearchOpen: boolean
+  setIsSearchOpenAction: (open: boolean) => void
+  searchQuery: string
+  setSearchQueryAction: (query: string) => void
 }) {
   return (
     <>
       <button
         type="button"
-        onClick={() => {
-          if (!isSettingsOpen) {
-            setSettingsOpen(true)
-            setSettingsView('directory')
-            return
-          }
-          if (settingsView !== 'directory') {
-            setSettingsView('directory')
-            return
-          }
-          setSettingsOpen(false)
-        }}
-        className="sm:hidden flex p-1 focus:outline-none flex-shrink-0"
-        style={{
-          filter: !isInviteModalOpen && isSettingsOpen ? 'drop-shadow(0 0 2px #22d3ee) drop-shadow(0 0 5px #22d3ee)' : 'none',
-        }}
-        aria-label="Toggle settings"
-      >
-        <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
-      </button>
-      <div className="w-2" />
-      <button
-        type="button"
-        onClick={() => setIsSearchOpen(!isSearchOpen)}
+        onClick={() => setIsSearchOpenAction(!isSearchOpen)}
         className="p-1 focus:outline-none flex-shrink-0"
         aria-label="Toggle search"
       >
@@ -125,7 +131,7 @@ export function SearchSettings({
             type="text"
             placeholder="SEARCH..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQueryAction(e.target.value)}
             className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-16 md:w-28 placeholder-[#475569] pb-[1px]"
           />
         </div>

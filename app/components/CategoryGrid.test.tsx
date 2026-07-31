@@ -115,9 +115,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -139,9 +139,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -163,9 +163,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -186,9 +186,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -210,9 +210,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -230,9 +230,9 @@ describe('CategoryGrid', () => {
         activeFilter="defi"
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -252,9 +252,9 @@ describe('CategoryGrid', () => {
         activeFilter={null}
         sortBy="default"
         setIsMobileOverlayOpen={() => {}}
-        setSettingsOpen={() => {}}
+        setSettingsOpenAction={() => {}}
         isSettingsOpen={false}
-        setSettingsView={() => {}}
+        setSettingsViewAction={() => {}}
         settingsView=""
       />
     )
@@ -278,9 +278,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -305,9 +305,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -341,9 +341,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -377,9 +377,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -413,9 +413,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -440,7 +440,7 @@ describe('CategoryGrid', () => {
     })
 
     it('closes overlay when switching categories', async () => {
-      const setSettingsOpen = vi.fn()
+      const setSettingsOpenAction = vi.fn()
       render(
         <CategoryGrid
           tokens={mockTokens}
@@ -450,9 +450,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={setSettingsOpen}
+          setSettingsOpenAction={setSettingsOpenAction}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )
@@ -473,7 +473,7 @@ describe('CategoryGrid', () => {
 
       // Settings should also be closed
       await waitFor(() => {
-        expect(setSettingsOpen).toHaveBeenCalledWith(false)
+        expect(setSettingsOpenAction).toHaveBeenCalledWith(false)
       })
     })
   })
@@ -489,9 +489,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={true}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView="directory"
         />
       )
@@ -511,9 +511,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={false}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView="directory"
         />
       )
@@ -533,9 +533,9 @@ describe('CategoryGrid', () => {
           activeFilter={null}
           sortBy="default"
           setIsMobileOverlayOpen={() => {}}
-          setSettingsOpen={() => {}}
+          setSettingsOpenAction={() => {}}
           isSettingsOpen={true}
-          setSettingsView={() => {}}
+          setSettingsViewAction={() => {}}
           settingsView=""
         />
       )

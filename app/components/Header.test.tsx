@@ -16,18 +16,18 @@ vi.mock('lucide-react', () => ({
 const defaultProps = {
   secondsLeft: 7200,
   isSearchOpen: false,
-  setIsSearchOpen: () => {},
+  setIsSearchOpenAction: () => {},
   searchQuery: '',
-  setSearchQuery: () => {},
+  setSearchQueryAction: () => {},
   timeFilter: 'all' as const,
-  setTimeFilter: () => {},
+  setTimeFilterAction: () => {},
   sortBy: 'default' as const,
-  setSortBy: () => {},
+  setSortByAction: () => {},
   isMobileOverlayOpen: false,
   isSettingsOpen: false,
-  setSettingsOpen: () => {},
+  setSettingsOpenAction: () => {},
   settingsView: '',
-  setSettingsView: () => {},
+  setSettingsViewAction: () => {},
 }
 
 describe('Header', () => {
@@ -60,7 +60,7 @@ describe('Header', () => {
   it('toggles search input on click', () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
-      <Header {...defaultProps} isSearchOpen={false} setIsSearchOpen={setIsSearchOpen} />
+      <Header {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     // Search input should not be visible initially
@@ -74,7 +74,7 @@ describe('Header', () => {
 
     // Re-render with search open
     rerender(
-      <Header {...defaultProps} isSearchOpen={true} setIsSearchOpen={setIsSearchOpen} />
+      <Header {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     const searchInputs = screen.getAllByPlaceholderText('SEARCH...')
@@ -88,7 +88,7 @@ describe('Header', () => {
   it('renders search input with query', () => {
     const setSearchQuery = vi.fn()
     render(
-      <Header {...defaultProps} isSearchOpen={true} searchQuery="test" setSearchQuery={setSearchQuery} />
+      <Header {...defaultProps} isSearchOpen={true} searchQuery="test" setSearchQueryAction={setSearchQuery} />
     )
 
     const searchInputs = screen.getAllByPlaceholderText('SEARCH...') as HTMLInputElement[]
@@ -110,8 +110,8 @@ describe('Header', () => {
     render(
       <Header
         {...defaultProps}
-        setSettingsOpen={setSettingsOpen}
-        setSettingsView={setSettingsView}
+        setSettingsOpenAction={setSettingsOpen}
+        setSettingsViewAction={setSettingsView}
       />
     )
 
@@ -130,8 +130,8 @@ describe('Header', () => {
     render(
       <Header
         {...defaultProps}
-        setSettingsOpen={setSettingsOpen}
-        setSettingsView={setSettingsView}
+        setSettingsOpenAction={setSettingsOpen}
+        setSettingsViewAction={setSettingsView}
       />
     )
 
@@ -167,7 +167,7 @@ describe('DesktopHeader', () => {
   it('toggles search input on click', () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
-      <DesktopHeader {...defaultProps} isSearchOpen={false} setIsSearchOpen={setIsSearchOpen} />
+      <DesktopHeader {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
@@ -177,7 +177,7 @@ describe('DesktopHeader', () => {
     expect(setIsSearchOpen).toHaveBeenCalledWith(true)
 
     rerender(
-      <DesktopHeader {...defaultProps} isSearchOpen={true} setIsSearchOpen={setIsSearchOpen} />
+      <DesktopHeader {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     expect(screen.getByPlaceholderText('SEARCH...')).toBeDefined()
@@ -192,8 +192,8 @@ describe('DesktopHeader', () => {
     render(
       <DesktopHeader
         {...defaultProps}
-        setSettingsOpen={setSettingsOpen}
-        setSettingsView={setSettingsView}
+        setSettingsOpenAction={setSettingsOpen}
+        setSettingsViewAction={setSettingsView}
       />
     )
 
@@ -226,7 +226,7 @@ describe('MobileHeader', () => {
   it('toggles search input on click', () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
-      <MobileHeader {...defaultProps} isSearchOpen={false} setIsSearchOpen={setIsSearchOpen} />
+      <MobileHeader {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
@@ -236,7 +236,7 @@ describe('MobileHeader', () => {
     expect(setIsSearchOpen).toHaveBeenCalledWith(true)
 
     rerender(
-      <MobileHeader {...defaultProps} isSearchOpen={true} setIsSearchOpen={setIsSearchOpen} />
+      <MobileHeader {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
     expect(screen.getByPlaceholderText('SEARCH...')).toBeDefined()
@@ -251,8 +251,8 @@ describe('MobileHeader', () => {
     render(
       <MobileHeader
         {...defaultProps}
-        setSettingsOpen={setSettingsOpen}
-        setSettingsView={setSettingsView}
+        setSettingsOpenAction={setSettingsOpen}
+        setSettingsViewAction={setSettingsView}
       />
     )
 
@@ -270,8 +270,8 @@ describe('MobileHeader', () => {
     render(
       <MobileHeader
         {...defaultProps}
-        setSettingsOpen={setSettingsOpen}
-        setSettingsView={setSettingsView}
+        setSettingsOpenAction={setSettingsOpen}
+        setSettingsViewAction={setSettingsView}
       />
     )
 

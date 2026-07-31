@@ -1,20 +1,14 @@
 'use client'
 
-import { HeaderProps, formatCountdown, SearchSettings, HeaderTitle } from './HeaderShared'
+import { HeaderProps, formatCountdown, SearchButton, HeaderTitle } from './HeaderShared'
 
 export default function DesktopHeader({
   secondsLeft,
   isSearchOpen,
-  setIsSearchOpen,
+  setIsSearchOpenAction,
   searchQuery,
-  setSearchQuery,
-  isSettingsOpen,
-  setSettingsOpen,
-  settingsView,
-  setSettingsView,
+  setSearchQueryAction,
 }: HeaderProps) {
-  const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen
-
   return (
     <div className="hidden md:flex items-center justify-between gap-4 w-full h-full">
       <HeaderTitle />
@@ -45,16 +39,11 @@ export default function DesktopHeader({
 
       <div className="flex items-center gap-4 justify-end flex-none">
         <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-          <SearchSettings
+          <SearchButton
             isSearchOpen={isSearchOpen}
-            setIsSearchOpen={setIsSearchOpen}
+            setIsSearchOpenAction={setIsSearchOpenAction}
             searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            isInviteModalOpen={isInviteModalOpen}
-            isSettingsOpen={isSettingsOpen}
-            setSettingsOpen={setSettingsOpen}
-            settingsView={settingsView}
-            setSettingsView={setSettingsView}
+            setSearchQueryAction={setSearchQueryAction}
           />
         </div>
       </div>
