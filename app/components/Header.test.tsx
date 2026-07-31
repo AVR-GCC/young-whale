@@ -186,63 +186,63 @@ describe('Header', () => {
     expect(setSearchQuery).toHaveBeenCalledWith('new query')
   })
 
-  it('renders time filter and sort dropdowns when search is open', () => {
-    render(
-      <Header
-        secondsLeft={7200}
-        isSearchOpen={true}
-        setIsSearchOpen={() => {}}
-        searchQuery=""
-        setSearchQuery={() => {}}
-        timeFilter="today"
-        setTimeFilter={() => {}}
-        sortBy="hashtag"
-        setSortBy={() => {}}
-        isMobileOverlayOpen={false}
-        isSettingsOpen={false}
-        setSettingsOpen={() => {}}
-        settingsView=""
-        setSettingsView={() => {}}
-      />
-    )
-
-    expect(screen.getByText('TIME: ALL')).toBeDefined()
-    expect(screen.getByText('TODAY')).toBeDefined()
-    expect(screen.getByText('1D AGO')).toBeDefined()
-    expect(screen.getByText('SORT: DFLT')).toBeDefined()
-    expect(screen.getByText('HASHTAG')).toBeDefined()
-  })
-
-  it('calls setTimeFilter and setSortBy on select change', () => {
-    const setTimeFilter = vi.fn()
-    const setSortBy = vi.fn()
-    render(
-      <Header
-        secondsLeft={7200}
-        isSearchOpen={true}
-        setIsSearchOpen={() => {}}
-        searchQuery=""
-        setSearchQuery={() => {}}
-        timeFilter="all"
-        setTimeFilter={setTimeFilter}
-        sortBy="default"
-        setSortBy={setSortBy}
-        isMobileOverlayOpen={false}
-        isSettingsOpen={false}
-        setSettingsOpen={() => {}}
-        settingsView=""
-        setSettingsView={() => {}}
-      />
-    )
-
-    const timeSelect = screen.getByDisplayValue('TIME: ALL') as HTMLSelectElement
-    fireEvent.change(timeSelect, { target: { value: 'today' } })
-    expect(setTimeFilter).toHaveBeenCalledWith('today')
-
-    const sortSelect = screen.getByDisplayValue('SORT: DFLT') as HTMLSelectElement
-    fireEvent.change(sortSelect, { target: { value: 'hashtag' } })
-    expect(setSortBy).toHaveBeenCalledWith('hashtag')
-  })
+  // it('renders time filter and sort dropdowns when search is open', () => {
+  //   render(
+  //     <Header
+  //       secondsLeft={7200}
+  //       isSearchOpen={true}
+  //       setIsSearchOpen={() => {}}
+  //       searchQuery=""
+  //       setSearchQuery={() => {}}
+  //       timeFilter="today"
+  //       setTimeFilter={() => {}}
+  //       sortBy="hashtag"
+  //       setSortBy={() => {}}
+  //       isMobileOverlayOpen={false}
+  //       isSettingsOpen={false}
+  //       setSettingsOpen={() => {}}
+  //       settingsView=""
+  //       setSettingsView={() => {}}
+  //     />
+  //   )
+  //
+  //   expect(screen.getByText('TIME: ALL')).toBeDefined()
+  //   expect(screen.getByText('TODAY')).toBeDefined()
+  //   expect(screen.getByText('1D AGO')).toBeDefined()
+  //   expect(screen.getByText('SORT: DFLT')).toBeDefined()
+  //   expect(screen.getByText('HASHTAG')).toBeDefined()
+  // })
+  //
+  // it('calls setTimeFilter and setSortBy on select change', () => {
+  //   const setTimeFilter = vi.fn()
+  //   const setSortBy = vi.fn()
+  //   render(
+  //     <Header
+  //       secondsLeft={7200}
+  //       isSearchOpen={true}
+  //       setIsSearchOpen={() => {}}
+  //       searchQuery=""
+  //       setSearchQuery={() => {}}
+  //       timeFilter="all"
+  //       setTimeFilter={setTimeFilter}
+  //       sortBy="default"
+  //       setSortBy={setSortBy}
+  //       isMobileOverlayOpen={false}
+  //       isSettingsOpen={false}
+  //       setSettingsOpen={() => {}}
+  //       settingsView=""
+  //       setSettingsView={() => {}}
+  //     />
+  //   )
+  //
+  //   const timeSelect = screen.getByDisplayValue('TIME: ALL') as HTMLSelectElement
+  //   fireEvent.change(timeSelect, { target: { value: 'today' } })
+  //   expect(setTimeFilter).toHaveBeenCalledWith('today')
+  //
+  //   const sortSelect = screen.getByDisplayValue('SORT: DFLT') as HTMLSelectElement
+  //   fireEvent.change(sortSelect, { target: { value: 'hashtag' } })
+  //   expect(setSortBy).toHaveBeenCalledWith('hashtag')
+  // })
 
   it('renders mobile timer', () => {
     render(

@@ -36,10 +36,10 @@ export default function Header({
   setIsSearchOpen,
   searchQuery,
   setSearchQuery,
-  timeFilter,
-  setTimeFilter,
-  sortBy,
-  setSortBy,
+  // timeFilter,
+  // setTimeFilter,
+  // sortBy,
+  // setSortBy,
   isMobileOverlayOpen,
   isSettingsOpen,
   setSettingsOpen,
@@ -140,15 +140,6 @@ export default function Header({
     <>
       <button
         type="button"
-        onClick={() => setIsSearchOpen(!isSearchOpen)}
-        className="p-1 focus:outline-none flex-shrink-0"
-        aria-label="Toggle search"
-      >
-        <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
-      </button>
-      <div className="w-2" />
-      <button
-        type="button"
         onClick={() => {
           if (!isSettingsOpen) {
             setSettingsOpen(true);
@@ -169,6 +160,15 @@ export default function Header({
       >
         <Settings className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
       </button>
+      <div className="w-2" />
+      <button
+        type="button"
+        onClick={() => setIsSearchOpen(!isSearchOpen)}
+        className="p-1 focus:outline-none flex-shrink-0"
+        aria-label="Toggle search"
+      >
+        <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
+      </button>
       {isSearchOpen && (
         <div className="flex items-center gap-2 md:gap-3 pl-1">
           <input
@@ -179,23 +179,23 @@ export default function Header({
             onChange={(e) => setSearchQuery(e.target.value)}
             className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-16 md:w-28 placeholder-[#475569] pb-[1px]"
           />
-          <select
-            value={timeFilter}
-            onChange={(e) => setTimeFilter(e.target.value as 'all' | 'today' | 'yesterday')}
-            className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
-          >
-            <option value="all">TIME: ALL</option>
-            <option value="today">TODAY</option>
-            <option value="yesterday">1D AGO</option>
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'default' | 'score' | 'hashtag')}
-            className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto"
-          >
-            <option value="default">SORT: DFLT</option>
-            <option value="hashtag">HASHTAG</option>
-          </select>
+          {/* <select */}
+          {/*   value={timeFilter} */}
+          {/*   onChange={(e) => setTimeFilter(e.target.value as 'all' | 'today' | 'yesterday')} */}
+          {/*   className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto" */}
+          {/* > */}
+          {/*   <option value="all">TIME: ALL</option> */}
+          {/*   <option value="today">TODAY</option> */}
+          {/*   <option value="yesterday">1D AGO</option> */}
+          {/* </select> */}
+          {/* <select */}
+          {/*   value={sortBy} */}
+          {/*   onChange={(e) => setSortBy(e.target.value as 'default' | 'score' | 'hashtag')} */}
+          {/*   className="bg-[#0B0F19] text-[#94A3B8] border-none focus:outline-none text-[9px] uppercase font-mono cursor-pointer outline-none p-0 w-auto" */}
+          {/* > */}
+          {/*   <option value="default">SORT: DFLT</option> */}
+          {/*   <option value="hashtag">HASHTAG</option> */}
+          {/* </select> */}
         </div>
       )}
     </>
