@@ -16,75 +16,85 @@ export default function MobileHeader({
 }: HeaderProps) {
   const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen
 
-  return (
-    <div className="flex md:hidden items-center justify-between gap-4 w-full relative h-10">
+  const title = (
+    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-60' : 'translate-x-5'}`}>
       <HeaderTitle isMobile isMobileOverlayOpen={isMobileOverlayOpen} />
+    </div>
+  );
 
-      <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
-        <WhaleIcon
-          isInviteModalOpen={isInviteModalOpen}
-          onClickAction={() => {
-            if (!isSettingsOpen) {
-              setSettingsOpenAction(true)
-              setSettingsViewAction('invite')
-              return
-            }
-            if (settingsView !== 'invite') {
-              setSettingsViewAction('invite')
-              return
-            }
-            setSettingsOpenAction(false)
-          }}
-        />
-      </div>
-
-      <div className={`py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
+  const timer = (
+    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(-10rem_-_50%)]' : 'translate-x-[calc(50vw_-_50%)]'}`}>
+      <div className="py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-1000 ease-in-out">
         <span className="font-oxanium text-[11px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE</span>
         <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
           {formatCountdown(secondsLeft)}
         </span>
       </div>
+    </div>
+  );
 
-      <div className={`absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 transition-all duration-1000 ease-in-out z-10 ${isMobileOverlayOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-        <TerminalPill />
-      </div>
+  const whale = (
+    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-5' : 'translate-x-[calc(100vw_-_4.5rem_-_100%)]'}`}>
+      <WhaleIcon
+        isInviteModalOpen={isInviteModalOpen}
+        onClickAction={() => {
+          if (!isSettingsOpen) {
+            setSettingsOpenAction(true)
+            setSettingsViewAction('invite')
+            return
+          }
+          if (settingsView !== 'invite') {
+            setSettingsViewAction('invite')
+            return
+          }
+          setSettingsOpenAction(false)
+        }}
+      />
+    </div>
+  );
 
-      <div className="flex items-center gap-4 justify-end flex-1">
-        <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-          <div className={`flex items-center transition-all duration-1000 ease-in-out ${isMobileOverlayOpen ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
-            <WhaleIcon
-              isInviteModalOpen={isInviteModalOpen}
-              onClickAction={() => {
-                if (!isSettingsOpen) {
-                  setSettingsOpenAction(true)
-                  setSettingsViewAction('invite')
-                  return
-                }
-                if (settingsView !== 'invite') {
-                  setSettingsViewAction('invite')
-                  return
-                }
-                setSettingsOpenAction(false)
-              }}
-            />
-            <div className="w-3" />
-          </div>
-          <SettingsButton
-            isInviteModalOpen={isInviteModalOpen}
-            isSettingsOpen={isSettingsOpen}
-            setSettingsOpenAction={setSettingsOpenAction}
-            settingsView={settingsView}
-            setSettingsViewAction={setSettingsViewAction}
-          />
-          <div className="w-2" />
-          <SearchButton
-            isSearchOpen={isSearchOpen}
-            setIsSearchOpenAction={setIsSearchOpenAction}
-            searchQuery={searchQuery}
-            setSearchQueryAction={setSearchQueryAction}
-          />
-        </div>
-      </div>
+  const settings = (
+    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-5' : '-translate-x-10'}`}>
+      <SettingsButton
+        isInviteModalOpen={isInviteModalOpen}
+        isSettingsOpen={isSettingsOpen}
+        setSettingsOpenAction={setSettingsOpenAction}
+        settingsView={settingsView}
+        setSettingsViewAction={setSettingsViewAction}
+      />
+    </div>
+  );
+
+  const search = (
+    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : '-translate-x-3'}`}>
+      <SearchButton
+        isSearchOpen={isSearchOpen}
+        setIsSearchOpenAction={setIsSearchOpenAction}
+        searchQuery={searchQuery}
+        setSearchQueryAction={setSearchQueryAction}
+      />
+    </div>
+  );
+
+  const pill = (
+    <TerminalPill />
+  );
+
+  return (
+    <div className="flex items-center relative w-full h-10 transition-all duration-1000 ease-out">
+      {title}
+
+      {timer}
+
+      {whale}
+      {settings}
+      {search}
+
+
+      {/* <div className="flex items-center gap-4 justify-end flex-1"> */}
+      {/*   <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}> */}
+      {/*   </div> */}
+      {/* </div> */}
     </div>
   )
 }
