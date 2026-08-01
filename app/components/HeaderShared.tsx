@@ -109,11 +109,13 @@ export function SearchButton({
   setIsSearchOpenAction,
   searchQuery,
   setSearchQueryAction,
+  classes,
 }: {
   isSearchOpen: boolean
   setIsSearchOpenAction: (open: boolean) => void
   searchQuery: string
   setSearchQueryAction: (query: string) => void
+  classes?: string
 }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -132,7 +134,7 @@ export function SearchButton({
   }, [isSearchOpen, setIsSearchOpenAction])
 
   return (
-    <div ref={containerRef} className="flex" data-search-container>
+    <div className={classes}>
       <button
         type="button"
         onClick={() => setIsSearchOpenAction(!isSearchOpen)}
@@ -141,18 +143,16 @@ export function SearchButton({
       >
         <Search className="w-4 h-4 text-[#94A3B8] hover:text-[#CBD5E1] transition-colors" />
       </button>
-      {isSearchOpen && (
-        <div className="flex items-center gap-2 md:gap-3 pl-1">
-          <input
-            autoFocus
-            type="text"
-            placeholder="SEARCH..."
-            value={searchQuery}
-            onChange={(e) => setSearchQueryAction(e.target.value)}
-            className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-full md:w-28 placeholder-[#475569] pb-[1px]"
-          />
-        </div>
-      )}
+      <div className="flex items-center gap-2 md:gap-3 pl-1">
+        <input
+          autoFocus
+          type="text"
+          placeholder="SEARCH..."
+          value={searchQuery}
+          onChange={(e) => setSearchQueryAction(e.target.value)}
+          className="bg-transparent border-none focus:outline-none text-[10px] uppercase font-mono text-[#F8FAFC] w-full placeholder-[#475569] pb-[1px]"
+        />
+      </div>
     </div>
   )
 }

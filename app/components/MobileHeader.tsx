@@ -17,25 +17,13 @@ export default function MobileHeader({
   const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen
 
   const title = (
-    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${
-      isSearchOpen
-        ? 'translate-x-[calc(1.25rem_-_100vw)]'
-        : isMobileOverlayOpen
-        ? '-translate-x-60'
-        : 'translate-x-5'
-    }`}>
+    <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-60' : 'translate-x-5'}`}>
       <HeaderTitle isMobile isMobileOverlayOpen={isMobileOverlayOpen} />
     </div>
   );
 
   const timer = (
-    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${
-      isSearchOpen
-        ? 'translate-x-[calc(-50vw_-_50%)]'
-        : isMobileOverlayOpen
-        ? 'translate-x-[calc(-10rem_-_50%)]'
-        : 'translate-x-[calc(50vw_-_50%)]'
-    }`}>
+    <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(-10rem_-_50%)]' : 'translate-x-[calc(50vw_-_50%)]'}`}>
       <div className="py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-1000 ease-in-out">
         <span className="font-oxanium text-[11px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE</span>
         <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
@@ -46,13 +34,7 @@ export default function MobileHeader({
   );
 
   const whale = (
-    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${
-      isSearchOpen
-        ? 'translate-x-[calc(-4.5rem_-_100%)]'
-        : isMobileOverlayOpen
-        ? 'translate-x-5'
-        : 'translate-x-[calc(100vw_-_4.5rem_-_100%)]'
-    }`}>
+    <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-5' : 'translate-x-[calc(100vw_-_4.5rem_-_100%)]'}`}>
       <WhaleIcon
         isInviteModalOpen={isInviteModalOpen}
         onClickAction={() => {
@@ -72,13 +54,7 @@ export default function MobileHeader({
   );
 
   const settings = (
-    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${
-      isSearchOpen
-        ? 'translate-x-[calc(-2.5rem_-_100vw)]'
-        : isMobileOverlayOpen
-        ? '-translate-x-5'
-        : '-translate-x-10'
-    }`}>
+    <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(100vw_-_1rem_-_100%)]' : 'translate-x-[calc(100vw_-_2.5rem_-_100%)]'}`}>
       <SettingsButton
         isInviteModalOpen={isInviteModalOpen}
         isSettingsOpen={isSettingsOpen}
@@ -90,14 +66,13 @@ export default function MobileHeader({
   );
 
   const search = (
-    <div className={`fixed right-0 flex transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : (isSearchOpen ? 'translate-x-[94vw]' : '-translate-x-3')}`}>
-      <SearchButton
-        isSearchOpen={isSearchOpen}
-        setIsSearchOpenAction={setIsSearchOpenAction}
-        searchQuery={searchQuery}
-        setSearchQueryAction={setSearchQueryAction}
-      />
-    </div>
+    <SearchButton
+      isSearchOpen={isSearchOpen}
+      setIsSearchOpenAction={setIsSearchOpenAction}
+      searchQuery={searchQuery}
+      setSearchQueryAction={setSearchQueryAction}
+      classes={`fixed left-0 flex transition-all duration-1000 ease-out overflow-hidden ${isMobileOverlayOpen ? 'translate-x-[100vw]' : (isSearchOpen ? 'translate-x-[94vw] w-[94vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)] w-6')}`}
+    />
   );
 
   const pill = (
@@ -105,7 +80,7 @@ export default function MobileHeader({
   );
 
   return (
-    <div className={`flex items-center relative w-full h-10 ${isSearchOpen ? '-translate-x-[94vw] ' : ''}transition-all duration-1000 ease-out`}>
+    <div className={`flex md:hidden items-center relative w-[196vw] h-10 transition-all duration-1000 ease-out ${isSearchOpen ? '-translate-x-[96vw]' : ''}`}>
       {title}
 
       {timer}
