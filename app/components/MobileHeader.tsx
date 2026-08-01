@@ -66,14 +66,13 @@ export default function MobileHeader({
   );
 
   const search = (
-    <div className={`fixed left-0 flex transition-all duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[100vw]' : (isSearchOpen ? 'translate-x-[94vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)]')}`}>
-      <SearchButton
-        isSearchOpen={isSearchOpen}
-        setIsSearchOpenAction={setIsSearchOpenAction}
-        searchQuery={searchQuery}
-        setSearchQueryAction={setSearchQueryAction}
-      />
-    </div>
+    <SearchButton
+      isSearchOpen={isSearchOpen}
+      setIsSearchOpenAction={setIsSearchOpenAction}
+      searchQuery={searchQuery}
+      setSearchQueryAction={setSearchQueryAction}
+      classes={`fixed left-0 flex transition-all duration-1000 ease-out overflow-hidden ${isMobileOverlayOpen ? 'translate-x-[100vw]' : (isSearchOpen ? 'translate-x-[94vw] w-[94vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)] w-6')}`}
+    />
   );
 
   const pill = (

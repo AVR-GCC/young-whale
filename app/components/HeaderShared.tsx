@@ -108,14 +108,16 @@ export function SearchButton({
   setIsSearchOpenAction,
   searchQuery,
   setSearchQueryAction,
+  classes,
 }: {
   isSearchOpen: boolean
   setIsSearchOpenAction: (open: boolean) => void
   searchQuery: string
   setSearchQueryAction: (query: string) => void
+  classes?: string
 }) {
   return (
-    <div className={`flex transition-all duration-1000 ease-out bg-[#ff0000] ${isSearchOpen ? 'w-full md:w-60' : 'w-6 md:w-6'} overflow-hidden`}>
+    <div className={classes}>
       <button
         type="button"
         onClick={() => setIsSearchOpenAction(!isSearchOpen)}

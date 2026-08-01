@@ -44,6 +44,7 @@ export default function DesktopHeader({
             setIsSearchOpenAction={setIsSearchOpenAction}
             searchQuery={searchQuery}
             setSearchQueryAction={setSearchQueryAction}
+            classes={`flex transition-all duration-1000 ease-out ${isSearchOpen ? 'w-60' : 'w-6'} overflow-hidden`}
           />
         </div>
       </div>
