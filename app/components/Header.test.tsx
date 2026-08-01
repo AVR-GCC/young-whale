@@ -57,14 +57,21 @@ describe('Header', () => {
     expect(searchIcons[0].closest('button')).toBeDefined()
   })
 
-  it('toggles search input on click', () => {
+  it('toggles search input on click', async () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
       <Header {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    // Search input should not be visible initially
-    expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
+    // Wait for transition
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // Search input is rendered but hidden (collapsed width)
+    const searchInputs = screen.queryAllByPlaceholderText('SEARCH...')
+    expect(searchInputs.length).toBeGreaterThanOrEqual(1)
+    searchInputs.forEach(input => {
+      expect(/\bw-6\b/.test(input.parentElement?.parentElement?.className || '')).toBe(true)
+    })
 
     // Click to open
     const searchIcons = screen.getAllByTestId('search-icon')
@@ -77,8 +84,11 @@ describe('Header', () => {
       <Header {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    const searchInputs = screen.getAllByPlaceholderText('SEARCH...')
-    expect(searchInputs.length).toBeGreaterThanOrEqual(1)
+    const openSearchInputs = screen.getAllByPlaceholderText('SEARCH...')
+    expect(openSearchInputs.length).toBeGreaterThanOrEqual(1)
+    openSearchInputs.forEach(input => {
+      expect(/\bw-6\b/.test(input.parentElement?.parentElement?.className || '')).toBe(false)
+    })
 
     // Click to close
     fireEvent.click(searchButton)
@@ -164,13 +174,17 @@ describe('DesktopHeader', () => {
     expect(screen.getByTestId('search-icon').closest('button')).toBeDefined()
   })
 
-  it('toggles search input on click', () => {
+  it('toggles search input on click', async () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
       <DesktopHeader {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const searchInput = screen.queryByPlaceholderText('SEARCH...')
+    expect(searchInput).toBeDefined()
+    expect(/\bw-6\b/.test(searchInput?.parentElement?.parentElement?.className || '')).toBe(true)
 
     const searchButton = screen.getByTestId('search-icon').closest('button')!
     fireEvent.click(searchButton)
@@ -180,7 +194,9 @@ describe('DesktopHeader', () => {
       <DesktopHeader {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    expect(screen.getByPlaceholderText('SEARCH...')).toBeDefined()
+    const openInput = screen.queryByPlaceholderText('SEARCH...')
+    expect(openInput).toBeDefined()
+    expect(/\bw-6\b/.test(openInput?.parentElement?.parentElement?.className || '')).toBe(false)
 
     fireEvent.click(searchButton)
     expect(setIsSearchOpen).toHaveBeenCalledWith(false)
@@ -223,13 +239,17 @@ describe('MobileHeader', () => {
     expect(screen.getByTestId('search-icon').closest('button')).toBeDefined()
   })
 
-  it('toggles search input on click', () => {
+  it('toggles search input on click', async () => {
     const setIsSearchOpen = vi.fn()
     const { rerender } = render(
       <MobileHeader {...defaultProps} isSearchOpen={false} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    expect(screen.queryByPlaceholderText('SEARCH...')).toBeNull()
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    const searchInput = screen.queryByPlaceholderText('SEARCH...')
+    expect(searchInput).toBeDefined()
+    expect(/\bw-6\b/.test(searchInput?.parentElement?.parentElement?.className || '')).toBe(true)
 
     const searchButton = screen.getByTestId('search-icon').closest('button')!
     fireEvent.click(searchButton)
@@ -239,7 +259,9 @@ describe('MobileHeader', () => {
       <MobileHeader {...defaultProps} isSearchOpen={true} setIsSearchOpenAction={setIsSearchOpen} />
     )
 
-    expect(screen.getByPlaceholderText('SEARCH...')).toBeDefined()
+    const openInput = screen.queryByPlaceholderText('SEARCH...')
+    expect(openInput).toBeDefined()
+    expect(/\bw-6\b/.test(openInput?.parentElement?.parentElement?.className || '')).toBe(false)
 
     fireEvent.click(searchButton)
     expect(setIsSearchOpen).toHaveBeenCalledWith(false)
