@@ -66,7 +66,7 @@ export default function MobileHeader({
   );
 
   const search = (
-    <div className={`fixed right-0 flex transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : '-translate-x-3'}`}>
+    <div className={`fixed right-0 flex transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : (isSearchOpen ? 'translate-x-[94vw]' : '-translate-x-3')}`}>
       <SearchButton
         isSearchOpen={isSearchOpen}
         setIsSearchOpenAction={setIsSearchOpenAction}
@@ -81,7 +81,7 @@ export default function MobileHeader({
   );
 
   return (
-    <div className={`flex items-center relative w-full h-10 ${isSearchOpen ? '-translate-x-[65vw] ' : ''}transition-all duration-1000 ease-out`}>
+    <div className={`flex items-center relative w-full h-10 ${isSearchOpen ? '-translate-x-[94vw] ' : ''}transition-all duration-1000 ease-out`}>
       {title}
 
       {timer}
