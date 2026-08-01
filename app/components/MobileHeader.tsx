@@ -54,7 +54,7 @@ export default function MobileHeader({
   );
 
   const settings = (
-    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-5' : '-translate-x-10'}`}>
+    <div className={`fixed left-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(100vw_-_1rem_-_100%)]' : 'translate-x-[calc(100vw_-_2.5rem_-_100%)]'}`}>
       <SettingsButton
         isInviteModalOpen={isInviteModalOpen}
         isSettingsOpen={isSettingsOpen}
@@ -66,7 +66,7 @@ export default function MobileHeader({
   );
 
   const search = (
-    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : '-translate-x-3'}`}>
+    <div className={`fixed left-0 flex transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[100vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)]'}`}>
       <SearchButton
         isSearchOpen={isSearchOpen}
         setIsSearchOpenAction={setIsSearchOpenAction}
@@ -81,7 +81,7 @@ export default function MobileHeader({
   );
 
   return (
-    <div className="flex items-center relative w-full h-10 transition-all duration-1000 ease-out">
+    <div className="flex md:hidden items-center relative w-full h-10 transition-all duration-1000 ease-out">
       {title}
 
       {timer}
