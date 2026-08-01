@@ -87,7 +87,8 @@ describe('Header', () => {
     const openSearchInputs = screen.getAllByPlaceholderText('SEARCH...')
     expect(openSearchInputs.length).toBeGreaterThanOrEqual(1)
     openSearchInputs.forEach(input => {
-      expect(/\bw-6\b/.test(input.parentElement?.parentElement?.className || '')).toBe(false)
+      const className = input.parentElement?.parentElement?.className || ''
+      expect(/\bw-60\b/.test(className) || className.includes('w-[94vw]')).toBe(true)
     })
 
     // Click to close
@@ -261,7 +262,7 @@ describe('MobileHeader', () => {
 
     const openInput = screen.queryByPlaceholderText('SEARCH...')
     expect(openInput).toBeDefined()
-    expect(/\bw-6\b/.test(openInput?.parentElement?.parentElement?.className || '')).toBe(false)
+    expect((openInput?.parentElement?.parentElement?.className || '').includes('w-[94vw]')).toBe(true)
 
     fireEvent.click(searchButton)
     expect(setIsSearchOpen).toHaveBeenCalledWith(false)

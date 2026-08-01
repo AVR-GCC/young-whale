@@ -117,8 +117,6 @@ export function SearchButton({
   setSearchQueryAction: (query: string) => void
   classes?: string
 }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     if (!isSearchOpen) return
 
