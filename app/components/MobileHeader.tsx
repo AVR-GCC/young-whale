@@ -90,21 +90,13 @@ export default function MobileHeader({
   );
 
   const search = (
-    <div className={`fixed right-0 transition-transform duration-1000 ease-out ${
-      isSearchOpen
-        ? 'translate-x-[calc(1.25rem_-_100vw_+_100%)] w-[90%]'
-        : isMobileOverlayOpen
-        ? 'translate-x-7'
-        : '-translate-x-3'
-    }`}>
-      <div className={`flex items-center border-b ${isSearchOpen ? 'border-[#334155]' : 'border-transparent'} transition-all`}>
-          <SearchButton
-            isSearchOpen={isSearchOpen}
-            setIsSearchOpenAction={setIsSearchOpenAction}
-            searchQuery={searchQuery}
-            setSearchQueryAction={setSearchQueryAction}
-          />
-      </div>
+    <div className={`fixed right-0 flex transition-transform duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-7' : (isSearchOpen ? 'translate-x-[94vw]' : '-translate-x-3')}`}>
+      <SearchButton
+        isSearchOpen={isSearchOpen}
+        setIsSearchOpenAction={setIsSearchOpenAction}
+        searchQuery={searchQuery}
+        setSearchQueryAction={setSearchQueryAction}
+      />
     </div>
   );
 
@@ -113,7 +105,7 @@ export default function MobileHeader({
   );
 
   return (
-    <div className="flex md:hidden items-center relative w-full h-10 transition-all duration-1000 ease-out">
+    <div className={`flex items-center relative w-full h-10 ${isSearchOpen ? '-translate-x-[94vw] ' : ''}transition-all duration-1000 ease-out`}>
       {title}
 
       {timer}
