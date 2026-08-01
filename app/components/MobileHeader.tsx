@@ -81,7 +81,7 @@ export default function MobileHeader({
   );
 
   return (
-    <div className={`flex md:hidden items-center relative w-full h-10 transition-all duration-1000 ease-out ${isSearchOpen ? '-translate-x-[96vw]' : ''}`}>
+    <div className={`flex md:hidden items-center relative w-[196vw] h-10 transition-all duration-1000 ease-out ${isSearchOpen ? '-translate-x-[96vw]' : ''}`}>
       {title}
 
       {timer}
