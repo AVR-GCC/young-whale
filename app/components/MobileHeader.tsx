@@ -71,7 +71,7 @@ export default function MobileHeader({
       setIsSearchOpenAction={setIsSearchOpenAction}
       searchQuery={searchQuery}
       setSearchQueryAction={setSearchQueryAction}
-      classes={`fixed left-0 flex transition-all duration-1000 ease-out overflow-hidden ${isMobileOverlayOpen ? 'translate-x-[100vw]' : (isSearchOpen ? 'translate-x-[94vw] w-[94vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)] w-6')}`}
+      classes={`fixed left-0 flex transition-all duration-1000 ease-out overflow-hidden w-6 ${isMobileOverlayOpen ? 'translate-x-[100vw]' : (isSearchOpen ? 'translate-x-[94vw] w-[94vw]' : 'translate-x-[calc(100vw_-_0.7rem_-_100%)]')}`}
     />
   );
 
