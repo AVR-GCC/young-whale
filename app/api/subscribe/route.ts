@@ -1,6 +1,46 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
 
+const EMAIL_OCTOPUS_API_KEY = process.env.EMAIL_OCTOPUS_API_KEY ?? 'YOUR_API_KEY_HERE'
+const EMAIL_OCTOPUS_LIST_ID = process.env.EMAIL_OCTOPUS_LIST_ID ?? 'YOUR_LIST_ID_HERE'
+const EMAIL_OCTOPUS_API_URL = 'https://api.emailoctopus.com'
+
+async function registerWithEmailOctopus(email: string) {
+  try {
+    const response = await fetch(
+      `${EMAIL_OCTOPUS_API_URL}/lists/${EMAIL_OCTOPUS_LIST_ID}/contacts`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${EMAIL_OCTOPUS_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email_address: email,
+          status: 'subscribed',
+          tags: ['website-signup'],
+        }),
+      }
+    )
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('EmailOctopus API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData,
+      })
+      return false
+    }
+
+    return true
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Failed to register with EmailOctopus:', message)
+    return false
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -77,8 +117,16 @@ export async function POST(request: Request) {
       )
     }
 
+    // Register with EmailOctopus
+    const emailOctopusSuccess = await registerWithEmailOctopus(normalizedEmail)
+
     return NextResponse.json(
-      { success: true, message: 'Subscribed successfully', id: inserted.id },
+      {
+        success: true,
+        message: 'Subscribed successfully',
+        id: inserted.id,
+        emailOctopusRegistered: emailOctopusSuccess,
+      },
       { status: 201 }
     )
   } catch (error) {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { POST } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 
@@ -31,6 +31,11 @@ function createRequest(body: unknown): Request {
 describe('POST /api/subscribe', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.stubGlobal('fetch', vi.fn())
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
   })
 
   it('returns 400 for invalid email', async () => {
@@ -217,5 +222,104 @@ describe('POST /api/subscribe', () => {
 
     expect(response.status).toBe(500)
     expect(json.error).toBe('Failed to reactivate subscription')
+  })
+
+  it('registers new contact with EmailOctopus and returns emailOctopusRegistered: true', async () => {
+    const checkBuilder = createMockBuilder({
+      data: null,
+      error: { code: 'PGRST116', message: 'No rows found' },
+    })
+
+    const insertBuilder = createMockBuilder({
+      data: { id: 'sub-1', email: 'test@example.com', is_active: true },
+      error: null,
+    })
+
+    let callCount = 0
+    vi.mocked(supabaseService.from).mockImplementation(() => {
+      callCount++
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify({ id: 'eo-1' }), { status: 201 })
+    )
+
+    const response = await POST(createRequest({ email: 'test@example.com' }))
+    const json = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(json.success).toBe(true)
+    expect(json.emailOctopusRegistered).toBe(true)
+    expect(fetch).toHaveBeenCalledWith(
+      expect.stringContaining('/lists/'),
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({
+          'Authorization': expect.stringContaining('Bearer'),
+          'Content-Type': 'application/json',
+        }),
+        body: expect.stringContaining('"status":"subscribed"'),
+      })
+    )
+  })
+
+  it('still succeeds when EmailOctopus registration fails', async () => {
+    const checkBuilder = createMockBuilder({
+      data: null,
+      error: { code: 'PGRST116', message: 'No rows found' },
+    })
+
+    const insertBuilder = createMockBuilder({
+      data: { id: 'sub-1', email: 'test@example.com', is_active: true },
+      error: null,
+    })
+
+    let callCount = 0
+    vi.mocked(supabaseService.from).mockImplementation(() => {
+      callCount++
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify({ detail: 'List contact already exists.' }), { status: 409 })
+    )
+
+    const response = await POST(createRequest({ email: 'test@example.com' }))
+    const json = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(json.success).toBe(true)
+    expect(json.emailOctopusRegistered).toBe(false)
+  })
+
+  it('still succeeds when EmailOctopus fetch throws', async () => {
+    const checkBuilder = createMockBuilder({
+      data: null,
+      error: { code: 'PGRST116', message: 'No rows found' },
+    })
+
+    const insertBuilder = createMockBuilder({
+      data: { id: 'sub-1', email: 'test@example.com', is_active: true },
+      error: null,
+    })
+
+    let callCount = 0
+    vi.mocked(supabaseService.from).mockImplementation(() => {
+      callCount++
+      if (callCount === 1) return checkBuilder as unknown as ReturnType<typeof supabaseService.from>
+      return insertBuilder as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    vi.mocked(fetch).mockRejectedValueOnce(new Error('Network error'))
+
+    const response = await POST(createRequest({ email: 'test@example.com' }))
+    const json = await response.json()
+
+    expect(response.status).toBe(201)
+    expect(json.success).toBe(true)
+    expect(json.emailOctopusRegistered).toBe(false)
   })
 })
