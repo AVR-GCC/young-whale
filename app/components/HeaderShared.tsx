@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Search, Settings } from 'lucide-react'
-import { useRef, useEffect } from 'react'
+import { useEffect } from 'react'
 
 export function formatCountdown(totalSeconds: number) {
   const hrs = Math.floor(totalSeconds / 3600)
