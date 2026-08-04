@@ -78,7 +78,9 @@ export default function MobileHeader({
   );
 
   const pill = (
-    <TerminalPill />
+    <div className={`fixed left-0 transition-all duration-500 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(50vw_-_50%)] opacity-100 delay-300' : 'translate-x-[calc(50vw_-_50%)] opacity-0 delay-0'}`}>
+      <TerminalPill />
+    </div>
   );
 
   return (
@@ -86,6 +88,8 @@ export default function MobileHeader({
       {title}
 
       {timer}
+
+      {pill}
 
       {whale}
       {settings}
