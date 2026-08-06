@@ -106,6 +106,30 @@ async function processJob(
     : await fetchDexScreenerLinks(raw);
   const preferred_exchange = exchange_links?.[0] ?? null;
 
+  // Ensure chain exists in chains table before creating token
+  if (raw.chain) {
+    const { data: existingChain } = await supabaseService
+      .from('chains')
+      .select('id')
+      .eq('id', raw.chain)
+      .maybeSingle()
+
+    if (!existingChain) {
+      const { error: chainInsertError } = await supabaseService
+        .from('chains')
+        .insert({
+          id: raw.chain,
+          name: raw.chain,
+          icon: 'star.png',
+          explorer_prefix: null,
+        })
+
+      if (chainInsertError) {
+        console.error('Failed to insert chain:', chainInsertError.message)
+      }
+    }
+  }
+
   const tokenData = {
     name: raw.name,
     symbol: raw.symbol,

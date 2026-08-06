@@ -435,6 +435,105 @@ describe('GET /api/cron/process', () => {
     expect(json.status).toBe('running')
   })
 
+  it('creates missing chain in chains table before inserting token', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+    vi.mocked(generateText).mockResolvedValue({
+      text: JSON.stringify(mockAIResult),
+    } as unknown as Awaited<ReturnType<typeof generateText>>)
+
+    const rawTokenWithNewChain = {
+      ...mockRawToken,
+      chain: 'new-chain',
+    }
+
+    let chainsInsertCalled = false
+    let chainsInsertData: any = null
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'hashtags') {
+        return createMockQueryBuilder(
+          {},
+          { data: [{ slug: 'defi' }, { slug: 'ai' }], error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'raw_tokens') {
+        return createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: rawTokenWithNewChain,
+            error: null,
+          }),
+        }) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'chains') {
+        const builder: any = {
+          select: vi.fn(() => builder),
+          insert: vi.fn().mockImplementation((data: any) => {
+            chainsInsertCalled = true
+            chainsInsertData = data
+            return builder
+          }),
+          update: vi.fn(() => builder),
+          upsert: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
+          in: vi.fn(() => builder),
+          or: vi.fn(() => builder),
+          limit: vi.fn(() => builder),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+          single: vi.fn().mockResolvedValue({ data: null, error: null }),
+          then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
+            Promise.resolve({ data: null, error: null }).then(onfulfilled),
+        }
+        return builder as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'tokens') {
+        return createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'token-1' },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: null,
+            error: null,
+          }),
+        }) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'token_hashtags') {
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    // Wait for background processing to complete
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
+    expect(chainsInsertCalled).toBe(true)
+    expect(chainsInsertData).toEqual({
+      id: 'new-chain',
+      name: 'new-chain',
+      icon: 'star.png',
+      explorer_prefix: null,
+    })
+  })
+
   it('uses CMC tags for hashtags and stores AI-selected main hashtag', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
     vi.mocked(generateText).mockResolvedValue({
