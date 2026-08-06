@@ -1,7 +1,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import TokenEditDrawer from './TokenEditDrawer'
 import type { Token, Hashtag } from '@/shared/types'
+
+vi.mock('@/lib/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        order: vi.fn(() => ({
+          data: [
+            { id: 'ethereum', name: 'Ethereum' },
+            { id: 'solana', name: 'Solana' },
+          ],
+          error: null,
+        })),
+      })),
+    })),
+  },
+}))
+
+import TokenEditDrawer from './TokenEditDrawer'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch

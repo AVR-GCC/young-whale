@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import type { Token, TokenStatus, TokenCategory, Confidence, Hashtag } from '@/shared/types'
+import { supabase } from '@/lib/supabase/client'
 import LinkInput from './LinkInput'
 import HashtagMultiSelect from './HashtagMultiSelect'
 import NewHashtagInput from './NewHashtagInput'
@@ -68,7 +69,25 @@ export default function TokenEditDrawer({
   const [allHashtags, setAllHashtags] = useState<Hashtag[]>([])
   const [selectedHashtagIds, setSelectedHashtagIds] = useState<string[]>([])
   const [newHashtags, setNewHashtags] = useState<string[]>([])
+  const [chains, setChains] = useState<{ id: string; name: string }[]>([])
 
+  const fetchChains = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('chains')
+        .select('id, name')
+        .order('name')
+
+      if (error) {
+        console.error('Failed to fetch chains:', error.message)
+        return
+      }
+
+      setChains(data ?? [])
+    } catch (err) {
+      console.error('Failed to fetch chains:', err)
+    }
+  }, [])
 
   const fetchAllHashtags = useCallback(async () => {
     try {
@@ -110,7 +129,8 @@ export default function TokenEditDrawer({
 
   useEffect(() => {
     fetchAllHashtags()
-  }, [fetchAllHashtags])
+    fetchChains()
+  }, [fetchAllHashtags, fetchChains])
 
   useEffect(() => {
     if (!isCreate) {
@@ -178,6 +198,7 @@ export default function TokenEditDrawer({
       const body: Record<string, unknown> = {}
       const fields: (keyof Token)[] = [
         'slug',
+        'chain',
         'category',
         'short_description',
         'full_description',
@@ -537,18 +558,18 @@ export default function TokenEditDrawer({
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                     Chain {isCreate && <span className="text-red-500">*</span>}
                   </label>
-                  {isCreate ? (
-                    <input
-                      type="text"
-                      value={editedToken.chain || ''}
-                      onChange={(e) => updateField('chain', e.target.value)}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                    />
-                  ) : (
-                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                      {token?.chain}
-                    </div>
-                  )}
+                  <select
+                    value={editedToken.chain || token?.chain || ''}
+                    onChange={(e) => updateField('chain', e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  >
+                    <option value="">Select chain...</option>
+                    {chains.map((chain) => (
+                      <option key={chain.id} value={chain.id}>
+                        {chain.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">

@@ -68,6 +68,7 @@ export async function PATCH(
     const allowedFields = [
       'slug',
       'category',
+      'chain',
       'short_description',
       'full_description',
       'main_hashtag',
