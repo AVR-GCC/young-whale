@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { requireAdmin } from '@/lib/admin-auth'
 import AdminActions from './components/AdminActions'
 import AIConfigSection from './components/AIConfigSection'
+import ChainsSection from './components/ChainsSection'
 import FailedTokensSection from './components/FailedTokensSection'
 import MessagesSection from './components/MessagesSection'
 import TokensSection from './components/TokensSection'
@@ -21,6 +22,7 @@ export default async function Admin() {
         </div>
 
         <AIConfigSection />
+        <ChainsSection />
         <FailedTokensSection />
         <MessagesSection />
         <Suspense fallback={

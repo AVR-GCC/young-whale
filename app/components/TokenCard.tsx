@@ -116,7 +116,7 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
           <div className={`absolute ${badgePositionClass} ${badgeSizeClass} flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
             {chainIcons[chain] && chainIcons[chain] !== 'blue' ? (
               <Image
-                src={`/chain-logos/${chainIcons[chain]}`}
+                src={chainIcons[chain].includes('http') ? chainIcons[chain] : `/chain-logos/${chainIcons[chain]}`}
                 alt={chain}
                 width={chainIconSize}
                 height={chainIconSize}
