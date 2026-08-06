@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Search, Settings } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 export function formatCountdown(totalSeconds: number) {
   const hrs = Math.floor(totalSeconds / 3600)
@@ -117,22 +117,31 @@ export function SearchButton({
   setSearchQueryAction: (query: string) => void
   classes?: string
 }) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     if (!isSearchOpen) return
 
+    const timeoutId = setTimeout(() => {
+      inputRef.current?.focus()
+    }, 1000)
+
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
-      if (!target.closest('[data-search-container]')) {
+      if (!target.closest('#data-search-container')) {
         setIsSearchOpenAction(false)
       }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    return () => {
+      clearTimeout(timeoutId)
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [isSearchOpen, setIsSearchOpenAction])
 
   return (
-    <div className={classes}>
+    <div id="data-search-container" className={classes}>
       <button
         type="button"
         onClick={() => setIsSearchOpenAction(!isSearchOpen)}
@@ -143,7 +152,7 @@ export function SearchButton({
       </button>
       <div className="flex items-center gap-2 md:gap-3 pl-1">
         <input
-          autoFocus
+          ref={inputRef}
           type="text"
           placeholder="SEARCH..."
           value={searchQuery}
