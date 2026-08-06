@@ -10,6 +10,8 @@ interface AdminActionsProps {
 export default function AdminActions({ userEmail }: AdminActionsProps) {
   const [processStatus, setProcessStatus] = useState<string>('')
   const [processLoading, setProcessLoading] = useState(false)
+  const [ingestStatus, setIngestStatus] = useState<string>('')
+  const [ingestLoading, setIngestLoading] = useState(false)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const clearPollInterval = useCallback(() => {
@@ -82,6 +84,27 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
     }
   }, [pollStatus])
 
+  const runIngest = useCallback(async () => {
+    setIngestLoading(true)
+    setIngestStatus('Starting ingestion...')
+    try {
+      const res = await fetch('/api/cron/ingest')
+      const data = await res.json()
+
+      if (!res.ok) {
+        setIngestStatus(`Error: ${data.error || 'Unknown error'}`)
+        setIngestLoading(false)
+        return
+      }
+
+      setIngestStatus(`Ingested ${data.imported} tokens`)
+      setIngestLoading(false)
+    } catch (err) {
+      setIngestStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setIngestLoading(false)
+    }
+  }, [])
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/login'
@@ -100,6 +123,20 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
         {processStatus && (
           <p className={`text-sm text-center whitespace-pre-line ${processStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>
             {processStatus}
+          </p>
+        )}
+      </div>
+      <div className="flex flex-col items-center gap-1 w-80 h-20">
+        <button
+          onClick={runIngest}
+          disabled={ingestLoading}
+          className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80%]"
+        >
+          {ingestLoading ? 'Running Ingest...' : 'Run Ingest'}
+        </button>
+        {ingestStatus && (
+          <p className={`text-sm text-center whitespace-pre-line ${ingestStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>
+            {ingestStatus}
           </p>
         )}
       </div>

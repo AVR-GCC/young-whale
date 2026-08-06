@@ -138,4 +138,67 @@ describe('Admin page', () => {
       expect(screen.getByRole('button', { name: 'Run Process' }).hasAttribute('disabled')).toBe(false)
     })
   })
+
+  it('renders ingest button', async () => {
+    const Page = await Admin()
+    render(Page)
+
+    expect(screen.getByRole('button', { name: 'Run Ingest' })).toBeDefined()
+  })
+
+  it('calls ingest API and shows success', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ imported: 42 }),
+    })
+
+    const Page = await Admin()
+    render(Page)
+    const button = screen.getByRole('button', { name: 'Run Ingest' })
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith('/api/cron/ingest')
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('Ingested 42 tokens')).toBeDefined()
+    })
+  })
+
+  it('shows error when ingest API fails', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ error: 'Ingest failed' }),
+    })
+
+    const Page = await Admin()
+    render(Page)
+    const button = screen.getByRole('button', { name: 'Run Ingest' })
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getByText('Error: Ingest failed')).toBeDefined()
+    })
+  })
+
+  it('shows loading state while ingest is running', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ imported: 10 }),
+    })
+
+    const Page = await Admin()
+    render(Page)
+    const button = screen.getByRole('button', { name: 'Run Ingest' })
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Running Ingest...' }).hasAttribute('disabled')).toBe(true)
+    })
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Run Ingest' }).hasAttribute('disabled')).toBe(false)
+    })
+  })
 })
