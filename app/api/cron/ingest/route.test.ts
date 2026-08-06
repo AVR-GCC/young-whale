@@ -274,6 +274,81 @@ describe('GET /api/cron/ingest', () => {
     expect(insertedTokenData.chain).toBe('chain-1')
   })
 
+  it('assigns chain "original" when no platform name and no explorer prefix matches', async () => {
+    const mockChains = [
+      { id: 'chain-1', explorer_prefix: 'https://example-explorer.com/token/' },
+    ]
+
+    const detailsWithNoMatch = {
+      ...mockDetails,
+      urls: {
+        website: ['https://example.com'],
+        explorer: ['https://unmatched-explorer.com/token/0x123'],
+      },
+      contract_address: [],
+    }
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/listings/latest')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ data: mockListings.slice(0, 1) }),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          data: { '1': { ...detailsWithNoMatch, name: 'Token 1', symbol: 'TKN1' } },
+        }),
+      })
+    })
+
+    let insertedTokenData: any = null
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'chains') {
+        return createMockQueryBuilder(
+          {},
+          { data: mockChains, error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'raw_tokens') {
+        const builder: any = {
+          select: vi.fn(() => builder),
+          insert: vi.fn().mockImplementation((data: any) => {
+            insertedTokenData = data
+            return builder
+          }),
+          limit: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
+          in: vi.fn(() => builder),
+          maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+          single: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+          then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
+            Promise.resolve({ data: null, error: null }).then(onfulfilled),
+        }
+        return builder as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder({
+        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      }) as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest())
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.imported).toBe(1)
+    expect(insertedTokenData).toBeDefined()
+    expect(insertedTokenData.chain).toBe('original')
+  })
+
   it('handles CMC API errors gracefully', async () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
