@@ -79,6 +79,19 @@ async function getTokenDetails(cmcId: number) {
   }
 }
 
+async function getChains() {
+  const { data, error } = await supabaseService
+    .from('chains')
+    .select('id, explorer_prefix')
+
+  if (error) {
+    console.error('Error fetching chains:', error.message)
+    return []
+  }
+
+  return data ?? []
+}
+
 function mapCmcToRawToken(listing: {
   id: number
   name: string
@@ -111,7 +124,7 @@ function mapCmcToRawToken(listing: {
   category: string
   tags: string[]
   'tag-names': string[]
-}) {
+}, chains: Array<{ id: string; explorer_prefix: string }>) {
   const primaryContract = details.contract_address?.[0]
 
   const socialLinks: Record<string, string> = {}
@@ -133,14 +146,11 @@ function mapCmcToRawToken(listing: {
   }
   let chain = primaryContract?.platform?.name ?? '';
   if (chain === '' && explorer !== '') {
-    if (explorer.includes('https://robinhoodchain.blockscout.com/token/')) {
-      chain = 'Robinhood';
-    }
-    if (explorer.includes('https://scanner.cofinex.io/address/')) {
-      chain = 'Cofinex';
-    }
-    if (explorer.includes('https://browser.anubispace.org/token/')) {
-      chain = 'AnubisChain';
+    for (const chainRecord of chains) {
+      if (chainRecord.explorer_prefix && explorer.includes(chainRecord.explorer_prefix)) {
+        chain = chainRecord.id;
+        break;
+      }
     }
   }
 
@@ -268,6 +278,7 @@ export async function GET(request: Request) {
     const results = []
     const rawTokenIds: string[] = []
     const hashtagMap = new Map<string, string>()
+    const chains = await getChains()
 
     if (isEmpty) {
       // Table is empty: ingest exactly 20 tokens
@@ -276,7 +287,7 @@ export async function GET(request: Request) {
       for (const listing of listings) {
         const details = await getTokenDetails(listing.id)
         collectHashtags(details, hashtagMap)
-        const tokenData = mapCmcToRawToken(listing, details)
+        const tokenData = mapCmcToRawToken(listing, details, chains)
 
         const { data, error } = await supabaseService
           .from('raw_tokens')
@@ -315,7 +326,7 @@ export async function GET(request: Request) {
 
           const details = await getTokenDetails(listing.id)
           collectHashtags(details, hashtagMap)
-          const tokenData = mapCmcToRawToken(listing, details)
+          const tokenData = mapCmcToRawToken(listing, details, chains)
 
           const { data, error } = await supabaseService
             .from('raw_tokens')
