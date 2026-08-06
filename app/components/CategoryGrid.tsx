@@ -7,18 +7,7 @@ import type { TokenWithHashtags } from '@/shared/types'
 import MobileCategoryFooter from './MobileCategoryFooter'
 import TokenTerminal from './TokenTerminal'
 import MobileSettingsMenu from './MobileSettingsMenu'
-
-const chainIcons: Record<string, string> = {
-  Arbitrum: 'arbitrum-arb-logo.svg',
-  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
-  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
-  Polygon: 'polygon-matic-logo.svg',
-  Solana: 'solana-sol-logo.svg',
-  Base: 'blue',
-  Robinhood: 'robinhood-chain.png',
-  Cofinex: 'cofinexexchange_logo',
-  AnubisChain: 'anubis-chain.webp'
-}
+import { supabase } from '@/lib/supabase/client'
 
 interface CategoryGridProps {
   tokens: TokenWithHashtags[]
@@ -54,6 +43,30 @@ export default function CategoryGrid({
   const [touchEnd, setTouchEnd] = useState<number | null>(null)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [slideOffset, setSlideOffset] = useState(-100)
+  const [chainIcons, setChainIcons] = useState<Record<string, string>>({})
+
+  useEffect(() => {
+    async function fetchChains() {
+      const { data, error } = await supabase
+        .from('chains')
+        .select('id, icon')
+
+      if (error) {
+        console.error('Error fetching chains:', error.message)
+        return
+      }
+
+      const icons: Record<string, string> = {}
+      data?.forEach((chain: { id: string; icon: string | null }) => {
+        if (chain.icon) {
+          icons[chain.id] = chain.icon
+        }
+      })
+      setChainIcons(icons)
+    }
+
+    fetchChains()
+  }, [])
 
   // Close overlay when switching categories
   useEffect(() => {

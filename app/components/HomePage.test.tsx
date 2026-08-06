@@ -7,6 +7,13 @@ vi.mock('@/lib/supabase/client', () => ({
   supabase: {
     from: vi.fn(() => ({
       insert: vi.fn(),
+      select: vi.fn(() => ({
+        data: [
+          { id: 'Ethereum', icon: 'ethereum-eth-logo-diamond-purple.svg' },
+          { id: 'Solana', icon: 'solana-sol-logo.svg' },
+        ],
+        error: null,
+      })),
     })),
   },
 }))

@@ -5,16 +5,23 @@ import TokenTerminal from '@/app/components/TokenTerminal'
 import { categories } from '@/app/lib/categories'
 import type { TokenWithHashtags } from '@/shared/types'
 
-const chainIcons: Record<string, string> = {
-  Arbitrum: 'arbitrum-arb-logo.svg',
-  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
-  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
-  Polygon: 'polygon-matic-logo.svg',
-  Solana: 'solana-sol-logo.svg',
-  Base: 'blue',
-  Robinhood: 'robinhood-chain.png',
-  Cofinex: 'cofinexexchange_logo',
-  AnubisChain: 'anubis-chain.webp'
+async function getChainIcons(): Promise<Record<string, string>> {
+  const { data, error } = await supabaseService
+    .from('chains')
+    .select('id, icon')
+
+  if (error) {
+    console.error('Error fetching chains:', error.message)
+    return {}
+  }
+
+  const icons: Record<string, string> = {}
+  data?.forEach((chain: { id: string; icon: string | null }) => {
+    if (chain.icon) {
+      icons[chain.id] = chain.icon
+    }
+  })
+  return icons
 }
 
 interface TokenPageProps {
@@ -88,6 +95,7 @@ export default async function TokenPage({ params }: TokenPageProps) {
     notFound()
   }
 
+  const chainIcons = await getChainIcons()
   const category = categories.find((c) => c.id === token.category)
   const themeColor = category?.color ?? '#22D3EE'
 
