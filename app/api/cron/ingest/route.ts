@@ -63,6 +63,7 @@ async function getTokenDetails(cmcId: number) {
       website?: string[]
       twitter?: string[]
       telegram?: string[]
+      explorer?: string[]
       [key: string]: string[] | undefined
     }
     contract_address?: Array<{
@@ -97,6 +98,7 @@ function mapCmcToRawToken(listing: {
     website?: string[]
     twitter?: string[]
     telegram?: string[]
+    explorer?: string[]
     [key: string]: string[] | undefined
   }
   contract_address?: Array<{
@@ -117,6 +119,8 @@ function mapCmcToRawToken(listing: {
   if (details.urls.reddit?.length) socialLinks.reddit = details.urls.reddit[0]
   if (details.urls.twitter?.length) socialLinks.twitter = details.urls.twitter[0]
   if (details.urls.telegram?.length) socialLinks.telegram = details.urls.telegram[0]
+  let explorer = '';
+  if (details.urls.explorer?.length) explorer = details.urls.explorer[0]
 
   if (details.urls.chat?.length) {
     if (!socialLinks.telegram) {
@@ -127,7 +131,18 @@ function mapCmcToRawToken(listing: {
     const discordUrls = details.urls.chat.filter((url) => url.includes('discord.gg/'))
     if (discordUrls.length) socialLinks.discord = discordUrls[0]
   }
-  const chain = primaryContract?.platform?.name ?? '';
+  let chain = primaryContract?.platform?.name ?? '';
+  if (chain === '' && explorer !== '') {
+    if (explorer.includes('https://robinhoodchain.blockscout.com/token/')) {
+      chain = 'Robinhood';
+    }
+    if (explorer.includes('https://scanner.cofinex.io/address/')) {
+      chain = 'Cofinex';
+    }
+    if (explorer.includes('https://browser.anubispace.org/token/')) {
+      chain = 'AnubisChain';
+    }
+  }
   const contract_address = primaryContract?.contract_address ?? '';
   const source_url = `https://coinmarketcap.com/currencies/${details.slug}`;
 
@@ -136,6 +151,7 @@ function mapCmcToRawToken(listing: {
     symbol: details.symbol,
     chain,
     contract_address,
+    explorer,
     website_url: details.urls.website?.[0] ?? null,
     logo_url: details.logo || null,
     social_links: socialLinks,

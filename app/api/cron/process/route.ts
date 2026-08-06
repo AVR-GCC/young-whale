@@ -51,7 +51,7 @@ async function processJob(
 
   const raw = rawToken as RawToken
 
-  if (!raw.name || !raw.symbol || !raw.chain) {
+  if (!raw.name || !raw.symbol) {
     await markJobFailed(job, 'Missing required fields: name, symbol, or chain')
     return 'failed'
   }

@@ -93,12 +93,15 @@ function TimeSince({ date }: { date: string }) {
 // }
 
 const chainIcons: Record<string, string> = {
-  Arbitrum: 'arbitrum-arb-logo',
-  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo',
-  Ethereum: 'ethereum-eth-logo-diamond-purple',
-  Polygon: 'polygon-matic-logo',
-  Solana: 'solana-sol-logo',
-  Base: 'blue'
+  Arbitrum: 'arbitrum-arb-logo.svg',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
+  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
+  Polygon: 'polygon-matic-logo.svg',
+  Solana: 'solana-sol-logo.svg',
+  Base: 'blue',
+  Robinhood: 'robinhood-chain.png',
+  Cofinex: 'cofinexexchange_logo',
+  AnubisChain: 'anubis-chain.webp'
 }
 
 export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 32 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
@@ -125,7 +128,7 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
           <div className={`absolute ${badgePositionClass} ${badgeSizeClass} flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
             {chainIcons[chain] && chainIcons[chain] !== 'blue' ? (
               <Image
-                src={`/chain-logos/${chainIcons[chain]}.svg`}
+                src={`/chain-logos/${chainIcons[chain]}`}
                 alt={chain}
                 width={chainIconSize}
                 height={chainIconSize}
