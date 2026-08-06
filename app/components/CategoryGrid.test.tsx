@@ -1,7 +1,22 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import CategoryGrid from './CategoryGrid'
 import type { TokenWithHashtags, TokenCategory } from '@/shared/types'
+
+vi.mock('@/lib/supabase/client', () => ({
+  supabase: {
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        data: [
+          { id: 'Ethereum', icon: 'ethereum-eth-logo-diamond-purple.svg' },
+          { id: 'Solana', icon: 'solana-sol-logo.svg' },
+        ],
+        error: null,
+      })),
+    })),
+  },
+}))
+
+import CategoryGrid from './CategoryGrid'
 
 vi.mock('./CategoryContainer', () => ({
   default: ({ category, tokenCount, tokens, onMobileTokenClick }: {

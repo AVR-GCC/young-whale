@@ -62,6 +62,7 @@ interface MockQueryBuilder {
   limit: () => MockQueryBuilder
   maybeSingle: () => Promise<{ data: unknown; error: null }>
   single: () => Promise<{ data: unknown; error: null }>
+  then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) => Promise<unknown>
 }
 
 function createMockQueryBuilder(
@@ -447,7 +448,7 @@ describe('GET /api/cron/process', () => {
     }
 
     let chainsInsertCalled = false
-    let chainsInsertData: any = null
+    let chainsInsertData: Record<string, unknown> | null = null
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'processing_runs') {
@@ -475,9 +476,9 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'chains') {
-        const builder: any = {
+        const builder: MockQueryBuilder = {
           select: vi.fn(() => builder),
-          insert: vi.fn().mockImplementation((data: any) => {
+          insert: vi.fn().mockImplementation((data: Record<string, unknown>) => {
             chainsInsertCalled = true
             chainsInsertData = data
             return builder
@@ -493,7 +494,7 @@ describe('GET /api/cron/process', () => {
           then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
             Promise.resolve({ data: null, error: null }).then(onfulfilled),
         }
-        return builder as ReturnType<typeof supabaseService.from>
+        return builder as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'tokens') {

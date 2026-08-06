@@ -45,6 +45,7 @@ interface MockQueryBuilder {
   in: () => MockQueryBuilder
   maybeSingle: () => Promise<{ data: unknown; error: null }>
   single: () => Promise<{ data: unknown; error: null }>
+  then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) => Promise<unknown>
 }
 
 function createMockQueryBuilder(
@@ -228,7 +229,7 @@ describe('GET /api/cron/ingest', () => {
       })
     })
 
-    let insertedTokenData: any = null
+    let insertedTokenData: { chain?: string } & Record<string, unknown> | null = null
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'chains') {
@@ -239,9 +240,9 @@ describe('GET /api/cron/ingest', () => {
       }
 
       if (table === 'raw_tokens') {
-        const builder: any = {
+        const builder: Record<string, unknown> = {
           select: vi.fn(() => builder),
-          insert: vi.fn().mockImplementation((data: any) => {
+          insert: vi.fn().mockImplementation((data: Record<string, unknown>) => {
             insertedTokenData = data
             return builder
           }),
@@ -253,7 +254,7 @@ describe('GET /api/cron/ingest', () => {
           then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
             Promise.resolve({ data: null, error: null }).then(onfulfilled),
         }
-        return builder as ReturnType<typeof supabaseService.from>
+        return builder as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'processing_queue') {
@@ -271,7 +272,7 @@ describe('GET /api/cron/ingest', () => {
     expect(response.status).toBe(200)
     expect(json.imported).toBe(1)
     expect(insertedTokenData).toBeDefined()
-    expect(insertedTokenData.chain).toBe('chain-1')
+    expect(insertedTokenData && (insertedTokenData as Record<string, unknown>)['chain']).toBe('chain-1')
   })
 
   it('assigns chain "original" when no platform name and no explorer prefix matches', async () => {
@@ -303,7 +304,7 @@ describe('GET /api/cron/ingest', () => {
       })
     })
 
-    let insertedTokenData: any = null
+    let insertedTokenData: { chain?: string } & Record<string, unknown> | null = null
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'chains') {
@@ -314,9 +315,9 @@ describe('GET /api/cron/ingest', () => {
       }
 
       if (table === 'raw_tokens') {
-        const builder: any = {
+        const builder: MockQueryBuilder = {
           select: vi.fn(() => builder),
-          insert: vi.fn().mockImplementation((data: any) => {
+          insert: vi.fn().mockImplementation((data: { chain?: string } & Record<string, unknown>) => {
             insertedTokenData = data
             return builder
           }),
@@ -328,7 +329,7 @@ describe('GET /api/cron/ingest', () => {
           then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
             Promise.resolve({ data: null, error: null }).then(onfulfilled),
         }
-        return builder as ReturnType<typeof supabaseService.from>
+        return builder as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'processing_queue') {
@@ -346,7 +347,7 @@ describe('GET /api/cron/ingest', () => {
     expect(response.status).toBe(200)
     expect(json.imported).toBe(1)
     expect(insertedTokenData).toBeDefined()
-    expect(insertedTokenData.chain).toBe('original')
+    expect(insertedTokenData && (insertedTokenData as Record<string, unknown>)['chain']).toBe('original')
   })
 
   it('handles CMC API errors gracefully', async () => {
