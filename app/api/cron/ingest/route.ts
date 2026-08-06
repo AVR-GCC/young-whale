@@ -143,6 +143,7 @@ function mapCmcToRawToken(listing: {
       chain = 'AnubisChain';
     }
   }
+
   const contract_address = primaryContract?.contract_address ?? '';
   const source_url = `https://coinmarketcap.com/currencies/${details.slug}`;
 
