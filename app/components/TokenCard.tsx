@@ -92,19 +92,7 @@ function TimeSince({ date }: { date: string }) {
 //   )
 // }
 
-const chainIcons: Record<string, string> = {
-  Arbitrum: 'arbitrum-arb-logo.svg',
-  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
-  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
-  Polygon: 'polygon-matic-logo.svg',
-  Solana: 'solana-sol-logo.svg',
-  Base: 'blue',
-  Robinhood: 'robinhood-chain.png',
-  Cofinex: 'cofinexexchange_logo',
-  AnubisChain: 'anubis-chain.webp'
-}
-
-export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 32 }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string }) {
+export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size = 32, chainIcons }: { name: string; logoUrl: string | null; chain: string | null, size: number, className?: string, chainIcons: Record<string, string> }) {
   const [imageError, setImageError] = useState(false)
   const isSmall = size <= 32;
   const badgeSizeClass = isSmall ? 'w-4.5 h-4.5' : 'w-6 h-6';
@@ -153,7 +141,7 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
   )
 }
 
-export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction, onMobileClick }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void, onMobileClick?: () => void }) {
+export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction, onMobileClick, chainIcons }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void, onMobileClick?: () => void, chainIcons: Record<string, string> }) {
   const [isHovered, setIsHovered] = useState(false)
 
   const toggle = useCallback(() => {
@@ -271,7 +259,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         {/* Token Logo */}
         <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
           <div className="flex-shrink-0 transition-transform hover:scale-105">
-            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={32} />
+            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={32} chainIcons={chainIcons} />
           </div>
         </CustomTooltip>
 
@@ -339,7 +327,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         </div>
       </div>
 
-      <TokenTerminal token={token} themeColor={themeColor} isExpired={isExpired} isExpanded={isExpanded} />
+      <TokenTerminal token={token} themeColor={themeColor} isExpired={isExpired} isExpanded={isExpanded} chainIcons={chainIcons} />
       <div className="h-px w-full bg-[#1E293B] pointer-events-none flex-shrink-0 my-[2px]" />
     </div>
   )

@@ -53,7 +53,7 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
-export default function TokenTerminal({ token, themeColor, isExpired, isExpanded }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean }) {
+export default function TokenTerminal({ token, themeColor, isExpired, isExpanded, chainIcons }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean, chainIcons: Record<string, string> }) {
   const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
   const pairs = getPairsList(token.exchange_links);
@@ -127,7 +127,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
             {/* Mobile layout */}
             <div className="flex sm:hidden items-center justify-between w-full">
-              <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={80} />
+                <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={80} chainIcons={chainIcons} />
               <div className="flex flex-col flex-1 items-center">
                 <span
                   className="text-white text-[26px] sm:text-[102px] font-bold tracking-tight leading-none"
@@ -158,7 +158,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             <div className="hidden sm:flex items-center gap-2 shrink-0 z-10 self-end sm:self-auto">
               {buttons}
               <div className="shrink-0 ml-2 sm:ml-3">
-                <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={64} />
+                <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={64} chainIcons={chainIcons} />
               </div>
             </div>
           </div>

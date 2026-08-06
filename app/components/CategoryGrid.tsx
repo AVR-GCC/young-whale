@@ -8,6 +8,18 @@ import MobileCategoryFooter from './MobileCategoryFooter'
 import TokenTerminal from './TokenTerminal'
 import MobileSettingsMenu from './MobileSettingsMenu'
 
+const chainIcons: Record<string, string> = {
+  Arbitrum: 'arbitrum-arb-logo.svg',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
+  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
+  Polygon: 'polygon-matic-logo.svg',
+  Solana: 'solana-sol-logo.svg',
+  Base: 'blue',
+  Robinhood: 'robinhood-chain.png',
+  Cofinex: 'cofinexexchange_logo',
+  AnubisChain: 'anubis-chain.webp'
+}
+
 interface CategoryGridProps {
   tokens: TokenWithHashtags[]
   loading: boolean
@@ -169,6 +181,7 @@ export default function CategoryGrid({
         loading={loading}
         renderTitle={renderTitle}
         onMobileTokenClick={handleMobileTokenClick}
+        chainIcons={chainIcons}
       />
     )
   }
@@ -225,6 +238,7 @@ export default function CategoryGrid({
                     themeColor={overlayThemeColor}
                     isExpired={isExpired(prevToken)}
                     isExpanded={true}
+                    chainIcons={chainIcons}
                   />
                 ) : (
                   <div className="w-full h-full" />
@@ -238,6 +252,7 @@ export default function CategoryGrid({
                   themeColor={overlayThemeColor}
                   isExpired={isExpired(currentOverlayToken)}
                   isExpanded={true}
+                  chainIcons={chainIcons}
                 />
               </div>
 
@@ -249,6 +264,7 @@ export default function CategoryGrid({
                     themeColor={overlayThemeColor}
                     isExpired={isExpired(nextToken)}
                     isExpanded={true}
+                    chainIcons={chainIcons}
                   />
                 ) : (
                   <div className="w-full h-full" />

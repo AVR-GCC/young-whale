@@ -10,6 +10,18 @@ vi.mock('next/navigation', () => ({
 
 const mockSetIsExpanded = vi.fn()
 
+const chainIcons: Record<string, string> = {
+  Arbitrum: 'arbitrum-arb-logo.svg',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
+  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
+  Polygon: 'polygon-matic-logo.svg',
+  Solana: 'solana-sol-logo.svg',
+  Base: 'blue',
+  Robinhood: 'robinhood-chain.png',
+  Cofinex: 'cofinexexchange_logo',
+  AnubisChain: 'anubis-chain.webp'
+}
+
 const mockToken: TokenWithHashtags = {
   id: '1',
   name: 'TestToken',
@@ -101,43 +113,43 @@ describe('TokenCard', () => {
   })
 
   it('renders token name in header', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const names = screen.getAllByText('TestToken')
     expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders short description when available', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getAllByText('A test token for testing').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders time since creation for expired tokens', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Token created 5 days ago (> 48h), so it shows TimeSince value
     expect(screen.getByText('5d')).toBeDefined()
   })
 
   it('renders with minimal data (no optional fields)', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const names = screen.getAllByText('MinimalToken')
     expect(names.length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows initials when no logo_url', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const initials = screen.getAllByText('MI')
     expect(initials.length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows token logo when logo_url is provided', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const imgs = screen.getAllByAltText('TestToken icon')
     expect(imgs.length).toBeGreaterThanOrEqual(1)
     expect(imgs[0].getAttribute('src')).toBe('https://example.com/logo.png')
   })
 
   it('expands on click', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
     expect(card).toBeDefined()
 
@@ -148,7 +160,7 @@ describe('TokenCard', () => {
   })
 
   it('collapses on second click', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -163,12 +175,12 @@ describe('TokenCard', () => {
   })
 
   it('displays hashtags in collapsed view', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getAllByText('#Test').length).toBeGreaterThanOrEqual(1)
   })
 
   it('does not display hashtags when empty', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockTokenNoOptional} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.queryByText('#Test')).toBeNull()
   })
 
@@ -181,52 +193,52 @@ describe('TokenCard', () => {
         { id: '2', name: 'SecondTag', slug: 'secondtag', is_active: true, created_at: '2024-01-01T00:00:00Z' },
       ],
     }
-    render(<TokenCard themeColor="#ff0000" token={tokenWithDifferentMainHashtag} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={tokenWithDifferentMainHashtag} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('#SecondTag')).toBeDefined()
     expect(screen.queryByText('#FirstTag')).toBeNull()
   })
 
   it('renders TODAY for tokens created within 24 hours', () => {
     const recentToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders 1D AGO for tokens created between 24-48 hours ago', () => {
     const dayAgoToken = { ...mockToken, created_at: '2024-06-14T10:00:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={dayAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={dayAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('1D AGO')).toBeDefined()
   })
 
   it('renders TimeSince for tokens older than 48 hours', () => {
     const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={oldToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={oldToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('2d')).toBeDefined()
   })
 
   it('renders hours correctly for recent tokens', () => {
     const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={hoursAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={hoursAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders minutes correctly for very recent tokens', () => {
     const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
-    render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders seconds correctly for just created tokens', () => {
     const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
-    render(<TokenCard themeColor="#ff0000" token={secondsAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={secondsAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('applies hover styles on mouse enter', () => {
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -246,7 +258,7 @@ describe('TokenCard', () => {
       value: 375,
     })
 
-    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} />)
+    render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
     if (card) {
@@ -279,6 +291,7 @@ describe('TokenCard', () => {
         isExpanded={false}
         setIsExpandedAction={mockSetIsExpanded}
         onMobileClick={mockOnMobileClick}
+        chainIcons={chainIcons}
       />
     )
     const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')

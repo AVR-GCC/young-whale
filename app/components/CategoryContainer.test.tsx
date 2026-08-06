@@ -11,6 +11,18 @@ vi.mock('next/navigation', () => ({
 
 const mockSetSelectedToken = vi.fn()
 
+const chainIcons: Record<string, string> = {
+  Arbitrum: 'arbitrum-arb-logo.svg',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
+  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
+  Polygon: 'polygon-matic-logo.svg',
+  Solana: 'solana-sol-logo.svg',
+  Base: 'blue',
+  Robinhood: 'robinhood-chain.png',
+  Cofinex: 'cofinexexchange_logo',
+  AnubisChain: 'anubis-chain.webp'
+}
+
 const mockTokens: TokenWithHashtags[] = [
   {
     id: '1',
@@ -229,6 +241,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
@@ -244,6 +257,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={false}
+        chainIcons={chainIcons}
       />
     )
     expect(screen.queryByText(categories[0].title)).toBeNull()
@@ -259,6 +273,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
     expect(
@@ -276,6 +291,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
@@ -293,6 +309,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
     expect(screen.queryByText('+')).toBeNull()
@@ -318,6 +335,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
 
@@ -340,6 +358,7 @@ describe('CategoryContainer', () => {
           setSelectedTokenAction={mockSetSelectedToken}
           loading={false}
           renderTitle={true}
+          chainIcons={chainIcons}
         />
       )
       expect(screen.getByText(category.title)).toBeDefined()
@@ -357,6 +376,7 @@ describe('CategoryContainer', () => {
         setSelectedTokenAction={mockSetSelectedToken}
         loading={true}
         renderTitle={true}
+        chainIcons={chainIcons}
       />
     )
     // Token names should not be visible while loading

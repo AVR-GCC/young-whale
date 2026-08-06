@@ -5,6 +5,18 @@ import TokenTerminal from '@/app/components/TokenTerminal'
 import { categories } from '@/app/lib/categories'
 import type { TokenWithHashtags } from '@/shared/types'
 
+const chainIcons: Record<string, string> = {
+  Arbitrum: 'arbitrum-arb-logo.svg',
+  ['BNB Smart Chain (BEP20)']: 'bnb-bnb-logo.svg',
+  Ethereum: 'ethereum-eth-logo-diamond-purple.svg',
+  Polygon: 'polygon-matic-logo.svg',
+  Solana: 'solana-sol-logo.svg',
+  Base: 'blue',
+  Robinhood: 'robinhood-chain.png',
+  Cofinex: 'cofinexexchange_logo',
+  AnubisChain: 'anubis-chain.webp'
+}
+
 interface TokenPageProps {
   params: Promise<{ slug: string }>
 }
@@ -111,6 +123,7 @@ export default async function TokenPage({ params }: TokenPageProps) {
         themeColor={themeColor}
         isExpired={isExpired}
         isExpanded={true}
+        chainIcons={chainIcons}
       />
     </>
   )
