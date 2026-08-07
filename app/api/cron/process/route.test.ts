@@ -19,6 +19,7 @@ vi.mock('@/lib/supabase/service', () => ({
       or: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       neq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       single: vi.fn().mockResolvedValue({ data: null, error: null }),
     })),
@@ -66,6 +67,7 @@ interface MockQueryBuilder {
   in: () => MockQueryBuilder
   or: () => MockQueryBuilder
   limit: () => MockQueryBuilder
+  order: () => MockQueryBuilder
   maybeSingle: () => Promise<{ data: unknown; error: null }>
   single: () => Promise<{ data: unknown; error: null }>
   then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) => Promise<unknown>
@@ -86,6 +88,7 @@ function createMockQueryBuilder(
     or: vi.fn(() => builder),
     limit: vi.fn(() => builder),
     neq: vi.fn(() => builder),
+    order: vi.fn(() => builder),
     maybeSingle: overrides.maybeSingle ?? vi.fn().mockResolvedValue({ data: null, error: null }),
     single: overrides.single ?? vi.fn().mockResolvedValue({ data: null, error: null }),
     then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
@@ -542,6 +545,7 @@ describe('GET /api/cron/process', () => {
           in: vi.fn(() => builder),
           or: vi.fn(() => builder),
           limit: vi.fn(() => builder),
+          order: vi.fn(() => builder),
           maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
           single: vi.fn().mockResolvedValue({ data: null, error: null }),
           then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
@@ -1052,5 +1056,32 @@ describe('GET /api/cron/process', () => {
     expect(response.status).toBe(200)
     expect(json.runId).toBe('run-1')
     expect(json.status).toBe('running')
+  })
+
+  it('returns existing running run instead of creating a new one', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createMockQueryBuilder(
+          {
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'existing-run-1', message: 'Already processing' },
+              error: null,
+            }),
+          },
+          { data: { id: 'existing-run-1', message: 'Already processing' }, error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('existing-run-1')
+    expect(json.status).toBe('running')
+    expect(json.message).toBe('Already processing')
   })
 })

@@ -591,6 +591,20 @@ export async function GET(request: Request) {
   }
 
   try {
+    const { data: existingRun } = await supabaseService
+      .from('processing_runs')
+      .select('*')
+      .eq('status', 'running')
+      .maybeSingle()
+
+    if (existingRun) {
+      return NextResponse.json({
+        runId: existingRun.id,
+        status: 'running',
+        message: existingRun.message,
+      })
+    }
+
     const { data: run, error: insertError } = await supabaseService
       .from('processing_runs')
       .insert({ status: 'running' })
