@@ -12,6 +12,7 @@ import type {
   Confidence,
   ProcessingRun,
 } from '@/shared/types'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 export const maxDuration = 60
 
@@ -582,10 +583,10 @@ async function runProcessing(runId: string) {
 }
 
 export async function GET(request: Request) {
-  // if (process.env.NODE_ENV !== 'development') {
-  if (false) {
+  if (process.env.NODE_ENV !== 'development') {
     if (!verifyCronRequest(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      const authResult = await requireAdminApi()
+      if (authResult instanceof NextResponse) return authResult
     }
   }
 

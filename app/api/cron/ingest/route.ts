@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 const CMC_BASE_URL = 'https://pro-api.coinmarketcap.com'
 
@@ -263,7 +264,8 @@ async function syncHashtags(hashtagMap: Map<string, string>) {
 export async function GET(request: Request) {
   if (process.env.NODE_ENV !== 'development') {
     if (!verifyCronRequest(request)) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      const authResult = await requireAdminApi()
+      if (authResult instanceof NextResponse) return authResult
     }
   }
 

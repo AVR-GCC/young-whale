@@ -1,6 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { NextResponse } from 'next/server'
 import { GET } from './route'
 import { supabaseService } from '@/lib/supabase/service'
+import { verifyCronRequest } from '@/lib/cron/verify'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
@@ -13,6 +16,14 @@ vi.mock('@/lib/supabase/service', () => ({
       single: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
     })),
   },
+}))
+
+vi.mock('@/lib/cron/verify', () => ({
+  verifyCronRequest: vi.fn(),
+}))
+
+vi.mock('@/lib/admin-auth', () => ({
+  requireAdminApi: vi.fn(),
 }))
 
 const mockListings = Array.from({ length: 50 }, (_, i) => ({
@@ -67,10 +78,12 @@ function createMockQueryBuilder(
   return builder as MockQueryBuilder & PromiseLike<{ data: unknown; error: unknown }>
 }
 
-function createRequest(): Request {
-  return new Request('http://localhost/api/cron/ingest', {
-    headers: { Authorization: 'Bearer test-cron-secret' },
-  })
+function createRequest(authHeader?: string): Request {
+  const headers: Record<string, string> = {}
+  if (authHeader) {
+    headers.Authorization = authHeader
+  }
+  return new Request('http://localhost/api/cron/ingest', { headers })
 }
 
 function setupMockFetch() {
@@ -94,30 +107,63 @@ function setupMockFetch() {
 describe('GET /api/cron/ingest', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(supabaseService.from).mockImplementation(() => createMockQueryBuilder() as any)
-    
+    vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('COINMARKETCAP_API_KEY', 'test-cmc-key')
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.mocked(supabaseService.from).mockImplementation(() => createMockQueryBuilder() as any)
   })
 
   afterEach(() => {
     vi.unstubAllEnvs()
   })
 
-  it('returns 401 when Authorization header is missing', async () => {
-    const request = new Request('http://localhost/api/cron/ingest')
-    const response = await GET(request)
+  it('returns 401 when not in development and both cron and admin auth fail', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue(
+      NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) as Awaited<ReturnType<typeof requireAdminApi>>
+    )
+
+    const response = await GET(createRequest('Bearer wrong-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(401)
     expect(json.error).toBe('Unauthorized')
   })
 
-  it('returns 500 when COINMARKETCAP_API_KEY is not set', async () => {
-    vi.stubEnv('COINMARKETCAP_API_KEY', '')
+  it('bypasses auth check in development mode', async () => {
+    vi.stubEnv('NODE_ENV', 'development')
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+
+    setupMockFetch()
 
     const response = await GET(createRequest())
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+  })
+
+  it('allows access with valid admin auth when cron verification fails', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
+
+    setupMockFetch()
+
+    const response = await GET(createRequest('Bearer admin-token'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+  })
+
+  it('returns 500 when COINMARKETCAP_API_KEY is not set', async () => {
+    vi.stubEnv('COINMARKETCAP_API_KEY', '')
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(500)
@@ -125,6 +171,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('ingests 20 tokens when raw_tokens table is empty', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const mockMaybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: null, error: null }) // isRawTokensTableEmpty check
       .mockResolvedValue({ data: null, error: null })     // individual token checks
@@ -136,7 +184,7 @@ describe('GET /api/cron/ingest', () => {
 
     setupMockFetch()
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -144,6 +192,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('stops ingesting when it finds an existing token', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const mockMaybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: { id: 'existing-id' }, error: null }) // not empty
       .mockResolvedValueOnce({ data: null, error: null })                  // token 1 doesn't exist
@@ -156,7 +206,7 @@ describe('GET /api/cron/ingest', () => {
 
     setupMockFetch()
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -164,6 +214,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('adds jobs to processing_queue after ingesting tokens', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const mockMaybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: null, error: null }) // isRawTokensTableEmpty check
       .mockResolvedValue({ data: null, error: null })     // individual token checks
@@ -188,7 +240,7 @@ describe('GET /api/cron/ingest', () => {
 
     setupMockFetch()
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -200,6 +252,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('assigns chain id from chains table when explorer matches prefix', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const mockChains = [
       { id: 'chain-1', explorer_prefix: 'https://example-explorer.com/token/' },
       { id: 'chain-2', explorer_prefix: 'https://other-explorer.com/address/' },
@@ -266,7 +320,7 @@ describe('GET /api/cron/ingest', () => {
       }) as unknown as ReturnType<typeof supabaseService.from>
     })
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -276,6 +330,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('assigns chain "original" when no platform name and no explorer prefix matches', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const mockChains = [
       { id: 'chain-1', explorer_prefix: 'https://example-explorer.com/token/' },
     ]
@@ -341,7 +397,7 @@ describe('GET /api/cron/ingest', () => {
       }) as unknown as ReturnType<typeof supabaseService.from>
     })
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
@@ -351,9 +407,10 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('handles CMC API errors gracefully', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
     mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(500)
@@ -361,6 +418,8 @@ describe('GET /api/cron/ingest', () => {
   })
 
   it('bulk inserts new hashtags after ingesting tokens', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
     const detailsWithTags = {
       ...mockDetails,
       tags: ['defi', 'ai', 'meme'],
@@ -405,7 +464,7 @@ describe('GET /api/cron/ingest', () => {
       }) as unknown as ReturnType<typeof supabaseService.from>
     })
 
-    const response = await GET(createRequest())
+    const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(200)

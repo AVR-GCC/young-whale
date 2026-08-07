@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { NextResponse } from 'next/server'
 import { GET } from './route'
 import { supabaseService } from '@/lib/supabase/service'
 import { generateText } from 'ai'
 import { verifyCronRequest } from '@/lib/cron/verify'
+import { requireAdminApi } from '@/lib/admin-auth'
 
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
@@ -41,6 +43,10 @@ vi.mock('ai', () => ({
 
 vi.mock('@/lib/cron/verify', () => ({
   verifyCronRequest: vi.fn(),
+}))
+
+vi.mock('@/lib/admin-auth', () => ({
+  requireAdminApi: vi.fn(),
 }))
 
 vi.mock('next/server', async () => {
@@ -210,6 +216,53 @@ describe('GET /api/cron/process', () => {
     })
 
     const response = await GET(createRequest())
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
+  })
+
+  it('returns 401 when not in development and both cron and admin auth fail', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue(
+      NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) as Awaited<ReturnType<typeof requireAdminApi>>
+    )
+
+    const response = await GET(createRequest('Bearer wrong-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(401)
+    expect(json.error).toBe('Unauthorized')
+  })
+
+  it('allows access with valid admin auth when cron verification fails', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
+
+    let callCount = 0
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      callCount++
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+      if (callCount === 2) {
+        return createMockQueryBuilder(
+          {},
+          { data: [{ slug: 'defi' }, { slug: 'ai' }], error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder(
+        {},
+        { data: [], error: null }
+      ) as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer admin-token'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
