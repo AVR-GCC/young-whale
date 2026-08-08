@@ -1,6 +1,7 @@
 import { Pin } from 'lucide-react';
 
 interface RatingBadgeProps {
+  isPresale: boolean;
   isPromoted: boolean;
   isExpired: boolean;
   isHovered: boolean;

@@ -138,7 +138,7 @@ describe('GET /api/cron/ingest', () => {
     setupMockFetch()
 
     const response = await GET(createRequest())
-    const json = await response.json()
+    // const json = await response.json()
 
     expect(response.status).toBe(200)
   })
@@ -154,7 +154,7 @@ describe('GET /api/cron/ingest', () => {
     setupMockFetch()
 
     const response = await GET(createRequest('Bearer admin-token'))
-    const json = await response.json()
+    // const json = await response.json()
 
     expect(response.status).toBe(200)
   })

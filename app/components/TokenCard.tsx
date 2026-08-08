@@ -172,6 +172,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   // const socialEntries = Object.entries(token.social_links).filter(([, url]) => url)
 
+  const isPresale = token.category === 'Presale'
   const isPromoted = token.is_promoted
   const [now] = useState(() => Date.now())
   const isExpired = useMemo(() => {
@@ -189,7 +190,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     timeLabel = <>FEATURED</>;
   } else if (!isExpired) {
     timeLabel = <>TODAY</>;
-  } else if (token.category === 'Presale') {
+  } else if (isPresale) {
     timeLabel = <>{token.presale_status}</>;
   } else if (!isBeforeYesterday) {
     timeLabel = <>1D AGO</>;
@@ -203,6 +204,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     <CustomTooltip content={isPromoted ? 'Sponsored Ping.' : (isExpired ? 'Expired score. Sonar ping timed out.' : <div className="text-center">Live Sonar Score.<br/>Valid for 24 hours only.</div>)} position="left" borderColor={themeColor}>
       <div className="flex-shrink-0 flex items-center justify-center w-7 ml-0 sm:ml-1 h-7">
         <RatingBadge
+          isPresale={isPresale}
           isPromoted={isPromoted}
           isExpired={isExpired}
           isHovered={isHovered}

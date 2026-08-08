@@ -145,6 +145,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                 </div>
                 <div className="h-1" />
                 <RatingBadge
+                  isPresale={token.category === 'Presale'}
                   isPromoted={token.is_promoted}
                   isExpired={isExpired}
                   isHovered={false}
