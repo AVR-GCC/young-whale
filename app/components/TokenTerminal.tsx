@@ -54,6 +54,7 @@ function getPairsList(exchangeLinks: string[]) {
 }
 
 export default function TokenTerminal({ token, themeColor, isExpired, isExpanded, chainIcons }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean, chainIcons: Record<string, string> }) {
+  const isPresale = token.category === 'Presale';
   const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
   const pairs = getPairsList(token.exchange_links);
@@ -65,7 +66,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
       <div className="text-[8px] sm:text-[9px] font-bold tracking-[0.16em] text-white/50 uppercase bg-white/5 border border-white/5 rounded-full px-2 sm:px-3 py-1 text-center truncate">
         YOUNGWHALE TERMINAL
       </div>
-      {!isExpired && (
+      {!isExpired && !isPresale && (
         <div className="flex items-center gap-1.5 text-[8px] sm:text-[9px] font-bold tracking-[0.12em] uppercase shrink-0" style={{ color: themeColor }}>
           <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }}></div>
           LIVE
@@ -145,7 +146,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                 </div>
                 <div className="h-1" />
                 <RatingBadge
-                  isPresale={token.category === 'Presale'}
+                  isPresale={isPresale}
                   isPromoted={token.is_promoted}
                   isExpired={isExpired}
                   isHovered={false}
@@ -234,7 +235,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                 <div className="flex items-center">
                   <span>${symbol.toUpperCase()}</span>
                   <span>@</span>
-                  <span className="tracking-wide font-bold">trade</span>
+                  <span className="tracking-wide font-bold">{isPresale ? 'participate' : 'trade'}</span>
                   <span className="mr-1 font-bold">:</span>
                 </div>
               </div>
