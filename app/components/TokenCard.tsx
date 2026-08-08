@@ -185,7 +185,9 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
   }, [token.created_at, now])
 
   let timeLabel;
-  if (isPromoted) {
+  if (token.category === 'Presale') {
+    timeLabel = <>{token.presale_status}</>;
+  } else if (isPromoted) {
     timeLabel = <>FEATURED</>;
   } else if (!isExpired) {
     timeLabel = <>TODAY</>;

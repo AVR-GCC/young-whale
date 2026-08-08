@@ -108,6 +108,7 @@ export interface Token {
   published_at: string | null
   created_at: string
   updated_at: string
+  presale_status: string | null
 }
 
 // Token with hashtags joined — used in frontend feeds
