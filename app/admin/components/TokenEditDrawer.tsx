@@ -260,6 +260,10 @@ export default function TokenEditDrawer({
 
   const handleApprove = async () => {
     if (!token || !tokenId) return
+    if (!token.rating) {
+      showToast('Cannot approve without rating', 'error')
+      return
+    }
     try {
       const res = await fetch(`/api/admin/tokens/${tokenId}`, {
         method: 'PATCH',
