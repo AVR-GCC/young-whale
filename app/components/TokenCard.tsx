@@ -192,7 +192,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
   } else if (!isBeforeYesterday) {
     timeLabel = <>1D AGO</>;
   } else {
-    timeLabel = <TimeSince date={token.created_at} />;
+    timeLabel = <TimeSince date={token.published_at || ''} />;
   }
 
   const displayHashtag = (token.hashtags.find(h => h.slug === token.main_hashtag)?.name) || token.main_hashtag
