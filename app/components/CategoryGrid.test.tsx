@@ -98,6 +98,7 @@ const createMockToken = (id: string, name: string, category: TokenCategory, crea
   status: 'approved',
   is_promoted: false,
   is_verified: false,
+  presale_status: null,
   main_hashtag: null,
   rating: 0,
   supply: 1000000,

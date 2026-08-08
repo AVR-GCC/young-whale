@@ -53,12 +53,13 @@ const mockToken: TokenWithHashtags = {
   status: 'approved',
   is_promoted: false,
   is_verified: true,
+  presale_status: null,
   main_hashtag: 'Test',
   rating: 4.5,
   supply: 1000000,
   created_at: '2024-06-10T10:00:00Z',
   updated_at: '2024-06-10T10:00:00Z',
-    published_at: null,
+    published_at: '2024-06-10T10:00:00Z',
   hashtags: [
     { id: '1', name: 'Test', slug: 'test', is_active: true, created_at: '2024-01-01T00:00:00Z' },
     { id: '2', name: 'DeFi', slug: 'defi', is_active: true, created_at: '2024-01-01T00:00:00Z' },
@@ -91,12 +92,13 @@ const mockTokenNoOptional: TokenWithHashtags = {
   status: 'approved',
   is_promoted: false,
   is_verified: false,
+  presale_status: null,
   main_hashtag: null,
   rating: 0,
   supply: null,
   created_at: '2024-06-09T10:00:00Z',
   updated_at: '2024-06-09T10:00:00Z',
-    published_at: null,
+    published_at: '2024-06-09T10:00:00Z',
   hashtags: [],
 }
 
@@ -211,7 +213,7 @@ describe('TokenCard', () => {
   })
 
   it('renders TimeSince for tokens older than 48 hours', () => {
-    const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z' }
+    const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z', published_at: '2024-06-13T10:00:00Z' }
     render(<TokenCard themeColor="#ff0000" token={oldToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('2d')).toBeDefined()
   })

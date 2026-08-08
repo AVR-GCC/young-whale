@@ -57,6 +57,7 @@ const mockToken: TokenWithHashtags = {
   status: 'approved',
   is_promoted: false,
   is_verified: true,
+  presale_status: null,
   main_hashtag: 'defi',
   rating: 5,
   supply: 1000000,
