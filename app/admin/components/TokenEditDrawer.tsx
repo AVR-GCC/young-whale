@@ -623,6 +623,21 @@ export default function TokenEditDrawer({
                 </select>
               </div>
 
+              {currentToken.category === 'Presale' && (
+                <div>
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    Status
+                  </label>
+                  <input
+                    type="text"
+                    value={currentToken.presale_status ?? ''}
+                    onChange={(e) => updateField('presale_status', e.target.value)}
+                    maxLength={60}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                   Short Description (max 6 words, beginner-friendly)
