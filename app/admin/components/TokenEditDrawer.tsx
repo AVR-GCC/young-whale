@@ -197,6 +197,9 @@ export default function TokenEditDrawer({
     try {
       const body: Record<string, unknown> = {}
       const fields: (keyof Token)[] = [
+        'name',
+        'symbol',
+        'contract_address',
         'slug',
         'chain',
         'category',
@@ -525,35 +528,23 @@ export default function TokenEditDrawer({
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                     Name
                   </label>
-                  {isCreate ? (
-                    <input
-                      type="text"
-                      value={editedToken.name || ''}
-                      onChange={(e) => updateField('name', e.target.value)}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                    />
-                  ) : (
-                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                      {token?.name}
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={editedToken.name || token?.name || ''}
+                    onChange={(e) => updateField('name', e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                     Symbol
                   </label>
-                  {isCreate ? (
-                    <input
-                      type="text"
-                      value={editedToken.symbol || ''}
-                      onChange={(e) => updateField('symbol', e.target.value)}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                    />
-                  ) : (
-                    <div className="px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300">
-                      {token?.symbol}
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={editedToken.symbol || token?.symbol || ''}
+                    onChange={(e) => updateField('symbol', e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
                 </div>
               </div>
 
@@ -579,48 +570,27 @@ export default function TokenEditDrawer({
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                     Contract Address
                   </label>
-                  {isCreate ? (
+                  <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      value={editedToken.contract_address || ''}
+                      value={editedToken.contract_address || token?.contract_address || ''}
                       onChange={(e) => updateField('contract_address', e.target.value || null)}
-                      className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm font-mono"
+                      className="flex-1 px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm font-mono"
                     />
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 px-3 py-2 bg-zinc-100 dark:bg-zinc-800 rounded text-sm text-zinc-700 dark:text-zinc-300 truncate font-mono">
-                        {token?.contract_address ?? 'N/A'}
-                      </div>
-                      {token?.contract_address && (
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(token.contract_address!)
-                            showToast('Copied to clipboard', 'success')
-                          }}
-                          className="px-2 py-1 text-xs bg-zinc-200 dark:bg-zinc-700 rounded hover:bg-zinc-300 dark:hover:bg-zinc-600"
-                        >
-                          Copy
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    {token?.contract_address && (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(token.contract_address!)
+                          showToast('Copied to clipboard', 'success')
+                        }}
+                        className="px-2 py-1 text-xs bg-zinc-200 dark:bg-zinc-700 rounded hover:bg-zinc-300 dark:hover:bg-zinc-600"
+                      >
+                        Copy
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              {isCreate && (
-                <div>
-                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Slug
-                  </label>
-                  <input
-                    type="text"
-                    value={editedToken.slug || ''}
-                    onChange={(e) => updateField('slug', e.target.value)}
-                    placeholder="e.g. pepe-ai-coin"
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                  />
-                </div>
-              )}
 
               {/* Editable fields */}
               <div>
