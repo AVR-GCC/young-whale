@@ -185,12 +185,12 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
   }, [token.created_at, now])
 
   let timeLabel;
-  if (token.category === 'Presale') {
-    timeLabel = <>{token.presale_status}</>;
-  } else if (isPromoted) {
+  if (isPromoted) {
     timeLabel = <>FEATURED</>;
   } else if (!isExpired) {
     timeLabel = <>TODAY</>;
+  } else if (token.category === 'Presale') {
+    timeLabel = <>{token.presale_status}</>;
   } else if (!isBeforeYesterday) {
     timeLabel = <>1D AGO</>;
   } else {
