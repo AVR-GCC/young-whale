@@ -523,7 +523,7 @@ export default function TokenEditDrawer({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Name {isCreate && <span className="text-red-500">*</span>}
+                    Name
                   </label>
                   {isCreate ? (
                     <input
@@ -540,7 +540,7 @@ export default function TokenEditDrawer({
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Symbol {isCreate && <span className="text-red-500">*</span>}
+                    Symbol
                   </label>
                   {isCreate ? (
                     <input
@@ -560,7 +560,7 @@ export default function TokenEditDrawer({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Chain {isCreate && <span className="text-red-500">*</span>}
+                    Chain
                   </label>
                   <select
                     value={editedToken.chain || token?.chain || ''}
@@ -610,7 +610,7 @@ export default function TokenEditDrawer({
               {isCreate && (
                 <div>
                   <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    Slug <span className="text-red-500">*</span>
+                    Slug
                   </label>
                   <input
                     type="text"
