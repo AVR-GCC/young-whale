@@ -55,7 +55,8 @@ export default function CategoryContainer({
   })
 
   const promotedList = sortedTokens.filter(st => st.is_promoted)
-  const sliced = sortedTokens.slice(0, limit)
+  const unpromotedList = sortedTokens.filter(st => !st.is_promoted)
+  const sliced = unpromotedList.slice(0, limit)
 
   return (
     <div className="flex flex-col bg-[#0B0F19] rounded-xl overflow-hidden border border-[#1E293B]/40 transition-colors break-inside-avoid">
@@ -88,7 +89,7 @@ export default function CategoryContainer({
             {[...Array(5)].map((_, i) => <SkeletonTokenRow key={`skeleton-${category.id}-${i}`} />)}
           </>
         ) : (
-          sliced.length > 0 ? (
+          sliced.length > 0 || promotedList.length > 0 ? (
             <>
               {/* Sliced List */}
               <div className="flex flex-col">
