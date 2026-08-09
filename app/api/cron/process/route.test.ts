@@ -360,8 +360,8 @@ describe('GET /api/cron/process', () => {
 
     const dexScreenerResponse = {
       pairs: [
-        { url: 'https://dexscreener.com/ethereum/0xabc' },
-        { url: 'https://dexscreener.com/ethereum/0xdef' },
+        { url: 'https://dexscreener.com/ethereum/0xabc', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'WETH' }, marketCap: 1000000 },
+        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 2000000 },
       ],
     }
 
@@ -369,6 +369,8 @@ describe('GET /api/cron/process', () => {
       ok: true,
       json: vi.fn().mockResolvedValue(dexScreenerResponse),
     } as unknown as Response)
+
+    let tokenUpsertData: Record<string, unknown> | null = null
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'processing_runs') {
@@ -396,7 +398,7 @@ describe('GET /api/cron/process', () => {
       }
 
       if (table === 'tokens') {
-        return createMockQueryBuilder({
+        const builder = createMockQueryBuilder({
           single: vi.fn().mockResolvedValue({
             data: { id: 'token-1' },
             error: null,
@@ -405,7 +407,12 @@ describe('GET /api/cron/process', () => {
             data: null,
             error: null,
           }),
-        }) as unknown as ReturnType<typeof supabaseService.from>
+        })
+        builder.upsert = vi.fn().mockImplementation((data: Record<string, unknown>) => {
+          tokenUpsertData = data
+          return builder
+        })
+        return builder as unknown as ReturnType<typeof supabaseService.from>
       }
 
       if (table === 'token_hashtags') {
@@ -418,9 +425,116 @@ describe('GET /api/cron/process', () => {
     const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
+    // Wait for background processing to complete
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
     expect(response.status).toBe(200)
     expect(json.runId).toBe('run-1')
     expect(json.status).toBe('running')
+    expect(global.fetch).toHaveBeenCalledWith(
+      `https://api.dexscreener.com/latest/dex/search?q=${encodeURIComponent(mockRawToken.contract_address)}`
+    )
+    expect(tokenUpsertData).not.toBeNull()
+    expect(tokenUpsertData!.exchange_links).toEqual([
+      'TEST_USDC_https://dexscreener.com/ethereum/0xdef',
+      'TEST_WETH_https://dexscreener.com/ethereum/0xabc',
+    ])
+    expect(tokenUpsertData!.preferred_exchange).toBe('TEST_USDC_https://dexscreener.com/ethereum/0xdef')
+  })
+
+  it('sorts DexScreener links by marketCap, prefixes with token symbols, and deduplicates', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+    vi.mocked(generateText).mockResolvedValue({
+      text: JSON.stringify(mockAIResult),
+    } as unknown as Awaited<ReturnType<typeof generateText>>)
+
+    const dexScreenerResponse = {
+      pairs: [
+        // Lower market cap - should come last
+        { url: 'https://dexscreener.com/ethereum/0xabc', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'WETH' }, marketCap: 1000000 },
+        // Higher market cap - should come first
+        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 5000000 },
+        // Medium market cap - should come second
+        { url: 'https://dexscreener.com/ethereum/0xghi', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'DAI' }, marketCap: 3000000 },
+        // Duplicate URL - should be deduplicated
+        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 6000000 },
+      ],
+    }
+
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockResolvedValue(dexScreenerResponse),
+    } as unknown as Response)
+
+    let tokenUpsertData: Record<string, unknown> | null = null
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createProcessingRunsMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'hashtags') {
+        return createMockQueryBuilder(
+          {},
+          { data: [{ slug: 'defi' }, { slug: 'ai' }], error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'processing_queue') {
+        return createQueueMock() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'raw_tokens') {
+        return createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { ...mockRawToken, exchange_links: [] },
+            error: null,
+          }),
+        }) as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'tokens') {
+        const builder = createMockQueryBuilder({
+          single: vi.fn().mockResolvedValue({
+            data: { id: 'token-1' },
+            error: null,
+          }),
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: null,
+            error: null,
+          }),
+        })
+        builder.upsert = vi.fn().mockImplementation((data: Record<string, unknown>) => {
+          tokenUpsertData = data
+          return builder
+        })
+        return builder as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      if (table === 'token_hashtags') {
+        return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+      }
+
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    // Wait for background processing to complete
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
+    expect(tokenUpsertData).not.toBeNull()
+    // Should be sorted by marketCap descending, deduplicated, and prefixed with symbols
+    expect(tokenUpsertData!.exchange_links).toEqual([
+      'TEST_USDC_https://dexscreener.com/ethereum/0xdef',
+      'TEST_DAI_https://dexscreener.com/ethereum/0xghi',
+      'TEST_WETH_https://dexscreener.com/ethereum/0xabc',
+    ])
+    expect(tokenUpsertData!.preferred_exchange).toBe('TEST_USDC_https://dexscreener.com/ethereum/0xdef')
   })
 
   it('processes a job successfully end-to-end', async () => {

@@ -243,7 +243,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                     </div>
                   </div>
                   <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                    {pairs.map((pair, idx) => (
+                    {pairs.slice(0, 2).map((pair, idx) => (
                       <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
                         [{pair.name}]
                       </a>
