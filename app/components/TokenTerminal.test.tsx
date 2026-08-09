@@ -129,9 +129,9 @@ describe('TokenTerminal', () => {
     expect(screen.getByText(/0x1234/)).toBeDefined()
   })
 
-  it('displays N/A when contract address is null', () => {
+  it('hides contract row when contract address is null', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockTokenNoOptional} isExpired={false} isExpanded={true} chainIcons={chainIcons} />)
-    expect(screen.getByText((content) => content.includes('N/A'))).toBeDefined()
+    expect(screen.queryByText((content) => content.includes('N/A'))).toBeNull()
   })
 
   it('displays social links', () => {
@@ -159,9 +159,9 @@ describe('TokenTerminal', () => {
     expect(screen.getByText('[TEST/BNB]')).toBeDefined()
   })
 
-  it('displays no pairs message when exchange links are empty', () => {
+  it('hides trade row when exchange links are empty', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockTokenNoOptional} isExpired={false} isExpanded={true} chainIcons={chainIcons} />)
-    expect(screen.getByText('[NO PAIRS FOUND]')).toBeDefined()
+    expect(screen.queryByText('[NO PAIRS FOUND]')).toBeNull()
   })
 
   it('displays supply', () => {

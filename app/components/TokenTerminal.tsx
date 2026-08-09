@@ -188,127 +188,133 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
           </div>
 
           {/* Shell */}
-          <div className="p-4 sm:p-6 pt-0 flex flex-col gap-2.5 font-mono">
-            {/* Socials Section */}
-            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative">
-              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                <div className="flex items-center">
-                  <span>${symbol.toUpperCase()}</span>
-                  <span>@</span>
-                  <span className="tracking-wide font-bold">socials</span>
-                  <span className="mr-1 font-bold">:</span>
-                </div>
-              </div>
+            <div className="p-4 sm:p-6 pt-0 flex flex-col gap-2.5 font-mono">
+              {/* Socials Section */}
+              {(token.website_url || socials.twitter || socials.telegram || socials.discord || socials.facebook) && (
+                <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative">
+                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+                    <div className="flex items-center">
+                      <span>${symbol.toUpperCase()}</span>
+                      <span>@</span>
+                      <span className="tracking-wide font-bold">socials</span>
+                      <span className="mr-1 font-bold">:</span>
+                    </div>
+                  </div>
 
-              <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                {token.website_url && (
-                  <a href={token.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                    {token.website_url.replace(/^https?:\/\//, '')}
-                  </a>
-                )}
-                {socials.twitter && (
-                  <a href={socials.twitter} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                    x.com/{socials.twitter.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
-                  </a>
-                )}
-                {socials.telegram && (
-                  <a href={socials.telegram} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                    t.me/{socials.telegram.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
-                  </a>
-                )}
-                {socials.discord && (
-                  <a href={socials.discord} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                    discord
-                  </a>
-                )}
-                {socials.facebook && (
-                  <a href={socials.facebook} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                    facebook
-                  </a>
-                )}
-              </div>
-            </div>
-
-            {/* Trade Row */}
-            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                <div className="flex items-center">
-                  <span>${symbol.toUpperCase()}</span>
-                  <span>@</span>
-                  <span className="tracking-wide font-bold">{isPresale ? 'participate' : 'trade'}</span>
-                  <span className="mr-1 font-bold">:</span>
+                  <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    {token.website_url && (
+                      <a href={token.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                        {token.website_url.replace(/^https?:\/\//, '')}
+                      </a>
+                    )}
+                    {socials.twitter && (
+                      <a href={socials.twitter} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                        x.com/{socials.twitter.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
+                      </a>
+                    )}
+                    {socials.telegram && (
+                      <a href={socials.telegram} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                        t.me/{socials.telegram.replace(/^https?:\/\/[^/]+\//, '').replace(/^@/, '')}
+                      </a>
+                    )}
+                    {socials.discord && (
+                      <a href={socials.discord} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                        discord
+                      </a>
+                    )}
+                    {socials.facebook && (
+                      <a href={socials.facebook} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                        facebook
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                {pairs.length > 0 ? pairs.map((pair, idx) => (
-                  <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
-                    [{pair.name}]
-                  </a>
-                )) : (
-                  <span className="text-white/40 font-mono text-[14px]">[NO PAIRS FOUND]</span>
-                )}
-              </div>
-            </div>
+              )}
 
-            {/* Contract Row */}
-            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                <div className="flex items-center">
-                  <span>${symbol.toUpperCase()}</span>
-                  <span>@</span>
-                  <span className="tracking-wide font-bold">contract</span>
-                  <span className="mr-1 font-bold">:</span>
+              {/* Trade Row */}
+              {pairs.length > 0 && (
+                <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+                    <div className="flex items-center">
+                      <span>${symbol.toUpperCase()}</span>
+                      <span>@</span>
+                      <span className="tracking-wide font-bold">{isPresale ? 'participate' : 'trade'}</span>
+                      <span className="mr-1 font-bold">:</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    {pairs.map((pair, idx) => (
+                      <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
+                        [{pair.name}]
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                <span className="text-[14px] font-mono text-white/90">
-                  [ {explorer.label} ]
-                </span>
-                <CopyButton address={explorer.rawAddress} />
-              </div>
-            </div>
+              )}
 
-            {/* Supply Row */}
-            <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-              <div className="flex shrink-0 w-full sm:min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                <div className="flex items-center">
-                  <span>${symbol.toUpperCase()}</span>
-                  <span>@</span>
-                  <span className="tracking-wide font-bold">supply</span>
-                  <span className="mr-1 font-bold">:</span>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                <span className="text-[14px] font-mono text-white/90">
-                  {token.supply} {symbol.toUpperCase()}
-                </span>
-              </div>
-            </div>
-
-            {/* Cursor */}
-            <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
-              <div className="flex shrink-0 min-w-[180px] sm:w-40 sm:mr-4 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                <div className="flex items-center">
-                  <span>${symbol.toUpperCase()}</span>
-                  <span>@</span>
-                  <span className="tracking-wide font-bold">Sonar Score</span>
-                  <span className="mr-1 font-bold">:</span>
-                </div>
-              </div>
-              <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                {isExpired ? (
-                  <span className="text-[14px] font-mono tracking-wide text-slate-400 whitespace-nowrap">
-                    [ SIGNAL EXPIRED ]
-                  </span>
-                ) : (
-                    <span className="text-[14px] font-mono tracking-wide text-white/90">
-                      {`${token.rating}/10`}
+              {/* Contract Row */}
+              {explorer.rawAddress && (
+                <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+                    <div className="flex items-center">
+                      <span>${symbol.toUpperCase()}</span>
+                      <span>@</span>
+                      <span className="tracking-wide font-bold">contract</span>
+                      <span className="mr-1 font-bold">:</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    <span className="text-[14px] font-mono text-white/90">
+                      [ {explorer.label} ]
                     </span>
-                  )}
-                {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
+                    <CopyButton address={explorer.rawAddress} />
+                  </div>
+                </div>
+              )}
+
+              {/* Supply Row */}
+              {token.supply && (
+                <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
+                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+                    <div className="flex items-center">
+                      <span>${symbol.toUpperCase()}</span>
+                      <span>@</span>
+                      <span className="tracking-wide font-bold">supply</span>
+                      <span className="mr-1 font-bold">:</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    <span className="text-[14px] font-mono text-white/90">
+                      {token.supply} {symbol.toUpperCase()}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Cursor */}
+              <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
+                <div className="flex shrink-0 min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+                  <div className="flex items-center">
+                    <span>${symbol.toUpperCase()}</span>
+                    <span>@</span>
+                    <span className="tracking-wide font-bold">Sonar Score</span>
+                    <span className="mr-1 font-bold">:</span>
+                  </div>
+                </div>
+                <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                  {isExpired ? (
+                    <span className="text-[14px] font-mono tracking-wide text-slate-400 whitespace-nowrap">
+                      [ SIGNAL EXPIRED ]
+                    </span>
+                  ) : (
+                      <span className="text-[14px] font-mono tracking-wide text-white/90">
+                        {`${token.rating}/10`}
+                      </span>
+                    )}
+                  {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
+                </div>
               </div>
             </div>
-          </div>
           </div>
         </div>
       </div>
