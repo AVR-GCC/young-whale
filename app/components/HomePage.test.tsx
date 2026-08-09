@@ -40,6 +40,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '1',
     name: 'TechToken1',
+    display_name: 'TechToken1',
     symbol: 'TT1',
     chain: 'Ethereum',
     contract_address: null,
@@ -75,6 +76,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '2',
     name: 'MemeToken1',
+    display_name: 'MemeToken1',
     symbol: 'MT1',
     chain: 'Solana',
     contract_address: null,
@@ -110,6 +112,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '3',
     name: 'RWAToken1',
+    display_name: 'RWAToken1',
     symbol: 'RT1',
     chain: 'Base',
     contract_address: null,
@@ -145,6 +148,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '4',
     name: 'PresaleToken1',
+    display_name: 'PresaleToken1',
     symbol: 'PT1',
     chain: 'Ethereum',
     contract_address: null,

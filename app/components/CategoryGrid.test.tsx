@@ -75,6 +75,7 @@ vi.mock('./MobileCategoryFooter', () => ({
 const createMockToken = (id: string, name: string, category: TokenCategory, createdAt: string): TokenWithHashtags => ({
   id,
   name,
+  display_name: name,
   symbol: 'TT',
   chain: 'Ethereum',
   contract_address: null,

@@ -34,6 +34,7 @@ interface TokenWithHashtags extends Token {
 const mockToken: TokenWithHashtags = {
   id: 'token-1',
   name: 'Test Token',
+  display_name: 'Test Token',
   symbol: 'TEST',
   chain: 'ethereum',
   contract_address: '0x123',
@@ -265,7 +266,7 @@ describe('TokenEditDrawer', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ ...mockToken, category: 'Meme' }),
+        json: async () => ({ ...mockToken, display_name: 'Updated Test Token', category: 'Meme' }),
       })
 
     render(
@@ -282,6 +283,12 @@ describe('TokenEditDrawer', () => {
     await waitFor(() => {
       expect(screen.getByText('Save Changes')).toBeDefined()
     })
+
+    // Change a field to trigger an actual update
+    const displayNameInputs = screen.getAllByDisplayValue('Test Token') as HTMLInputElement[]
+    // The second input with 'Test Token' is the Display Name field
+    const displayNameInput = displayNameInputs[1]
+    fireEvent.change(displayNameInput, { target: { value: 'Updated Test Token' } })
 
     const saveButton = screen.getByText('Save Changes')
     fireEvent.click(saveButton)

@@ -27,6 +27,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '1',
     name: 'Token1',
+    display_name: 'Token1',
     symbol: 'TK1',
     chain: 'Ethereum',
     contract_address: '0x123',
@@ -62,6 +63,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '2',
     name: 'Token2',
+    display_name: 'Token2',
     symbol: 'TK2',
     chain: 'Solana',
     contract_address: null,
@@ -97,6 +99,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '3',
     name: 'Token3',
+    display_name: 'Token3',
     symbol: 'TK3',
     chain: 'Base',
     contract_address: null,
@@ -132,6 +135,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '4',
     name: 'Token4',
+    display_name: 'Token4',
     symbol: 'TK4',
     chain: 'Ethereum',
     contract_address: null,
@@ -167,6 +171,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '5',
     name: 'Token5',
+    display_name: 'Token5',
     symbol: 'TK5',
     chain: 'Solana',
     contract_address: null,
@@ -202,6 +207,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '6',
     name: 'Token6',
+    display_name: 'Token6',
     symbol: 'TK6',
     chain: 'Base',
     contract_address: null,

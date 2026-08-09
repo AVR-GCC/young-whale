@@ -7,6 +7,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '1',
     name: 'TechToken1',
+    display_name: 'TechToken1',
     symbol: 'TT1',
     chain: 'Ethereum',
     contract_address: null,
@@ -42,6 +43,7 @@ const mockTokens: TokenWithHashtags[] = [
   {
     id: '2',
     name: 'MemeToken1',
+    display_name: 'MemeToken1',
     symbol: 'MT1',
     chain: 'Solana',
     contract_address: null,

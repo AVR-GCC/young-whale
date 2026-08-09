@@ -25,6 +25,7 @@ const chainIcons: Record<string, string> = {
 const mockToken: TokenWithHashtags = {
   id: '1',
   name: 'TestToken',
+  display_name: 'TestToken',
   symbol: 'TEST',
   chain: 'Ethereum',
   contract_address: '0x1234567890abcdef1234567890abcdef12345678',
@@ -69,6 +70,7 @@ const mockToken: TokenWithHashtags = {
 const mockTokenNoOptional: TokenWithHashtags = {
   id: '2',
   name: 'MinimalToken',
+  display_name: 'MinimalToken',
   symbol: 'MIN',
   chain: 'Solana',
   contract_address: null,
