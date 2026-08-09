@@ -84,6 +84,7 @@ export async function PATCH(
       'is_promoted',
       'is_verified',
       'rating',
+      'presale_status',
     ]
 
     const updates: Record<string, unknown> = {}

@@ -165,6 +165,7 @@ export default function TokenEditDrawer({
           is_verified: editedToken.is_verified || false,
           main_hashtag: editedToken.main_hashtag || null,
           rating: editedToken.rating || null,
+          presale_status: editedToken.presale_status || null,
           hashtags: selectedHashtagIds,
           new_hashtags: newHashtags,
         }
@@ -219,6 +220,7 @@ export default function TokenEditDrawer({
         'is_promoted',
         'is_verified',
         'rating',
+        'presale_status',
       ]
       for (const field of fields) {
         if (field in editedToken && editedToken[field] !== token[field]) {
@@ -945,7 +947,7 @@ export default function TokenEditDrawer({
               disabled={saving}
               className="px-4 py-2 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
-              {saving ? 'Saving...' : isCreate ? 'Create Token' : 'Save Changes'}
+              {saving ? 'Saving...' : (isCreate ? 'Create Token' : 'Save Changes')}
             </button>
             {!isCreate && (
               <>
