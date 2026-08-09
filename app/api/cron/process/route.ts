@@ -133,6 +133,7 @@ async function processJob(
 
   const tokenData = {
     name: raw.name,
+    display_name: raw.name,
     symbol: raw.symbol,
     chain: raw.chain,
     contract_address: raw.contract_address,

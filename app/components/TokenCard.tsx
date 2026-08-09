@@ -269,7 +269,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
         {/* Token Name - visible text on desktop */}
         <span className="hidden md:inline font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
-          {token.name}
+          {token.display_name}
         </span>
 
         {/* Desktop Description */}

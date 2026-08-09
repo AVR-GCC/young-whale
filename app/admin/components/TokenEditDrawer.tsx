@@ -166,6 +166,7 @@ export default function TokenEditDrawer({
           main_hashtag: editedToken.main_hashtag || null,
           rating: editedToken.rating || null,
           presale_status: editedToken.presale_status || null,
+          display_name: editedToken.display_name,
           hashtags: selectedHashtagIds,
           new_hashtags: newHashtags,
         }
@@ -221,6 +222,7 @@ export default function TokenEditDrawer({
         'is_verified',
         'rating',
         'presale_status',
+        'display_name',
       ]
       for (const field of fields) {
         if (field in editedToken && editedToken[field] !== token[field]) {
@@ -545,6 +547,20 @@ export default function TokenEditDrawer({
                     type="text"
                     value={editedToken.symbol || token?.symbol || ''}
                     onChange={(e) => updateField('symbol', e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    Display Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editedToken.display_name || token?.display_name || ''}
+                    onChange={(e) => updateField('display_name', e.target.value)}
                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
                   />
                 </div>

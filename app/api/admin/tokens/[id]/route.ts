@@ -85,6 +85,7 @@ export async function PATCH(
       'is_verified',
       'rating',
       'presale_status',
+      'display_name',
     ]
 
     const updates: Record<string, unknown> = {}
