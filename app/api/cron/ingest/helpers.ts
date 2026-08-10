@@ -3,6 +3,8 @@ import { supabaseService } from '@/lib/supabase/service'
 const CMC_BASE_URL = 'https://pro-api.coinmarketcap.com'
 const CG_BASE_URL = 'https://api.coingecko.com/api/v3'
 
+// API calls
+// Coin Marketcap
 export async function getLatestListings(limit = 10, start = 1) {
   const url = new URL(`${CMC_BASE_URL}/v1/cryptocurrency/listings/latest`)
   url.searchParams.set('limit', limit.toString())
@@ -78,19 +80,85 @@ export async function getTokenDetails(cmcId: number) {
   }
 }
 
-export async function getChains() {
-  const { data, error } = await supabaseService
-    .from('chains')
-    .select('id, explorer_prefix')
+// Coin Geko
+export async function getCoinGeckoMarkets(page = 1, perPage = 100) {
+  const url = new URL(`${CG_BASE_URL}/coins/markets`)
+  url.searchParams.set('vs_currency', 'usd')
+  url.searchParams.set('order', 'market_cap_desc')
+  url.searchParams.set('per_page', perPage.toString())
+  url.searchParams.set('page', page.toString())
+  url.searchParams.set('sparkline', 'false')
 
-  if (error) {
-    console.error('Error fetching chains:', error.message)
-    return []
+  const response = await fetch(url.toString(), {
+    headers: {
+      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CoinGecko markets error: ${response.status} ${response.statusText}`)
   }
 
-  return data ?? []
+  return await response.json() as Array<{
+    id: string
+    symbol: string
+    name: string
+    image: string
+    current_price: number | null
+    market_cap: number | null
+    total_volume: number | null
+    circulating_supply: number | null
+    total_supply: number | null
+    max_supply: number | null
+  }>
 }
 
+export async function getCoinGeckoCoinDetails(coinId: string) {
+  const url = new URL(`${CG_BASE_URL}/coins/${coinId}`)
+  url.searchParams.set('localization', 'false')
+  url.searchParams.set('tickers', 'false')
+  url.searchParams.set('community_data', 'false')
+  url.searchParams.set('developer_data', 'false')
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CoinGecko details error: ${response.status} ${response.statusText}`)
+  }
+
+  return await response.json() as {
+    id: string
+    symbol: string
+    name: string
+    description: { en?: string }
+    image: { thumb?: string; small?: string; large?: string }
+    links: {
+      homepage?: string[]
+      twitter_screen_name?: string
+      telegram_channel_identifier?: string
+      subreddit_url?: string
+      facebook_username?: string
+      blockchain_site?: string[]
+      official_forum_url?: string[]
+      chat_url?: string[]
+    }
+    platforms: Record<string, string | null>
+    market_data: {
+      circulating_supply: number | null
+      total_supply: number | null
+      max_supply: number | null
+    }
+    categories: string[]
+  }
+}
+
+// Map tokens
 export function mapCmcToRawToken(listing: {
   id: number
   name: string
@@ -175,164 +243,6 @@ export function mapCmcToRawToken(listing: {
     },
     status: 'pending' as const,
     supply: listing.total_supply,
-  }
-}
-
-export async function isTokenInRawTokens(symbol: string, name: string): Promise<boolean> {
-  const { data, error } = await supabaseService
-    .from('raw_tokens')
-    .select('id')
-    .eq('symbol', symbol)
-    .eq('name', name)
-    .maybeSingle()
-
-  if (error) {
-    console.error('Error checking existing token:', error.message)
-    return false
-  }
-
-  return !!data
-}
-
-export async function isRawTokensTableEmpty(): Promise<boolean> {
-  const { data, error } = await supabaseService
-    .from('raw_tokens')
-    .select('id')
-    .limit(1)
-    .maybeSingle()
-
-  if (error) {
-    console.error('Error checking raw_tokens table:', error.message)
-    return true
-  }
-
-  return !data
-}
-
-export function collectHashtags(
-  details: {
-    tags: string[]
-    'tag-names': string[]
-  },
-  hashtagMap: Map<string, string>
-) {
-  if (
-    !details.tags ||
-    !details['tag-names'] ||
-    details.tags.length !== details['tag-names'].length
-  ) {
-    return
-  }
-
-  for (let i = 0; i < details.tags.length; i++) {
-    const slug = details.tags[i].toLowerCase().trim()
-    const name = details['tag-names'][i]
-    if (slug && name) {
-      hashtagMap.set(slug, name)
-    }
-  }
-}
-
-export async function syncHashtags(hashtagMap: Map<string, string>) {
-  if (hashtagMap.size === 0) return
-
-  const slugs = Array.from(hashtagMap.keys())
-
-  const { data: existingRows } = await supabaseService
-    .from('hashtags')
-    .select('slug')
-    .in('slug', slugs)
-
-  const existingSlugs = new Set(
-    (existingRows ?? []).map((r: { slug: string }) => r.slug)
-  )
-
-  const newHashtags = slugs
-    .filter((slug) => !existingSlugs.has(slug))
-    .map((slug) => ({ slug, name: hashtagMap.get(slug)! }))
-
-  if (newHashtags.length > 0) {
-    const { error } = await supabaseService.from('hashtags').insert(newHashtags)
-    if (error) {
-      console.error('Failed to bulk insert hashtags:', error.message)
-    }
-  }
-}
-
-export async function getCoinGeckoMarkets(page = 1, perPage = 100) {
-  const url = new URL(`${CG_BASE_URL}/coins/markets`)
-  url.searchParams.set('vs_currency', 'usd')
-  url.searchParams.set('order', 'market_cap_desc')
-  url.searchParams.set('per_page', perPage.toString())
-  url.searchParams.set('page', page.toString())
-  url.searchParams.set('sparkline', 'false')
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CoinGecko markets error: ${response.status} ${response.statusText}`)
-  }
-
-  return await response.json() as Array<{
-    id: string
-    symbol: string
-    name: string
-    image: string
-    current_price: number | null
-    market_cap: number | null
-    total_volume: number | null
-    circulating_supply: number | null
-    total_supply: number | null
-    max_supply: number | null
-  }>
-}
-
-export async function getCoinGeckoCoinDetails(coinId: string) {
-  const url = new URL(`${CG_BASE_URL}/coins/${coinId}`)
-  url.searchParams.set('localization', 'false')
-  url.searchParams.set('tickers', 'false')
-  url.searchParams.set('community_data', 'false')
-  url.searchParams.set('developer_data', 'false')
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CoinGecko details error: ${response.status} ${response.statusText}`)
-  }
-
-  return await response.json() as {
-    id: string
-    symbol: string
-    name: string
-    description: { en?: string }
-    image: { thumb?: string; small?: string; large?: string }
-    links: {
-      homepage?: string[]
-      twitter_screen_name?: string
-      telegram_channel_identifier?: string
-      subreddit_url?: string
-      facebook_username?: string
-      blockchain_site?: string[]
-      official_forum_url?: string[]
-      chat_url?: string[]
-    }
-    platforms: Record<string, string | null>
-    market_data: {
-      circulating_supply: number | null
-      total_supply: number | null
-      max_supply: number | null
-    }
-    categories: string[]
   }
 }
 
@@ -460,6 +370,57 @@ export function mapCoinGeckoToRawToken(
   }
 }
 
+// Hashtags
+export function collectHashtags(
+  details: {
+    tags: string[]
+    'tag-names': string[]
+  },
+  hashtagMap: Map<string, string>
+) {
+  if (
+    !details.tags ||
+    !details['tag-names'] ||
+    details.tags.length !== details['tag-names'].length
+  ) {
+    return
+  }
+
+  for (let i = 0; i < details.tags.length; i++) {
+    const slug = details.tags[i].toLowerCase().trim()
+    const name = details['tag-names'][i]
+    if (slug && name) {
+      hashtagMap.set(slug, name)
+    }
+  }
+}
+
+export async function syncHashtags(hashtagMap: Map<string, string>) {
+  if (hashtagMap.size === 0) return
+
+  const slugs = Array.from(hashtagMap.keys())
+
+  const { data: existingRows } = await supabaseService
+    .from('hashtags')
+    .select('slug')
+    .in('slug', slugs)
+
+  const existingSlugs = new Set(
+    (existingRows ?? []).map((r: { slug: string }) => r.slug)
+  )
+
+  const newHashtags = slugs
+    .filter((slug) => !existingSlugs.has(slug))
+    .map((slug) => ({ slug, name: hashtagMap.get(slug)! }))
+
+  if (newHashtags.length > 0) {
+    const { error } = await supabaseService.from('hashtags').insert(newHashtags)
+    if (error) {
+      console.error('Failed to bulk insert hashtags:', error.message)
+    }
+  }
+}
+
 export function collectCoinGeckoHashtags(
   details: {
     categories: string[]
@@ -478,4 +439,49 @@ export function collectCoinGeckoHashtags(
       }
     }
   }
+}
+
+// Other
+export async function getChains() {
+  const { data, error } = await supabaseService
+    .from('chains')
+    .select('id, explorer_prefix')
+
+  if (error) {
+    console.error('Error fetching chains:', error.message)
+    return []
+  }
+
+  return data ?? []
+}
+
+export async function isTokenInRawTokens(symbol: string, name: string): Promise<boolean> {
+  const { data, error } = await supabaseService
+    .from('raw_tokens')
+    .select('id')
+    .eq('symbol', symbol)
+    .eq('name', name)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error checking existing token:', error.message)
+    return false
+  }
+
+  return !!data
+}
+
+export async function isRawTokensTableEmpty(): Promise<boolean> {
+  const { data, error } = await supabaseService
+    .from('raw_tokens')
+    .select('id')
+    .limit(1)
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error checking raw_tokens table:', error.message)
+    return true
+  }
+
+  return !data
 }
