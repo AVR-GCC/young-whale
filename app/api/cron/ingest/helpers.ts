@@ -81,11 +81,12 @@ export async function getTokenDetailsCMC(cmcId: number) {
 }
 
 // Coin Geko
-export async function getLatestListingsCG(page = 1, perPage = 100) {
+export async function getLatestListingsCG(limit = 10, start = 1) {
+  const page = ((start - 1) / limit) + 1;
   const url = new URL(`${CG_BASE_URL}/coins/markets`)
   url.searchParams.set('vs_currency', 'usd')
   url.searchParams.set('order', 'market_cap_desc')
-  url.searchParams.set('per_page', perPage.toString())
+  url.searchParams.set('per_page', limit.toString())
   url.searchParams.set('page', page.toString())
   url.searchParams.set('sparkline', 'false')
 
