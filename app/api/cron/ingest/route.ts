@@ -3,8 +3,8 @@ import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
 import { requireAdminApi } from '@/lib/admin-auth'
 import {
-  getLatestListings,
-  getTokenDetails,
+  getLatestListingsCMC,
+  getTokenDetailsCMC,
   getChains,
   mapCmcToRawToken,
   isTokenInRawTokens,
@@ -37,10 +37,10 @@ export async function GET(request: Request) {
 
     if (isEmpty) {
       // Table is empty: ingest exactly 20 tokens
-      const listings = await getLatestListings(20)
+      const listings = await getLatestListingsCMC(20)
 
       for (const listing of listings) {
-        const details = await getTokenDetails(listing.id)
+        const details = await getTokenDetailsCMC(listing.id)
         collectHashtags(details, hashtagMap)
         const tokenData = mapCmcToRawToken(listing, details, chains)
 
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
       let foundExisting = false
 
       while (!foundExisting) {
-        const listings = await getLatestListings(batchSize, start)
+        const listings = await getLatestListingsCMC(batchSize, start)
 
         if (listings.length === 0) {
           break
@@ -79,7 +79,7 @@ export async function GET(request: Request) {
             break
           }
 
-          const details = await getTokenDetails(listing.id)
+          const details = await getTokenDetailsCMC(listing.id)
           collectHashtags(details, hashtagMap)
           const tokenData = mapCmcToRawToken(listing, details, chains)
 

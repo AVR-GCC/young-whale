@@ -5,7 +5,7 @@ const CG_BASE_URL = 'https://api.coingecko.com/api/v3'
 
 // API calls
 // Coin Marketcap
-export async function getLatestListings(limit = 10, start = 1) {
+export async function getLatestListingsCMC(limit = 10, start = 1) {
   const url = new URL(`${CMC_BASE_URL}/v1/cryptocurrency/listings/latest`)
   url.searchParams.set('limit', limit.toString())
   url.searchParams.set('start', start.toString())
@@ -35,7 +35,7 @@ export async function getLatestListings(limit = 10, start = 1) {
   }>
 }
 
-export async function getTokenDetails(cmcId: number) {
+export async function getTokenDetailsCMC(cmcId: number) {
   const url = new URL(`${CMC_BASE_URL}/v2/cryptocurrency/info`)
   url.searchParams.set('id', cmcId.toString())
 
@@ -81,7 +81,7 @@ export async function getTokenDetails(cmcId: number) {
 }
 
 // Coin Geko
-export async function getCoinGeckoMarkets(page = 1, perPage = 100) {
+export async function getLatestListingsCG(page = 1, perPage = 100) {
   const url = new URL(`${CG_BASE_URL}/coins/markets`)
   url.searchParams.set('vs_currency', 'usd')
   url.searchParams.set('order', 'market_cap_desc')
@@ -114,7 +114,7 @@ export async function getCoinGeckoMarkets(page = 1, perPage = 100) {
   }>
 }
 
-export async function getCoinGeckoCoinDetails(coinId: string) {
+export async function getTokenDetailsCG(coinId: string) {
   const url = new URL(`${CG_BASE_URL}/coins/${coinId}`)
   url.searchParams.set('localization', 'false')
   url.searchParams.set('tickers', 'false')
@@ -246,7 +246,7 @@ export function mapCmcToRawToken(listing: {
   }
 }
 
-export function mapCoinGeckoToRawToken(
+export function mapCgToRawToken(
   market: {
     id: string
     symbol: string
