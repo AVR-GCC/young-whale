@@ -396,6 +396,26 @@ export function collectHashtags(
   }
 }
 
+export function collectCoinGeckoHashtags(
+  details: {
+    categories: string[]
+  },
+  hashtagMap: Map<string, string>
+) {
+  if (!details.categories || !Array.isArray(details.categories)) {
+    return
+  }
+
+  for (const category of details.categories) {
+    if (category) {
+      const slug = category.toLowerCase().replace(/\s+/g, '-').trim()
+      if (slug) {
+        hashtagMap.set(slug, category)
+      }
+    }
+  }
+}
+
 export async function syncHashtags(hashtagMap: Map<string, string>) {
   if (hashtagMap.size === 0) return
 
@@ -418,26 +438,6 @@ export async function syncHashtags(hashtagMap: Map<string, string>) {
     const { error } = await supabaseService.from('hashtags').insert(newHashtags)
     if (error) {
       console.error('Failed to bulk insert hashtags:', error.message)
-    }
-  }
-}
-
-export function collectCoinGeckoHashtags(
-  details: {
-    categories: string[]
-  },
-  hashtagMap: Map<string, string>
-) {
-  if (!details.categories || !Array.isArray(details.categories)) {
-    return
-  }
-
-  for (const category of details.categories) {
-    if (category) {
-      const slug = category.toLowerCase().replace(/\s+/g, '-').trim()
-      if (slug) {
-        hashtagMap.set(slug, category)
-      }
     }
   }
 }
