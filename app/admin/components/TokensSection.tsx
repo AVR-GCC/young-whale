@@ -610,7 +610,7 @@ export default function TokensSection() {
               Source
             </label>
             <div className="flex gap-1">
-              {(['coinbase', 'dex', 'user_paid'] as SourceType[]).map((src) => (
+              {(['coinmarketcap', 'dex', 'user_paid', 'coingecko'] as SourceType[]).map((src) => (
                 <button
                   key={src}
                   onClick={() => toggleArrayFilter('source_type', src)}

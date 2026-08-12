@@ -155,7 +155,7 @@ const mockRawToken = {
   logo_url: 'https://test.com/logo.png',
   social_links: {},
   exchange_links: [],
-  source_type: 'coinbase',
+  source_type: 'coinmarketcap',
   source_url: 'https://coinmarketcap.com',
   raw_payload: null,
   status: 'pending',

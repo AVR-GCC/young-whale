@@ -51,7 +51,7 @@ const mockToken: TokenWithHashtags = {
   preferred_exchange: 'https://dex.example.com',
   start_date: null,
   end_date: null,
-  source_type: 'coinbase',
+  source_type: 'coinmarketcap',
   source_url: 'https://coinmarketcap.com',
   confidence: 'high',
   raw_token_id: 'raw-1',

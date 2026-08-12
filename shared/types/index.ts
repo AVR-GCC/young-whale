@@ -12,7 +12,7 @@ export type TokenCategory = 'Presale' | 'Tech' | 'Meme' | 'RWA' | 'Airdrop'
 
 export type TokenStatus = 'approved' | 'pending_review' | 'rejected'
 
-export type SourceType = 'coinbase' | 'dex' | 'user_paid'
+export type SourceType = 'coinmarketcap' | 'dex' | 'user_paid' | 'coingecko'
 
 export type Confidence = 'low' | 'medium' | 'high'
 
@@ -58,7 +58,7 @@ export interface RawToken {
   logo_url: string | null
   social_links: SocialLinks
   exchange_links: string[]
-  source_type: 'coinbase' | 'dex' | null
+  source_type: SourceType | null
   source_url: string | null
   raw_payload: Record<string, unknown> | null
   supply: number | null

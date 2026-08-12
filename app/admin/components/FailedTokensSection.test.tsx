@@ -11,7 +11,7 @@ const mockFailedToken = {
   symbol: 'FAIL',
   chain: 'ethereum',
   contract_address: '0xabc123',
-  source_type: 'coinbase',
+  source_type: 'coinmarketcap',
   status: 'failed',
   error_message: 'AI processing failed: invalid JSON response',
   retry_count: 2,
@@ -192,7 +192,7 @@ describe('FailedTokensSection', () => {
       expect(screen.getByText('ethereum')).toBeDefined()
     })
     await waitFor(() => {
-      expect(screen.getByText('coinbase')).toBeDefined()
+      expect(screen.getByText('coinmarketcap')).toBeDefined()
     })
   })
 
