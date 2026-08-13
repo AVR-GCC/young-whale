@@ -177,13 +177,13 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
   const [now] = useState(() => Date.now())
   const isExpired = useMemo(() => {
     const oneDayAgo = new Date(now - ONE_DAY)
-    return new Date(token.created_at) < oneDayAgo
-  }, [token.created_at, now])
+    return !!token.published_at && new Date(token.published_at) < oneDayAgo
+  }, [token.published_at, now])
 
   const isBeforeYesterday = useMemo(() => {
     const twoDaysAgo = new Date(now - (ONE_DAY * 2))
-    return new Date(token.created_at) < twoDaysAgo;
-  }, [token.created_at, now])
+    return token.published_at && new Date(token.published_at) < twoDaysAgo;
+  }, [token.published_at, now])
 
   let timeLabel;
   if (isPromoted) {
