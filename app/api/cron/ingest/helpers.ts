@@ -1,57 +1,20 @@
 import { supabaseService } from '@/lib/supabase/service'
+import { RawToken } from '@/shared/types'
 
 const CMC_BASE_URL = 'https://pro-api.coinmarketcap.com'
 const CG_BASE_URL = 'https://api.coingecko.com/api/v3'
 
-// API calls
-// Coin Marketcap
-export async function getLatestListingsCMC(limit = 10, start = 1) {
-  const url = new URL(`${CMC_BASE_URL}/v1/cryptocurrency/listings/latest`)
-  url.searchParams.set('limit', limit.toString())
-  url.searchParams.set('start', start.toString())
-  url.searchParams.set('sort', 'date_added')
-  url.searchParams.set('sort_dir', 'desc')
-  url.searchParams.set('convert', 'USD')
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CMC listings error: ${response.status} ${response.statusText}`)
-  }
-
-  const json = await response.json()
-  return json.data as Array<{
+// types
+export type CMCListing = {
     id: number
     name: string
     symbol: string
     date_added: string
     quote?: { USD?: { price?: number } }
     total_supply: number
-  }>
 }
 
-export async function getTokenDetailsCMC(cmcId: number) {
-  const url = new URL(`${CMC_BASE_URL}/v2/cryptocurrency/info`)
-  url.searchParams.set('id', cmcId.toString())
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CMC info error: ${response.status} ${response.statusText}`)
-  }
-
-  const json = await response.json()
-  return json.data[cmcId.toString()] as {
+export type CMCDetails = {
     name: string
     symbol: string
     slug: string
@@ -77,31 +40,9 @@ export async function getTokenDetailsCMC(cmcId: number) {
     category: string
     tags: string[]
     'tag-names': string[]
-  }
 }
 
-// Coin Geko
-export async function getLatestListingsCG(limit = 10, start = 1) {
-  const page = ((start - 1) / limit) + 1;
-  const url = new URL(`${CG_BASE_URL}/coins/markets`)
-  url.searchParams.set('vs_currency', 'usd')
-  url.searchParams.set('order', 'market_cap_desc')
-  url.searchParams.set('per_page', limit.toString())
-  url.searchParams.set('page', page.toString())
-  url.searchParams.set('sparkline', 'false')
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CoinGecko markets error: ${response.status} ${response.statusText}`)
-  }
-
-  return await response.json() as Array<{
+export type CGListing = {
     id: string
     symbol: string
     name: string
@@ -112,28 +53,9 @@ export async function getLatestListingsCG(limit = 10, start = 1) {
     circulating_supply: number | null
     total_supply: number | null
     max_supply: number | null
-  }>
 }
 
-export async function getTokenDetailsCG(coinId: string) {
-  const url = new URL(`${CG_BASE_URL}/coins/${coinId}`)
-  url.searchParams.set('localization', 'false')
-  url.searchParams.set('tickers', 'false')
-  url.searchParams.set('community_data', 'false')
-  url.searchParams.set('developer_data', 'false')
-
-  const response = await fetch(url.toString(), {
-    headers: {
-      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
-      Accept: 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`CoinGecko details error: ${response.status} ${response.statusText}`)
-  }
-
-  return await response.json() as {
+export type CGDetails = {
     id: string
     symbol: string
     name: string
@@ -156,43 +78,107 @@ export async function getTokenDetailsCG(coinId: string) {
       max_supply: number | null
     }
     categories: string[]
+}
+
+export type Listing = CMCListing | CGListing
+export type Details = CMCDetails | CGDetails
+
+export type ListingEntry =
+| { source: 'coinmarketcap', listing: CMCListing }
+| { source: 'coingecko', listing: CGListing }
+
+// API calls
+// Coin Marketcap
+export async function getLatestListingsCMC(limit = 10, start = 1) {
+  const url = new URL(`${CMC_BASE_URL}/v1/cryptocurrency/listings/latest`)
+  url.searchParams.set('limit', limit.toString())
+  url.searchParams.set('start', start.toString())
+  url.searchParams.set('sort', 'date_added')
+  url.searchParams.set('sort_dir', 'desc')
+  url.searchParams.set('convert', 'USD')
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CMC listings error: ${response.status} ${response.statusText}`)
   }
+
+  const json = await response.json()
+  return json.data as Array<CMCListing>
+}
+
+export async function getTokenDetailsCMC(cmcId: number) {
+  const url = new URL(`${CMC_BASE_URL}/v2/cryptocurrency/info`)
+  url.searchParams.set('id', cmcId.toString())
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CMC info error: ${response.status} ${response.statusText}`)
+  }
+
+  const json = await response.json()
+  return json.data[cmcId.toString()] as CMCDetails
+}
+
+// Coin Geko
+export async function getLatestListingsCG(limit = 10, start = 1) {
+  const page = ((start - 1) / limit) + 1;
+//   const url = new URL(`${CG_BASE_URL}/coins/list/new`)
+  const url = new URL(`${CG_BASE_URL}/coins/markets`)
+  url.searchParams.set('vs_currency', 'usd')
+  url.searchParams.set('order', 'market_cap_desc')
+  url.searchParams.set('per_page', limit.toString())
+  url.searchParams.set('page', page.toString())
+  url.searchParams.set('sparkline', 'false')
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CoinGecko markets error: ${response.status} ${response.statusText}`)
+  }
+
+  return await response.json() as Array<CGListing>
+}
+
+export async function getTokenDetailsCG(coinId: string) {
+  const url = new URL(`${CG_BASE_URL}/coins/${coinId}`)
+  url.searchParams.set('localization', 'false')
+  url.searchParams.set('tickers', 'false')
+  url.searchParams.set('community_data', 'false')
+  url.searchParams.set('developer_data', 'false')
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      'x-cg-demo-api-key': process.env.COINGEKO_API_KEY!,
+      Accept: 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`CoinGecko details error: ${response.status} ${response.statusText}`)
+  }
+
+  return await response.json() as CGDetails
 }
 
 // Map tokens
-export function mapCmcToRawToken(listing: {
-  id: number
-  name: string
-  symbol: string
-  date_added: string
-  quote?: { USD?: { price?: number } }
-  total_supply: number
-}, details: {
-  name: string
-  symbol: string
-  slug: string
-  logo: string
-  description: string
-  urls: {
-    facebook?: string[]
-    reddit?: string[]
-    website?: string[]
-    twitter?: string[]
-    telegram?: string[]
-    explorer?: string[]
-    [key: string]: string[] | undefined
-  }
-  contract_address?: Array<{
-      contract_address: string
-      platform: {
-        name: string
-        coin: { id: string; name: string; symbol: string; slug: string }
-      }
-    }>
-  category: string
-  tags: string[]
-  'tag-names': string[]
-}, chains: Array<{ id: string; explorer_prefix: string }>) {
+export function mapToRawTokenCMC(listing: CMCListing, details: CMCDetails, chains: Array<{ id: string; explorer_prefix: string }>) {
   const primaryContract = details.contract_address?.[0]
 
   const socialLinks: Record<string, string> = {}
@@ -236,7 +222,7 @@ export function mapCmcToRawToken(listing: {
     logo_url: details.logo || null,
     social_links: socialLinks,
     exchange_links: [],
-    source_type: 'coinbase' as const,
+    source_type: 'coinmarketcap' as const,
     source_url,
     raw_payload: {
       cmc_listing: listing,
@@ -244,41 +230,12 @@ export function mapCmcToRawToken(listing: {
     },
     status: 'pending' as const,
     supply: listing.total_supply,
-  }
+  } as Partial<RawToken>
 }
 
-export function mapCgToRawToken(
-  market: {
-    id: string
-    symbol: string
-    name: string
-    image: string
-    total_supply: number | null
-  },
-  details: {
-    id: string
-    symbol: string
-    name: string
-    description: { en?: string }
-    image: { thumb?: string; small?: string; large?: string }
-    links: {
-      homepage?: string[]
-      twitter_screen_name?: string
-      telegram_channel_identifier?: string
-      subreddit_url?: string
-      facebook_username?: string
-      blockchain_site?: string[]
-      official_forum_url?: string[]
-      chat_url?: string[]
-    }
-    platforms: Record<string, string | null>
-    market_data: {
-      circulating_supply: number | null
-      total_supply: number | null
-      max_supply: number | null
-    }
-    categories: string[]
-  },
+export function mapToRawTokenCG(
+  market: CGListing,
+  details: CGDetails,
   chains: Array<{ id: string; explorer_prefix: string }>
 ) {
   // Find primary contract address and chain from platforms
@@ -368,11 +325,11 @@ export function mapCgToRawToken(
     },
     status: 'pending' as const,
     supply,
-  }
+  } as Partial<RawToken>
 }
 
 // Hashtags
-export function collectHashtags(
+export function collectHashtagsCMC(
   details: {
     tags: string[]
     'tag-names': string[]
@@ -396,7 +353,7 @@ export function collectHashtags(
   }
 }
 
-export function collectCoinGeckoHashtags(
+export function collectHashtagsCG(
   details: {
     categories: string[]
   },
