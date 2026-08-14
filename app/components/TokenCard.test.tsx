@@ -203,39 +203,39 @@ describe('TokenCard', () => {
   })
 
   it('renders TODAY for tokens created within 24 hours', () => {
-    const recentToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
+    const recentToken = { ...mockToken, published_at: '2024-06-15T08:00:00Z' }
     render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
-  it('renders 1D AGO for tokens created between 24-48 hours ago', () => {
-    const dayAgoToken = { ...mockToken, created_at: '2024-06-14T10:00:00Z' }
+  it('renders 1D AGO for tokens published between 24-48 hours ago', () => {
+    const dayAgoToken = { ...mockToken, published_at: '2024-06-14T10:00:00Z' }
     render(<TokenCard themeColor="#ff0000" token={dayAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('1D AGO')).toBeDefined()
   })
 
   it('renders TimeSince for tokens older than 48 hours', () => {
-    const oldToken = { ...mockToken, created_at: '2024-06-13T10:00:00Z', published_at: '2024-06-13T10:00:00Z' }
+    const oldToken = { ...mockToken, published_at: '2024-06-13T10:00:00Z' }
     render(<TokenCard themeColor="#ff0000" token={oldToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     expect(screen.getByText('2d')).toBeDefined()
   })
 
   it('renders hours correctly for recent tokens', () => {
-    const hoursAgoToken = { ...mockToken, created_at: '2024-06-15T08:00:00Z' }
+    const hoursAgoToken = { ...mockToken, published_at: '2024-06-15T08:00:00Z' }
     render(<TokenCard themeColor="#ff0000" token={hoursAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
   it('renders minutes correctly for very recent tokens', () => {
-    const recentToken = { ...mockToken, created_at: '2024-06-15T11:59:00Z' }
+    const recentToken = { ...mockToken, published_at: '2024-06-15T11:59:00Z' }
     render(<TokenCard themeColor="#ff0000" token={recentToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
   })
 
-  it('renders seconds correctly for just created tokens', () => {
-    const secondsAgoToken = { ...mockToken, created_at: '2024-06-15T11:59:59Z' }
+  it('renders seconds correctly for just published tokens', () => {
+    const secondsAgoToken = { ...mockToken, published_at: '2024-06-15T11:59:59Z' }
     render(<TokenCard themeColor="#ff0000" token={secondsAgoToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
     // Within past 24h shows TODAY
     expect(screen.getByText('TODAY')).toBeDefined()
