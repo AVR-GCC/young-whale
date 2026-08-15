@@ -197,7 +197,7 @@ describe('GET /api/cron/ingest', () => {
     const mockMaybeSingle = vi.fn()
       .mockResolvedValueOnce({ data: { id: 'existing-id' }, error: null }) // not empty
       .mockResolvedValueOnce({ data: null, error: null })                  // token 1 doesn't exist
-      .mockResolvedValueOnce({ data: { id: 'existing-id' }, error: null }) // token 2 exists
+      .mockResolvedValue({ data: { id: 'existing-id' }, error: null })     // token 2+ exists
 
     vi.mocked(supabaseService.from).mockImplementation(() =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -35,10 +35,10 @@ export async function GET(request: Request) {
 
     if (isEmpty) {
       // Table is empty: ingest exactly 20 tokens
-      sources.forEach(async src => {
+      await Promise.all(sources.map(async src => {
         const lst = await src.getListings(20)
         srcListings[src.name] = lst
-      })
+      }))
     } else {
       // Table is not empty: ingest tokens until we hit one that already exists
       const batchSize = 50
@@ -62,8 +62,7 @@ export async function GET(request: Request) {
         await Promise.all(sources.map(async src => {
           const srcListings = newListings[src.name]
           if (!srcListings) return true
-          const sorted = srcListings.sort((a, b) => b.date_added > a.date_added ? -1 : 1)
-          const newTokens = await Promise.all(sorted.map(async listing => {
+          const newTokens = await Promise.all(srcListings.map(async listing => {
             const exists = await isTokenInRawTokens(listing.symbol, listing.name)
             if (exists) {
               foundSet[src.name] = true
@@ -90,6 +89,7 @@ export async function GET(request: Request) {
       }
     }
 
+    // collect listings
     const listingLookup: Record<string, ListingEntry> = {}
 
     sources.forEach(async source => {
@@ -102,6 +102,7 @@ export async function GET(request: Request) {
 
     const listings = Object.keys(listingLookup).map(key => listingLookup[key])
 
+    // map tokens and collect hashtags
     const results = []
     const rawTokenIds: string[] = []
     const hashtagMap = new Map<string, string>()
@@ -127,6 +128,7 @@ export async function GET(request: Request) {
 
     await syncHashtags(hashtagMap)
 
+    // populate processing_queue
     if (rawTokenIds.length > 0) {
       const queueJobs = rawTokenIds.map((id) => ({ raw_token_id: id }))
       const { error: queueError } = await supabaseService
@@ -144,6 +146,7 @@ export async function GET(request: Request) {
     // return NextResponse.json({ imported: listingsCG.length, listingsCG })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
+    console.log('Ingest ERROR:', message);
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
