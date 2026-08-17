@@ -12,7 +12,7 @@ export type TokenCategory = 'Presale' | 'Tech' | 'Meme' | 'RWA' | 'Airdrop'
 
 export type TokenStatus = 'approved' | 'pending_review' | 'rejected'
 
-export type SourceType = 'coinmarketcap' | 'dex' | 'user_paid' | 'coingecko'
+export type SourceType = 'coinmarketcap' | 'dex' | 'user_paid' | 'coingecko' | 'coinranking'
 
 export type Confidence = 'low' | 'medium' | 'high'
 
