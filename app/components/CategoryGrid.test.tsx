@@ -79,6 +79,7 @@ const createMockToken = (id: string, name: string, category: TokenCategory, crea
   symbol: 'TT',
   chain: 'Ethereum',
   contract_address: null,
+  slug: 'tt',
   category,
   short_description: `${name} description`,
   full_description: 'Full description',

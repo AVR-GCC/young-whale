@@ -38,6 +38,7 @@ const mockToken: TokenWithHashtags = {
   symbol: 'TEST',
   chain: 'ethereum',
   contract_address: '0x123',
+  slug: 'test',
   category: 'Tech',
   short_description: 'A test token',
   full_description: 'This is a test token for testing purposes.',

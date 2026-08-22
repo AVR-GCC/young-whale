@@ -67,7 +67,7 @@ export async function GET(request: Request) {
           const srcListings = newListings[src.name]
           if (!srcListings) return true
           const newTokens = await Promise.all(srcListings.map(async listing => {
-            const exists = await isTokenInRawTokens(listing.symbol)
+            const exists = await isTokenInRawTokens(listing.symbol, listing.name)
             // console.log(listing.symbol, 'from', src.name, exists ? 'exists' : 'added');
             if (exists) {
               foundSet[src.name] = true

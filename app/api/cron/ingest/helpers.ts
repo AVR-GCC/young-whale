@@ -86,11 +86,12 @@ export async function getChains() {
   return data ?? []
 }
 
-export async function isTokenInRawTokens(symbol: string): Promise<boolean> {
+export async function isTokenInRawTokens(symbol: string, name: string): Promise<boolean> {
   const { data, error } = await supabaseService
     .from('raw_tokens')
     .select('id')
     .eq('symbol', symbol)
+    .eq('name', name)
     .maybeSingle()
 
   if (error) {
