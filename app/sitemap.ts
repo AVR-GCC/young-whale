@@ -22,6 +22,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   //   .select('slug')
   //   .eq('is_active', true)
 
+  // Get total count for pagination
+  const { count: totalTokens } = await supabase
+    .from('tokens')
+    .select('*', { count: 'exact', head: true })
+    .not('published_at', 'is', null)
+
+  const TOKENS_PER_PAGE = 20
+  const totalPages = Math.ceil((totalTokens ?? 0) / TOKENS_PER_PAGE)
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
@@ -56,6 +65,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // },
   ]
 
+  // Paginated archive pages
+  const paginatedPages: MetadataRoute.Sitemap = Array.from(
+    { length: Math.max(0, totalPages - 1) },
+    (_, i) => {
+      const pageNum = i + 2
+      return {
+        url: `${BASE_URL}/page/${pageNum}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily' as const,
+        priority: 0.4,
+      }
+    }
+  )
+
   // Hashtag pages
   // const hashtagPages: MetadataRoute.Sitemap = (hashtags ?? []).map(hashtag => ({
   //   url: `${BASE_URL}/hashtag/${hashtag.slug}`,
@@ -72,5 +95,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }))
 
-  return [...staticPages, ...tokenPages /* , ...hashtagPages */]
+  return [...staticPages, ...paginatedPages, ...tokenPages /* , ...hashtagPages */]
 }
