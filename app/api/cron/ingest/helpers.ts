@@ -1,29 +1,31 @@
 import { supabaseService } from '@/lib/supabase/service'
 import { CMCListing, CMCListingEntry, CMCSource, CMCSourceType } from './coinmarketcap'
-// import { CGListing, CGListingEntry, CGSource, CGSourceType } from './coingecko'
+import { CRListing, CRListingEntry, CRSource, CRSourceType } from './coinranking'
 
 export type { CMCListing, CMCDetails } from './coinmarketcap'
 export type { CGListing, CGDetails } from './coingecko'
+export type { CRListing, CRDetails } from './coinranking'
 
 export type Listing =
 | CMCListing
-// | CGListing
+| CRListing
 
 export type SourceObject =
 | CMCSourceType
-// | CGSourceType
+| CRSourceType
 
 export type ListingEntry =
 | CMCListingEntry
-// | CGListingEntry
+| CRListingEntry
 
 export const sources: SourceObject[] = [
   CMCSource,
-  // CGSource
+  CRSource
 ]
 
 export const sourceLookup = {
   coinmarketcap: CMCSource,
+  coinranking: CRSource,
   // coingecko: CGSource,
 }
 
@@ -34,6 +36,9 @@ export function processToken(
 ) {
   switch (listingEntry.source) {
     case 'coinmarketcap': {
+      return sourceLookup[listingEntry.source].processToken(listingEntry.listing, chains, hashtagMap)
+    }
+    case 'coinranking': {
       return sourceLookup[listingEntry.source].processToken(listingEntry.listing, chains, hashtagMap)
     }
     // case 'coingecko': {
@@ -81,12 +86,11 @@ export async function getChains() {
   return data ?? []
 }
 
-export async function isTokenInRawTokens(symbol: string, name: string): Promise<boolean> {
+export async function isTokenInRawTokens(symbol: string): Promise<boolean> {
   const { data, error } = await supabaseService
     .from('raw_tokens')
     .select('id')
     .eq('symbol', symbol)
-    .eq('name', name)
     .maybeSingle()
 
   if (error) {

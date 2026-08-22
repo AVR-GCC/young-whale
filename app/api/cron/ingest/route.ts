@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     }
   }
 
-  if (!process.env.COINMARKETCAP_API_KEY) {
+  if (!process.env.COINMARKETCAP_API_KEY && !process.env.COINRANKING_API_KEY) {
     return NextResponse.json(
       { error: 'COINMARKETCAP_API_KEY is not set' },
       { status: 500 }
@@ -48,9 +48,12 @@ export async function GET(request: Request) {
 
       while (Object.keys(foundSet).length < sources.length) {
         // get batches
+        // console.log('batches');
         await Promise.all(sources.map(async src => {
           if (foundSet[src.name]) return true
+          // console.log('src.name', src.name);
           const lst = await src.getListings(batchSize, start)
+          // console.log('lst.length', lst.length);
           if (lst.length === 0) {
             foundSet[src.name] = true
             return true
@@ -59,11 +62,13 @@ export async function GET(request: Request) {
         }))
 
         // filter existing tokens
+        // console.log('filter existing');
         await Promise.all(sources.map(async src => {
           const srcListings = newListings[src.name]
           if (!srcListings) return true
           const newTokens = await Promise.all(srcListings.map(async listing => {
-            const exists = await isTokenInRawTokens(listing.symbol, listing.name)
+            const exists = await isTokenInRawTokens(listing.symbol)
+            // console.log(listing.symbol, 'from', src.name, exists ? 'exists' : 'added');
             if (exists) {
               foundSet[src.name] = true
               return null
@@ -71,6 +76,7 @@ export async function GET(request: Request) {
             return listing
           }))
           const filtered = newTokens.filter(nt => !!nt)
+          // console.log('added', filtered.length, 'from', src.name);
           newListings[src.name] = filtered
         }))
 
@@ -121,6 +127,7 @@ export async function GET(request: Request) {
         console.error(`Failed to insert ${entry.listing.symbol}:`, error.message)
         results.push({ symbol: entry.listing.symbol, success: false, error: error.message })
       } else {
+        // console.log('adding', entry.listing.symbol, 'from', entry.source);
         results.push({ symbol: entry.listing.symbol, success: true, data })
         rawTokenIds.push(data.id)
       }
@@ -141,9 +148,18 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({ imported: results.length, results })
 
-    // const listingsCG: Array<CGListing> = await getLatestListingsCG(30)
-    // console.log('listingsCG', listingsCG.length, listingsCG.map(lcg => lcg.name));
-    // return NextResponse.json({ imported: listingsCG.length, listingsCG })
+    // const chains = await getChains()
+    // console.log('chains before', chains);
+    // const listingsCR: Array<CRListing> = await getLatestListingsCR(4)
+    // console.log('listingsCR', listingsCR.length, listingsCR);
+    // const hashtagMap = new Map<string, string>()
+    // for (let i = 0; i < listingsCR.length; i++) {
+    //   const dets = await processTokenCR(listingsCR[i], chains, hashtagMap)
+    //   console.log('dets', dets);
+    // }
+    // console.log('chains after', chains);
+    // console.log('hashtagMap', hashtagMap);
+    // return NextResponse.json({ imported: listingsCR.length, listingsCR })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.log('Ingest ERROR:', message);
