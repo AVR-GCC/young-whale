@@ -92,15 +92,7 @@ async function processJob(
     })
     .eq('id', runId)
 
-  const uniqueKey = raw.contract_address
-    ? `${raw.chain}_${raw.contract_address}`.toLowerCase()
-    : `${raw.website_url ?? ''}_${raw.name}`.toLowerCase().replace(/[^a-z0-9]/g, '_')
-
-  let slug = `${raw.name}-${raw.symbol}`
-  .toLowerCase()
-  .replace(/[^a-z0-9]+/g, '-')
-  .replace(/^-|-$/g, '')
-
+  let slug = raw.symbol.toLowerCase()
   slug = await ensureUniqueSlug(slug)
   const exchange_links = raw.exchange_links && raw.exchange_links.length > 0
     ? raw.exchange_links
@@ -137,7 +129,6 @@ async function processJob(
     symbol: raw.symbol,
     chain: raw.chain,
     contract_address: raw.contract_address,
-    unique_key: uniqueKey,
     slug,
     category: aiResult.category as TokenCategory,
     short_description: aiResult.short_description,
@@ -169,7 +160,7 @@ async function processJob(
     .eq('id', runId)
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
-    .upsert(tokenData, { onConflict: 'unique_key' })
+    .upsert(tokenData, { onConflict: 'slug' })
     .select()
     .single()
 

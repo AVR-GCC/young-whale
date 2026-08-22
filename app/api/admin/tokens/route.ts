@@ -167,17 +167,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate unique_key from chain + contract_address (or chain + symbol if no contract)
-    const unique_key = contract_address
-      ? `${chain.toLowerCase()}:${contract_address.toLowerCase()}`
-      : `${chain.toLowerCase()}:${symbol.toLowerCase()}`
-
     const tokenData = {
       name,
       symbol,
       chain,
       contract_address: contract_address || null,
-      unique_key,
       slug,
       category,
       short_description: body.short_description || null,
