@@ -92,8 +92,6 @@ async function processJob(
     })
     .eq('id', runId)
 
-  let slug = raw.symbol.toLowerCase()
-  slug = await ensureUniqueSlug(slug)
   const exchange_links = raw.exchange_links && raw.exchange_links.length > 0
     ? raw.exchange_links
     : await fetchDexScreenerLinks(raw);
@@ -129,7 +127,6 @@ async function processJob(
     symbol: raw.symbol,
     chain: raw.chain,
     contract_address: raw.contract_address,
-    slug,
     category: aiResult.category as TokenCategory,
     short_description: aiResult.short_description,
     full_description: aiResult.full_description,
@@ -160,7 +157,7 @@ async function processJob(
     .eq('id', runId)
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
-    .upsert(tokenData, { onConflict: 'slug' })
+    .upsert(tokenData, { onConflict: 'symbol' })
     .select()
     .single()
 
@@ -417,31 +414,6 @@ function validateAIResult(
   }
 
   return { valid: true }
-}
-
-async function ensureUniqueSlug(baseSlug: string): Promise<string> {
-  let slug = baseSlug
-  let suffix = 2
-
-  while (true) {
-    const { data, error } = await supabaseService
-      .from('tokens')
-      .select('id')
-      .eq('slug', slug)
-      .maybeSingle()
-
-    if (error) {
-      console.error('Error checking slug collision:', error.message)
-      break
-    }
-
-    if (!data) break
-
-    slug = `${baseSlug}-${suffix}`
-    suffix++
-  }
-
-  return slug
 }
 
 async function markJobFailed(job: ProcessingQueueJob, errorMessage: string) {

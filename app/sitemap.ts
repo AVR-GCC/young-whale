@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all approved tokens
   const { data: tokens } = await supabase
     .from('tokens')
-    .select('slug, updated_at')
+    .select('symbol, updated_at')
     .eq('status', 'approved')
     .order('updated_at', { ascending: false })
 
@@ -66,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Token pages — one per approved token
   const tokenPages: MetadataRoute.Sitemap = (tokens ?? []).map(token => ({
-    url: `${BASE_URL}/token/${token.slug}`,
+    url: `${BASE_URL}/token/${token.symbol.toLowerCase()}`,
     lastModified: new Date(token.updated_at),
     changeFrequency: 'weekly' as const,  // token data doesn't change often
     priority: 0.6,

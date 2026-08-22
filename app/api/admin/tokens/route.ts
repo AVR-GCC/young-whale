@@ -158,11 +158,11 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     // Required fields
-    const { name, symbol, chain, contract_address, slug, category } = body
+    const { name, symbol, chain, contract_address, category } = body
 
-    if (!name || !symbol || !chain || !slug || !category) {
+    if (!name || !symbol || !chain || !category) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, symbol, chain, slug, category' },
+        { error: 'Missing required fields: name, symbol, chain, category' },
         { status: 400 }
       )
     }
@@ -172,7 +172,6 @@ export async function POST(request: Request) {
       symbol,
       chain,
       contract_address: contract_address || null,
-      slug,
       category,
       short_description: body.short_description || null,
       full_description: body.full_description || null,

@@ -93,6 +93,58 @@ function setupMockFetch() {
       const limit = limitMatch ? parseInt(limitMatch[1], 10) : 50
       return Promise.resolve({ ok: true, json: async () => ({ data: mockListings.slice(0, limit) }) })
     }
+    if (url.includes('/coins') && !url.includes('/coin/')) {
+      // Coinranking listings endpoint
+      const limitMatch = url.match(/limit=(\d+)/)
+      const limit = limitMatch ? parseInt(limitMatch[1], 10) : 50
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          data: {
+            coins: mockListings.slice(0, limit).map((l) => ({
+              uuid: `uuid-${l.id}`,
+              symbol: l.symbol,
+              name: l.name,
+              iconUrl: 'https://example.com/icon.png',
+              marketCap: '1000000',
+              price: '1.00',
+              listedAt: Date.now(),
+              tier: 1,
+              change: '0',
+              rank: l.id,
+              '24hVolume': '100000',
+              btcPrice: '0.00001',
+              contractAddresses: [],
+            })),
+          },
+        }),
+      })
+    }
+    if (url.includes('/coin/')) {
+      // Coinranking details endpoint
+      const uuidMatch = url.match(/\/coin\/([^/]+)/)
+      const uuid = uuidMatch ? uuidMatch[1] : 'uuid-1'
+      const id = uuid.replace('uuid-', '')
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          data: {
+            coin: {
+              uuid,
+              symbol: `TKN${id}`,
+              name: `Token ${id}`,
+              description: 'Test token',
+              color: '#000000',
+              iconUrl: 'https://example.com/icon.png',
+              websiteUrl: 'https://example.com',
+              links: [],
+              tags: [],
+              coinrankingUrl: `https://coinranking.com/coin/${uuid}`,
+            },
+          },
+        }),
+      })
+    }
     const idMatch = url.match(/id=(\d+)/)
     const id = idMatch ? idMatch[1] : '1'
     return Promise.resolve({
@@ -159,15 +211,16 @@ describe('GET /api/cron/ingest', () => {
     expect(response.status).toBe(200)
   })
 
-  it('returns 500 when COINMARKETCAP_API_KEY is not set', async () => {
+  it('returns 500 when COINMARKETCAP_API_KEY and COINRANKING_API_KEY are not set', async () => {
     vi.stubEnv('COINMARKETCAP_API_KEY', '')
+    vi.stubEnv('COINRANKING_API_KEY', '')
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 
     const response = await GET(createRequest('Bearer test-cron-secret'))
     const json = await response.json()
 
     expect(response.status).toBe(500)
-    expect(json.error).toBe('COINMARKETCAP_API_KEY is not set')
+    expect(json.error).toBe('COINMARKETCAP_API_KEY and COINRANKING_API_KEY are not set')
   })
 
   it('ingests 20 tokens when raw_tokens table is empty', async () => {

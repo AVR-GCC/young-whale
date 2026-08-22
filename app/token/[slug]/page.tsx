@@ -37,7 +37,7 @@ async function getToken(slug: string): Promise<TokenWithHashtags | null> {
         hashtags(id, name, slug)
       )`
     )
-    .eq('slug', slug)
+    .eq('symbol', slug.toUpperCase())
     .not('published_at', 'is', null)
     .single()
 
@@ -75,7 +75,7 @@ export async function generateMetadata({ params }: TokenPageProps): Promise<Meta
       title,
       description,
       type: 'article',
-      url: `https://youngwhale.io/token/${token.slug}`,
+      url: `https://youngwhale.io/token/${token.symbol.toLowerCase()}`,
       images: token.logo_url ? [token.logo_url] : [],
     },
     twitter: {
@@ -108,7 +108,7 @@ export default async function TokenPage({ params }: TokenPageProps) {
     '@type': 'WebPage',
     name: `${token.name} (${token.symbol})`,
     description: token.full_description || token.short_description || '',
-    url: `https://youngwhale.io/token/${token.slug}`,
+    url: `https://youngwhale.io/token/${token.symbol.toLowerCase()}`,
     image: token.logo_url || undefined,
     datePublished: token.published_at || token.created_at,
     dateModified: token.updated_at,

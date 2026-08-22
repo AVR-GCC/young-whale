@@ -147,7 +147,6 @@ export default function TokenEditDrawer({
           symbol: editedToken.symbol || '',
           chain: editedToken.chain || '',
           contract_address: editedToken.contract_address || null,
-          slug: editedToken.slug || '',
           category: editedToken.category || 'Meme',
           short_description: editedToken.short_description || null,
           full_description: editedToken.full_description || null,
@@ -202,7 +201,6 @@ export default function TokenEditDrawer({
         'name',
         'symbol',
         'contract_address',
-        'slug',
         'chain',
         'category',
         'short_description',
@@ -611,18 +609,6 @@ export default function TokenEditDrawer({
               </div>
 
               {/* Editable fields */}
-              <div>
-                <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  value={currentToken.slug ?? ''}
-                  onChange={(e) => updateField('slug', e.target.value)}
-                  className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded bg-white dark:bg-zinc-900 text-black dark:text-zinc-50 text-sm"
-                />
-              </div>
-
               <div>
                 <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-1">
                   Category

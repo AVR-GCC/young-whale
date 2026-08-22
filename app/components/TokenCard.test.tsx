@@ -29,7 +29,6 @@ const mockToken: TokenWithHashtags = {
   symbol: 'TEST',
   chain: 'Ethereum',
   contract_address: '0x1234567890abcdef1234567890abcdef12345678',
-  slug: 'testtoken',
   category: 'Tech',
   short_description: 'A test token for testing',
   full_description: 'This is the full description of the test token with more details.',
@@ -73,7 +72,6 @@ const mockTokenNoOptional: TokenWithHashtags = {
   symbol: 'MIN',
   chain: 'Solana',
   contract_address: null,
-  slug: 'minimaltoken',
   category: 'Meme',
   short_description: null,
   full_description: null,
@@ -265,7 +263,7 @@ describe('TokenCard', () => {
 
     if (card) {
       fireEvent.click(card)
-      expect(mockPush).toHaveBeenCalledWith('/token/testtoken')
+      expect(mockPush).toHaveBeenCalledWith('/token/test')
       expect(mockSetIsExpanded).not.toHaveBeenCalled()
     }
 

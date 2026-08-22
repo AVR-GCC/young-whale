@@ -82,7 +82,6 @@ export interface Token {
   symbol: string
   chain: string
   contract_address: string | null
-  slug: string
   category: TokenCategory
   short_description: string | null
   full_description: string | null

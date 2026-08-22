@@ -38,7 +38,6 @@ const mockToken: TokenWithHashtags = {
   symbol: 'TEST',
   chain: 'ethereum',
   contract_address: '0x123',
-  slug: 'test-token',
   category: 'Tech',
   short_description: 'A test token',
   full_description: 'This is a test token for testing purposes.',
@@ -144,9 +143,6 @@ describe('TokenEditDrawer', () => {
       />
     )
 
-    await waitFor(() => {
-      expect(screen.getByDisplayValue('test-token')).toBeDefined()
-    })
     await waitFor(() => {
       expect(screen.getByDisplayValue('A test token')).toBeDefined()
     })

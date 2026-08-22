@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   if (!process.env.COINMARKETCAP_API_KEY && !process.env.COINRANKING_API_KEY) {
     return NextResponse.json(
-      { error: 'COINMARKETCAP_API_KEY is not set' },
+      { error: 'COINMARKETCAP_API_KEY and COINRANKING_API_KEY are not set' },
       { status: 500 }
     )
   }

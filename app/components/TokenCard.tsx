@@ -155,12 +155,12 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
       if (onMobileClick) {
         onMobileClick()
       } else {
-        router.push(`/token/${token.slug}`)
+        router.push(`/token/${token.symbol.toLowerCase()}`)
       }
     } else {
       toggle()
     }
-  }, [router, token.slug, toggle, onMobileClick])
+  }, [router, token.symbol, toggle, onMobileClick])
 
   // const expand = useCallback(() => {
   //   setIsExpanded(true);
@@ -295,7 +295,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
         {/* Hidden SEO link for crawlers */}
         <Link
-          href={`/token/${token.slug}`}
+          href={`/token/${token.symbol.toLowerCase()}`}
           className="sr-only"
           aria-hidden="true"
           tabIndex={-1}
