@@ -33,10 +33,24 @@ interface AIResult {
   confidence: string
 }
 
+function generateUniqueSlug(symbol: string, slugSet: Set<string>): string {
+  let slug = symbol
+  let counter = 2
+
+  while (slugSet.has(slug)) {
+    slug = `${symbol}-${counter}`
+    counter++
+  }
+
+  slugSet.add(slug)
+  return slug
+}
+
 async function processJob(
   job: ProcessingQueueJob,
   allowedHashtags: string[],
-  runId: string
+  runId: string,
+  slugSet: Set<string>
 ): Promise<'success' | 'failed'> {
   const { data: rawToken, error: rawError } = await supabaseService
     .from('raw_tokens')
@@ -53,9 +67,10 @@ async function processJob(
   const raw = rawToken as RawToken
 
   if (!raw.name || !raw.symbol) {
-    await markJobFailed(job, 'Missing required fields: name, symbol, or chain')
+    await markJobFailed(job, 'Missing required fields: name or symbol')
     return 'failed'
   }
+
   await supabaseService
     .from('processing_runs')
     .update({
@@ -85,6 +100,7 @@ async function processJob(
     await markJobFailed(job, validation.error)
     return 'failed'
   }
+
   await supabaseService
     .from('processing_runs')
     .update({
@@ -121,9 +137,12 @@ async function processJob(
     }
   }
 
+  const slug = generateUniqueSlug(raw.symbol, slugSet)
+
   const tokenData = {
     name: raw.name,
     display_name: raw.name,
+    slug,
     symbol: raw.symbol,
     chain: raw.chain,
     contract_address: raw.contract_address,
@@ -155,13 +174,15 @@ async function processJob(
       message: `Got exchanges for ${raw.name}`,
     })
     .eq('id', runId)
+
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
-    .upsert(tokenData, { onConflict: 'symbol' })
+    .upsert(tokenData, { onConflict: 'slug' })
     .select()
     .single()
 
   if (upsertError || !upserted) {
+    console.log('upsertError', raw.name, upsertError);
     await markJobFailed(
       job,
       upsertError?.message ?? 'Failed to upsert token'
@@ -175,6 +196,7 @@ async function processJob(
       message: `Token ${raw.name} saved`,
     })
     .eq('id', runId)
+
   if (validCmcTags.length > 0) {
     const { data: hashtagRows } = await supabaseService
       .from('hashtags')
@@ -464,6 +486,14 @@ async function runProcessing(runId: string) {
 
     const allowedHashtags = (hashtagRows ?? []).map((h: { slug: string }) => h.slug)
 
+    const { data: existingTokens } = await supabaseService
+      .from('tokens')
+      .select('slug')
+
+    const slugSet = new Set(
+      (existingTokens ?? []).map((t: { slug: string }) => t.slug)
+    )
+
     await supabaseService
     .from('processing_runs')
     .update({
@@ -506,7 +536,7 @@ async function runProcessing(runId: string) {
 
       for (const job of jobs as ProcessingQueueJob[]) {
         try {
-          const result = await processJob(job, allowedHashtags, runId)
+          const result = await processJob(job, allowedHashtags, runId, slugSet)
           if (result === 'success') {
             processed++
           } else {
