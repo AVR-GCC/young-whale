@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Outfit, Oxanium, JetBrains_Mono, Space_Mono } from 'next/font/google'
 import './index.css'
+import { YMYLTrustSignals } from './components/YMYLTrustSignals'
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -42,7 +43,10 @@ export default function RootLayout({
       lang="en"
       className={`${outfit.variable} ${oxanium.variable} ${jetbrainsMono.variable} ${spaceMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <YMYLTrustSignals />
+        {children}
+      </body>
     </html>
   )
 }
