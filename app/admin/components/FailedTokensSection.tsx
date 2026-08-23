@@ -87,6 +87,7 @@ export default function FailedTokensSection() {
       const data = await res.json()
       if (res.ok) {
         setRefreshKey((k) => k + 1)
+        window.dispatchEvent(new Event('tokens-requeued'))
       } else {
         setError(data.error || 'Failed to requeue token')
       }
@@ -107,6 +108,7 @@ export default function FailedTokensSection() {
       const data = await res.json()
       if (res.ok) {
         setRefreshKey((k) => k + 1)
+        window.dispatchEvent(new Event('tokens-requeued'))
       } else {
         setError(data.error || 'Failed to requeue all tokens')
       }

@@ -350,6 +350,7 @@ export default function TokenEditDrawer({
         if (onDelete) {
           onDelete(tokenId)
         }
+        window.dispatchEvent(new Event('tokens-requeued'))
       } else {
         showToast(data.error || 'Failed to re-queue token', 'error')
       }

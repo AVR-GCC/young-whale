@@ -51,6 +51,16 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
     })
   }, [])
 
+  useEffect(() => {
+    const handleRequeue = () => {
+      fetchAvailableTokens().then(count => {
+        if (count !== null) setAvailableTokens(count)
+      })
+    }
+    window.addEventListener('tokens-requeued', handleRequeue)
+    return () => window.removeEventListener('tokens-requeued', handleRequeue)
+  }, [])
+
   const pollStatus = useCallback((runId: string) => {
     clearPollInterval()
 

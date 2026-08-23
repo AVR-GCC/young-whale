@@ -362,6 +362,7 @@ export default function TokensSection() {
         setSelectedIds(new Set())
         fetchTokens()
         fetchStats()
+        window.dispatchEvent(new Event('tokens-requeued'))
       }
     } catch (err) {
       showToast(err instanceof Error ? err.message : 'Action failed', 'error')
