@@ -12,6 +12,7 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
   const [processLoading, setProcessLoading] = useState(false)
   const [ingestStatus, setIngestStatus] = useState<string>('')
   const [ingestLoading, setIngestLoading] = useState(false)
+  const [availableTokens, setAvailableTokens] = useState<number | null>(null)
   const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const clearPollInterval = useCallback(() => {
@@ -24,6 +25,31 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
   useEffect(() => {
     return clearPollInterval
   }, [clearPollInterval])
+
+  const fetchAvailableTokens = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('processing_queue')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'queued')
+
+      if (error) {
+        console.error('Error fetching available tokens:', error)
+        return null
+      }
+
+      return count
+    } catch (err) {
+      console.error('Error fetching available tokens:', err)
+      return null
+    }
+  }
+
+  useEffect(() => {
+    fetchAvailableTokens().then(count => {
+      if (count !== null) setAvailableTokens(count)
+    })
+  }, [])
 
   const pollStatus = useCallback((runId: string) => {
     clearPollInterval()
@@ -44,10 +70,16 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
           setProcessStatus(`Completed! Processed: ${data.processed}, Failed: ${data.failed}`)
           setProcessLoading(false)
           clearPollInterval()
+          fetchAvailableTokens().then(count => {
+            if (count !== null) setAvailableTokens(count)
+          })
         } else if (data.status === 'failed') {
           setProcessStatus(`Failed: ${data.errorMessage || 'Unknown error'}`)
           setProcessLoading(false)
           clearPollInterval()
+          fetchAvailableTokens().then(count => {
+            if (count !== null) setAvailableTokens(count)
+          })
         } else {
           setProcessStatus(`Processing...\n${data.message || ''}`)
         }
@@ -99,6 +131,9 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
 
       setIngestStatus(`Ingested ${data.imported} tokens`)
       setIngestLoading(false)
+      fetchAvailableTokens().then(count => {
+        if (count !== null) setAvailableTokens(count)
+      })
     } catch (err) {
       setIngestStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`)
       setIngestLoading(false)
@@ -124,6 +159,11 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
           <p className={`text-sm text-center whitespace-pre-line ${processStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>
             {processStatus}
           </p>
+        )}
+        {availableTokens !== null && !processStatus && (
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            {availableTokens} token{availableTokens !== 1 ? 's' : ''} available
+          </span>
         )}
       </div>
       <div className="flex flex-col items-center gap-1 w-80 h-20">
