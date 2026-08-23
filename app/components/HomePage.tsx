@@ -88,7 +88,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   })
 
   return (
-    <div className="min-h-dvh w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit selection:bg-[#00E5D2]/30 selection:text-[#00E5D2] relative overflow-x-hidden">
+    <div className="min-h-[calc(100dvh-65px)] sm:min-h-dvh w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit selection:bg-[#00E5D2]/30 selection:text-[#00E5D2] relative overflow-x-hidden">
       {/* Legal Modal */}
       <LegalModal
         isOpen={legalModalTab !== null}
