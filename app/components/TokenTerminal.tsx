@@ -165,7 +165,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             </div>
           </div>
 
-          <div className="max-sm:overflow-y-auto max-sm:flex-1">
+          <div className="max-sm:overflow-x-clip max-sm:overflow-y-auto max-sm:flex-1">
 
           {/* Token Header */}
           <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
