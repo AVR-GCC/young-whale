@@ -1,13 +1,34 @@
-export function YMYLTrustSignals() {
-  const now = new Date()
-  const formattedDateTime = now.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  })
+import { supabaseService } from '@/lib/supabase/service'
+
+async function getLastPublishedAt(): Promise<Date | null> {
+  const { data, error } = await supabaseService
+    .from('tokens')
+    .select('published_at')
+    .not('published_at', 'is', null)
+    .order('published_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (error || !data?.published_at) {
+    return null
+  }
+
+  return new Date(data.published_at)
+}
+
+export async function YMYLTrustSignals() {
+  const lastPublishedAt = await getLastPublishedAt()
+
+  const formattedDateTime = lastPublishedAt
+    ? lastPublishedAt.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      })
+    : '—'
 
   return (
     <div className="w-full bg-[#0B0F19]/95 backdrop-blur-sm border-t border-cyan-400/20 sm:border-b sm:border-cyan-400/10 py-2 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] sm:shadow-none">
