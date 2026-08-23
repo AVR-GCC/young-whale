@@ -251,7 +251,7 @@ describe('TokenCard', () => {
     }
   })
 
-  it('navigates to token page on mobile tap', () => {
+  it('renders a Link to token page on mobile', () => {
     // Mock mobile viewport
     const originalInnerWidth = window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
@@ -261,13 +261,11 @@ describe('TokenCard', () => {
     })
 
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
-    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
-    if (card) {
-      fireEvent.click(card)
-      expect(mockPush).toHaveBeenCalledWith('/token/test')
-      expect(mockSetIsExpanded).not.toHaveBeenCalled()
-    }
+    // Check that a Link element with proper href exists for SEO
+    const link = screen.getByRole('link', { name: /A test token for testing/i })
+    expect(link.getAttribute('href')).toBe('/token/test')
+    expect(mockSetIsExpanded).not.toHaveBeenCalled()
 
     // Restore viewport
     Object.defineProperty(window, 'innerWidth', {
@@ -277,7 +275,7 @@ describe('TokenCard', () => {
     })
   })
 
-  it('calls onMobileClick instead of navigating on mobile tap when provided', () => {
+  it('renders a Link component for SEO on mobile', () => {
     const originalInnerWidth = window.innerWidth
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -285,25 +283,19 @@ describe('TokenCard', () => {
       value: 375,
     })
 
-    const mockOnMobileClick = vi.fn()
     render(
       <TokenCard
         themeColor="#ff0000"
         token={mockToken}
         isExpanded={false}
         setIsExpandedAction={mockSetIsExpanded}
-        onMobileClick={mockOnMobileClick}
         chainIcons={chainIcons}
       />
     )
-    const card = screen.getAllByText('A test token for testing')[0].closest('[class*="cursor-pointer"]')
 
-    if (card) {
-      fireEvent.click(card)
-      expect(mockOnMobileClick).toHaveBeenCalled()
-      expect(mockPush).not.toHaveBeenCalled()
-      expect(mockSetIsExpanded).not.toHaveBeenCalled()
-    }
+    // Check that a Link element with proper href exists
+    const link = screen.getByRole('link', { name: /A test token for testing/i })
+    expect(link.getAttribute('href')).toBe('/token/test')
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,

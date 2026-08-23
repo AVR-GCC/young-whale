@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+
 import type { TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip';
 import TokenTerminal from './TokenTerminal';
@@ -147,19 +147,15 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
     setIsExpandedAction(!isExpanded);
   }, [isExpanded, setIsExpandedAction]);
 
-  const router = useRouter()
-
   const handleClick = useCallback(() => {
     if (window.innerWidth < 768) {
       if (onMobileClick) {
         onMobileClick()
-      } else {
-        router.push(`/token/${token.symbol.toLowerCase()}`)
       }
     } else {
       toggle()
     }
-  }, [router, token.symbol, toggle, onMobileClick])
+  }, [toggle, onMobileClick])
 
   // const expand = useCallback(() => {
   //   setIsExpanded(true);
@@ -259,47 +255,52 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
       <div
         className="flex items-center h-auto md:h-[46px] w-full px-3 md:px-4 py-1.5 gap-3 overflow-hidden"
       >
-        {/* Token Logo */}
-        <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
-          <div className="flex-shrink-0 transition-transform hover:scale-105">
-            <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={32} chainIcons={chainIcons} />
-          </div>
-        </CustomTooltip>
-
-        {/* Token Name - visible text on desktop */}
-        <span className="hidden md:inline font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
-          {token.display_name}
-        </span>
-
-        {/* Desktop Description */}
-        <div
-          className="hidden md:block flex-grow min-w-0 overflow-hidden text-[11px] text-[#CBD5E1] font-normal whitespace-nowrap text-left ml-1.5 md:ml-2 mr-1 md:mr-2"
-          style={descMaskStyle}
+        {/* Token Logo and Name as proper Link for SEO */}
+        <Link
+          href={`/token/${token.symbol.toLowerCase()}`}
+          className="flex items-center gap-3 flex-grow min-w-0 no-underline"
+          onClick={(e) => {
+            // On mobile, prevent navigation and open overlay instead
+            // On desktop, prevent navigation since card expands inline
+            e.preventDefault();
+            if (window.innerWidth < 768 && onMobileClick) {
+              onMobileClick();
+            } else if (window.innerWidth >= 768) {
+              toggle();
+            }
+          }}
         >
-          {token.short_description}
-        </div>
+          <CustomTooltip content={`${token.name} launched on ${token.chain} Network`} position="right" borderColor={themeColor}>
+            <div className="flex-shrink-0 transition-transform hover:scale-105">
+              <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={32} chainIcons={chainIcons} />
+            </div>
+          </CustomTooltip>
 
-        {/* Mobile: Name above Description */}
-        <div className="md:hidden flex flex-col flex-grow min-w-0">
-          <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate">
-            {token.name}
+          {/* Token Name - visible text on desktop */}
+          <span className="hidden md:inline font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] w-[66px] md:w-[86px] flex-shrink-0 text-left truncate">
+            {token.display_name}
           </span>
+
+          {/* Desktop Description */}
           <div
-            className="text-[11px] text-[#CBD5E1] font-normal truncate text-left"
+            className="hidden md:block flex-grow min-w-0 overflow-hidden text-[11px] text-[#CBD5E1] font-normal whitespace-nowrap text-left ml-1.5 md:ml-2 mr-1 md:mr-2"
             style={descMaskStyle}
           >
             {token.short_description}
           </div>
-        </div>
 
-        {/* Hidden SEO link for crawlers */}
-        <Link
-          href={`/token/${token.symbol.toLowerCase()}`}
-          className="sr-only"
-          aria-hidden="true"
-          tabIndex={-1}
-        >
-          {token.name}
+          {/* Mobile: Name above Description */}
+          <div className="md:hidden flex flex-col flex-grow min-w-0">
+            <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate">
+              {token.name}
+            </span>
+            <div
+              className="text-[11px] text-[#CBD5E1] font-normal truncate text-left"
+              style={descMaskStyle}
+            >
+              {token.short_description}
+            </div>
+          </div>
         </Link>
 
         {/* Hashtag */}
