@@ -167,7 +167,7 @@ export default async function PaginatedPage({ params }: PaginatedPageProps) {
           {/* Pagination Navigation */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 mt-8">
-              {page > 2 && (
+              {page > 1 && (
                 <Link
                   href={`/page/${page - 1}`}
                   className="px-4 py-2 rounded-lg border border-[#1E293B]/40 hover:border-[#1E293B] hover:bg-white/5 transition-all text-sm"
@@ -175,9 +175,9 @@ export default async function PaginatedPage({ params }: PaginatedPageProps) {
                   ← Previous
                 </Link>
               )}
-              {page > 2 && (
+              {page > 1 && (
                 <Link
-                  href="/"
+                  href="/page/1"
                   className="px-4 py-2 rounded-lg border border-[#1E293B]/40 hover:border-[#1E293B] hover:bg-white/5 transition-all text-sm"
                 >
                   First Page
