@@ -32,7 +32,7 @@ describe('YMYLTrustSignals', () => {
 
   it('renders data source attribution', async () => {
     render(await YMYLTrustSignals())
-    expect(screen.getByText(/DATA: CoinMarketCap \/ On-Chain/)).toBeDefined()
+    expect(screen.getByText(/DATA: CoinMarketCap \/ CoinRanking \/ On-Chain/)).toBeDefined()
   })
 
   it('renders financial disclaimer', async () => {

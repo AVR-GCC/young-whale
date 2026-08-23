@@ -39,7 +39,7 @@ export async function YMYLTrustSignals() {
           </span>
           <span className="hidden sm:inline text-slate-600">|</span>
           <span className="text-[10px] tracking-wider">
-            DATA: CoinMarketCap / On-Chain
+            DATA: CoinMarketCap / CoinRanking / On-Chain
           </span>
         </div>
         <div className="text-[10px] tracking-wider text-amber-400/70 font-medium">
