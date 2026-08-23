@@ -24,6 +24,7 @@ export default function FailedTokensSection() {
   const [error, setError] = useState<string>('')
   const [refreshKey, setRefreshKey] = useState(0)
   const [requeueingId, setRequeueingId] = useState<string | null>(null)
+  const [isRequeueingAll, setIsRequeueingAll] = useState(false)
 
   useEffect(() => {
     if (!isOpen) return
@@ -96,6 +97,26 @@ export default function FailedTokensSection() {
     }
   }
 
+  const requeueAll = async () => {
+    if (!confirm('Are you sure you want to requeue all failed tokens?')) return
+
+    setIsRequeueingAll(true)
+    setError('')
+    try {
+      const res = await fetch('/api/admin/raw-tokens/requeue-all', { method: 'POST' })
+      const data = await res.json()
+      if (res.ok) {
+        setRefreshKey((k) => k + 1)
+      } else {
+        setError(data.error || 'Failed to requeue all tokens')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to requeue all tokens')
+    } finally {
+      setIsRequeueingAll(false)
+    }
+  }
+
   const formatDate = (date: string | null) => {
     if (!date) return '-'
     return new Date(date).toLocaleString()
@@ -146,13 +167,24 @@ export default function FailedTokensSection() {
             <div className="text-sm text-zinc-500 dark:text-zinc-400">
               Showing {rawTokens.length} of {pagination.total} failed tokens
             </div>
-            <button
-              onClick={() => setRefreshKey((k) => k + 1)}
-              disabled={isLoading}
-              className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isLoading ? 'Refreshing...' : 'Refresh'}
-            </button>
+            <div className="flex items-center gap-2">
+              {pagination.total > 0 && (
+                <button
+                  onClick={requeueAll}
+                  disabled={isRequeueingAll || isLoading}
+                  className="px-3 py-1.5 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isRequeueingAll ? 'Requeueing...' : 'Requeue All'}
+                </button>
+              )}
+              <button
+                onClick={() => setRefreshKey((k) => k + 1)}
+                disabled={isLoading}
+                className="px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Refreshing...' : 'Refresh'}
+              </button>
+            </div>
           </div>
 
           {isLoading && rawTokens.length === 0 ? (

@@ -282,4 +282,84 @@ describe('FailedTokensSection', () => {
       expect(screen.getByText('REFRESHED')).toBeDefined()
     })
   })
+
+  it('requeue all button requeues all failed tokens and refreshes', async () => {
+    const mockConfirm = vi.fn(() => true)
+    global.confirm = mockConfirm
+
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          rawTokens: [mockFailedToken],
+          pagination: { page: 1, pageSize: 25, total: 1, totalPages: 1 },
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ success: true }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          rawTokens: [{ ...mockFailedToken, symbol: 'REQUEUED' }],
+          pagination: { page: 1, pageSize: 25, total: 1, totalPages: 1 },
+        }),
+      })
+
+    render(<FailedTokensSection />)
+
+    const button = screen.getByText('Failed Tokens')
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getByText('Requeue All')).toBeDefined()
+    })
+
+    const requeueAllButton = screen.getByText('Requeue All')
+    fireEvent.click(requeueAllButton)
+
+    await waitFor(() => {
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to requeue all failed tokens?')
+    })
+
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith('/api/admin/raw-tokens/requeue-all', { method: 'POST' })
+    })
+
+    await waitFor(() => {
+      expect(screen.getByText('REQUEUED')).toBeDefined()
+    })
+  })
+
+  it('requeue all button does nothing when cancelled', async () => {
+    const mockConfirm = vi.fn(() => false)
+    global.confirm = mockConfirm
+
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        rawTokens: [mockFailedToken],
+        pagination: { page: 1, pageSize: 25, total: 1, totalPages: 1 },
+      }),
+    })
+
+    render(<FailedTokensSection />)
+
+    const button = screen.getByText('Failed Tokens')
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      expect(screen.getByText('Requeue All')).toBeDefined()
+    })
+
+    const requeueAllButton = screen.getByText('Requeue All')
+    fireEvent.click(requeueAllButton)
+
+    await waitFor(() => {
+      expect(mockConfirm).toHaveBeenCalledWith('Are you sure you want to requeue all failed tokens?')
+    })
+
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+  })
 })
