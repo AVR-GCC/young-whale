@@ -44,8 +44,12 @@ export default function RootLayout({
       className={`${outfit.variable} ${oxanium.variable} ${jetbrainsMono.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <YMYLTrustSignals />
-        {children}
+        <div className="order-1 sm:order-2 flex-1 flex flex-col">
+          {children}
+        </div>
+        <div className="order-2 sm:order-1">
+          <YMYLTrustSignals />
+        </div>
       </body>
     </html>
   )
