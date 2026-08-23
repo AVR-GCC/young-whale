@@ -110,10 +110,51 @@ export default async function PaginatedPage({ params }: PaginatedPageProps) {
 
   const canonicalUrl = `${BASE_URL}/page/${page}`
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'Home',
+        url: 'https://youngwhale.io/',
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'Token Archive',
+        url: canonicalUrl,
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'New Tech Projects',
+        url: 'https://youngwhale.io/?category=tech',
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'New Meme Coins',
+        url: 'https://youngwhale.io/?category=meme',
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'Latest RWA Tokens',
+        url: 'https://youngwhale.io/?category=rwa',
+      },
+      {
+        '@type': 'SiteNavigationElement',
+        name: 'Upcoming Presales & Airdrops',
+        url: 'https://youngwhale.io/?category=presale',
+      },
+    ],
+  }
+
   return (
     <>
       {/* Self-referencing canonical link */}
       <link rel="canonical" href={canonicalUrl} />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <div className="min-h-dvh w-full flex flex-col items-center bg-[#0B0F19] text-[#F8FAFC] font-outfit">
         <main className="max-w-7xl mx-auto w-full px-4 pt-8 pb-16 flex flex-col gap-6">

@@ -23,10 +23,32 @@ describe('Homepage SEO', () => {
 
     const jsonLd = JSON.parse(script!.textContent!)
     expect(jsonLd['@context']).toBe('https://schema.org')
-    expect(jsonLd['@type']).toBe('WebSite')
-    expect(jsonLd.name).toBe('Young Whale')
-    expect(jsonLd.url).toBe('https://youngwhale.io/')
-    expect(jsonLd.description).toBe(EXPECTED_DESCRIPTION)
+    expect(Array.isArray(jsonLd['@graph'])).toBe(true)
+
+    const webSite = jsonLd['@graph'].find((item: any) => item['@type'] === 'WebSite')
+    expect(webSite).toBeTruthy()
+    expect(webSite.name).toBe('Young Whale')
+    expect(webSite.url).toBe('https://youngwhale.io/')
+    expect(webSite.description).toBe(EXPECTED_DESCRIPTION)
+  })
+
+  it('renders SiteNavigationElement JSON-LD schema for main sections', () => {
+    render(<Home />)
+
+    const script = document.querySelector('script[type="application/ld+json"]')
+    expect(script).toBeTruthy()
+
+    const jsonLd = JSON.parse(script!.textContent!)
+    const navElements = jsonLd['@graph'].filter((item: any) => item['@type'] === 'SiteNavigationElement')
+    expect(navElements.length).toBeGreaterThan(0)
+
+    const homeNav = navElements.find((item: any) => item.name === 'Home')
+    expect(homeNav).toBeTruthy()
+    expect(homeNav.url).toBe('https://youngwhale.io/')
+
+    const techNav = navElements.find((item: any) => item.name === 'New Tech Projects')
+    expect(techNav).toBeTruthy()
+    expect(techNav.url).toBe('https://youngwhale.io/?category=tech')
   })
 
   it('renders the HomePageClient component', () => {
