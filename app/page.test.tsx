@@ -25,7 +25,7 @@ describe('Homepage SEO', () => {
     expect(jsonLd['@context']).toBe('https://schema.org')
     expect(Array.isArray(jsonLd['@graph'])).toBe(true)
 
-    const webSite = jsonLd['@graph'].find((item: any) => item['@type'] === 'WebSite')
+    const webSite = jsonLd['@graph'].find((item: Record<string, unknown>) => item['@type'] === 'WebSite')
     expect(webSite).toBeTruthy()
     expect(webSite.name).toBe('Young Whale')
     expect(webSite.url).toBe('https://youngwhale.io/')
@@ -39,14 +39,14 @@ describe('Homepage SEO', () => {
     expect(script).toBeTruthy()
 
     const jsonLd = JSON.parse(script!.textContent!)
-    const navElements = jsonLd['@graph'].filter((item: any) => item['@type'] === 'SiteNavigationElement')
+    const navElements = jsonLd['@graph'].filter((item: Record<string, unknown>) => item['@type'] === 'SiteNavigationElement')
     expect(navElements.length).toBeGreaterThan(0)
 
-    const homeNav = navElements.find((item: any) => item.name === 'Home')
+    const homeNav = navElements.find((item: Record<string, unknown>) => item.name === 'Home')
     expect(homeNav).toBeTruthy()
     expect(homeNav.url).toBe('https://youngwhale.io/')
 
-    const techNav = navElements.find((item: any) => item.name === 'New Tech Projects')
+    const techNav = navElements.find((item: Record<string, unknown>) => item.name === 'New Tech Projects')
     expect(techNav).toBeTruthy()
     expect(techNav.url).toBe('https://youngwhale.io/?category=tech')
   })

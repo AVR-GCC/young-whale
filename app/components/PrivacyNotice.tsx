@@ -63,7 +63,7 @@ export const PrivacyNotice: React.FC = () => {
           <section>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-4">3. Use of Cookies</h2>
             <p className="mb-3">
-              We use cookies and similar tools to enhance your user experience, ensure our Services function correctly, and understand how users navigate our site. Depending on applicable laws in your region, a cookie banner on your browser will allow you to accept or refuse non-essential cookies. You can adapt your choices in your browser&apos;s cookie preference settings at any time.
+              We use only essential cookies that are strictly necessary for the website to function. These cookies are used solely for authentication and session management purposes (e.g., keeping you signed in when you access protected areas of the site). We do not use cookies for analytics, advertising, or tracking purposes. Because these cookies are essential for the operation of our Services, they cannot be disabled through browser settings without affecting functionality.
             </p>
           </section>
 
