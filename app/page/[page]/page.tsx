@@ -137,11 +137,10 @@ export default async function PaginatedPage({ params }: PaginatedPageProps) {
                 {token.logo_url ? (
                   <Image
                     src={token.logo_url}
-                    alt={`${token.name} logo`}
+                    alt={`${token.name} token logo`}
                     width={40}
                     height={40}
                     className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                    unoptimized
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center flex-shrink-0">
