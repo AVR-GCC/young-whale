@@ -167,8 +167,33 @@ export async function POST(request: Request) {
       )
     }
 
+    const { data: existingTokens } = await supabaseService
+      .from('tokens')
+      .select('slug')
+
+    const slugSet = new Set(
+      (existingTokens ?? []).map((t: { slug: string }) => t.slug)
+    )
+
+    function generateUniqueSlug(symbol: string, slugSet: Set<string>): string {
+      let slug = symbol
+      let counter = 2
+
+      while (slugSet.has(slug)) {
+        slug = `${symbol}-${counter}`
+        counter++
+      }
+
+      slugSet.add(slug)
+      return slug
+    }
+
+    const slug = generateUniqueSlug(symbol, slugSet)
+
     const tokenData = {
       name,
+      display_name: name,
+      slug,
       symbol,
       chain,
       contract_address: contract_address || null,
