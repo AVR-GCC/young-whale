@@ -56,7 +56,7 @@ export default function RootLayout({
           gtag('config', 'G-Q624V34H8T');
         `}
       </Script>
-      <Script id="clarity" strategy="afterInteractive">
+      <Script id="clarity-analytics" strategy="afterInteractive">
         {`
           (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
