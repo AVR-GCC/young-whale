@@ -46,6 +46,13 @@ function generateUniqueSlug(symbol: string, slugSet: Set<string>): string {
   return slug
 }
 
+async function logRunMessage(runId: string, message: string) {
+  await supabaseService
+    .from('processing_runs')
+    .update({ message })
+    .eq('id', runId)
+}
+
 async function processJob(
   job: ProcessingQueueJob,
   allowedHashtags: string[],
@@ -71,12 +78,7 @@ async function processJob(
     return 'failed'
   }
 
-  await supabaseService
-    .from('processing_runs')
-    .update({
-      message: `Processing ${raw.name}`,
-    })
-    .eq('id', runId)
+  await logRunMessage(runId, `Processing ${raw.name}`)
 
   // Extract CMC tags from raw payload
   const cmcDetails = raw.raw_payload?.cmc_details as Record<string, unknown> | undefined
@@ -101,12 +103,7 @@ async function processJob(
     return 'failed'
   }
 
-  await supabaseService
-    .from('processing_runs')
-    .update({
-      message: `Validation for AI response for token: ${raw.name} succeeded`,
-    })
-    .eq('id', runId)
+  await logRunMessage(runId, `Validation for AI response for token: ${raw.name} succeeded`)
 
   const exchange_links = raw.exchange_links && raw.exchange_links.length > 0
     ? raw.exchange_links
@@ -168,12 +165,7 @@ async function processJob(
     supply: raw.supply,
   }
 
-  await supabaseService
-    .from('processing_runs')
-    .update({
-      message: `Got exchanges for ${raw.name}`,
-    })
-    .eq('id', runId)
+  await logRunMessage(runId, `Got exchanges for ${raw.name}`)
 
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
@@ -190,12 +182,7 @@ async function processJob(
     return 'failed'
   }
 
-  await supabaseService
-    .from('processing_runs')
-    .update({
-      message: `Token ${raw.name} saved`,
-    })
-    .eq('id', runId)
+  await logRunMessage(runId, `Token ${raw.name} saved`)
 
   if (validCmcTags.length > 0) {
     const { data: hashtagRows } = await supabaseService
@@ -238,12 +225,7 @@ async function processJob(
   .update({ status: 'processed', error_message: null })
   .eq('id', job.raw_token_id)
 
-  await supabaseService
-    .from('processing_runs')
-    .update({
-      message: `Token ${raw.name} processed`,
-    })
-    .eq('id', runId)
+  await logRunMessage(runId, `Token ${raw.name} processed`)
 
   return 'success'
 }
@@ -345,12 +327,7 @@ ${rawStr}`
 
     while (true) {
       try {
-        await supabaseService
-          .from('processing_runs')
-          .update({
-            message: `Querying ${raw.name} with ${currentModelName}`,
-          })
-          .eq('id', runId)
+        await logRunMessage(runId, `Querying ${raw.name} with ${currentModelName}`)
         const result = await generateText({
           model,
           system,
@@ -358,31 +335,24 @@ ${rawStr}`
           temperature: 0.2,
         })
         text = result.text
+        await logRunMessage(runId, `Querying ${raw.name} with ${currentModelName} - success`)
         break
       } catch (error: unknown) {
         const errorCode = (error as { errors: { statusCode: number }[] }).errors?.[0]?.statusCode;
         if (errorCode === 503) {
-          await supabaseService
-            .from('processing_runs')
-            .update({
-              message: `Model ${currentModelName} is overloaded - waiting one minute`,
-            })
-            .eq('id', runId)
+          await logRunMessage(runId, `Model ${currentModelName} is overloaded - waiting one minute`)
           await new Promise((resolve) => setTimeout(resolve, 60000))
           continue
         }
         if (errorCode === 429) {
           if (i < modelsToTry.length - 1) {
-            await supabaseService
-              .from('processing_runs')
-              .update({
-                message: `Model ${currentModelName} quota finished`,
-              })
-              .eq('id', runId)
+            await logRunMessage(runId, `Model ${currentModelName} quota finished`)
             break
           }
+          await logRunMessage(runId, `Querying failed with error code 429 and error: ${error}`)
           throw error
         }
+        await logRunMessage(runId, `Querying failed with error: ${error}`)
         throw error
       }
     }
@@ -393,12 +363,7 @@ ${rawStr}`
   }
 
   if (text === undefined) {
-    await supabaseService
-      .from('processing_runs')
-      .update({
-        message: 'All models failed',
-      })
-      .eq('id', runId)
+    await logRunMessage(runId, 'All models failed')
     throw new Error('All models failed')
   }
 
@@ -494,12 +459,7 @@ async function runProcessing(runId: string) {
       (existingTokens ?? []).map((t: { slug: string }) => t.slug)
     )
 
-    await supabaseService
-    .from('processing_runs')
-    .update({
-      message: 'Got hashtags',
-    })
-    .eq('id', runId)
+    await logRunMessage(runId, 'Got hashtags')
     while (true) {
       const now = new Date().toISOString()
       const lockUntil = new Date(Date.now() + 2 * 60 * 1000).toISOString()
