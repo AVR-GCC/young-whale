@@ -110,6 +110,8 @@ async function processJob(
     : await fetchDexScreenerLinks(raw);
   const preferred_exchange = exchange_links?.[0] ?? null;
 
+  await logRunMessage(runId, `Got exchange links for ${raw.name}`)
+
   // Ensure chain exists in chains table before creating token
   if (raw.chain) {
     const { data: existingChain } = await supabaseService
@@ -134,7 +136,11 @@ async function processJob(
     }
   }
 
+  await logRunMessage(runId, `Registered chain for ${raw.name}`)
+
   const slug = generateUniqueSlug(raw.symbol, slugSet)
+
+  await logRunMessage(runId, `Generate slug for ${raw.name} - ${slug}`)
 
   const tokenData = {
     name: raw.name,
@@ -164,8 +170,6 @@ async function processJob(
     main_hashtag: aiResult.main_hashtag,
     supply: raw.supply,
   }
-
-  await logRunMessage(runId, `Got exchanges for ${raw.name}`)
 
   const { data: upserted, error: upsertError } = await supabaseService
     .from('tokens')
@@ -214,6 +218,8 @@ async function processJob(
       }
     }
   }
+
+  await logRunMessage(runId, `Hashtags saved from ${raw.name}`)
 
   await supabaseService
   .from('processing_queue')
