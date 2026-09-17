@@ -6,6 +6,7 @@ import CategoryGrid from './CategoryGrid'
 // import FilteredSignals from './FilteredSignals'
 import Footer from './Footer'
 import type { TokenWithHashtags } from '@/shared/types'
+import { categories } from '../lib/categories'
 import { SubscriptionTerminal } from './SubscriptionTerminal'
 import { LegalModal, LegalTab } from './LegalModal'
 import { ContactFormModal } from './ContactForm'
@@ -29,6 +30,7 @@ const twoDayAgo = new Date(now.getTime() - ONE_DAY * 2)
 
 export default function HomePage({ tokens, loading }: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
+  const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [secondsLeft, setSecondsLeft] = useState(0)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -41,6 +43,10 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [settingsView, setSettingsView] = useState('directory');
 
+
+  const setToDefaultCategory = () => {
+    selectCategory(categories[0].id);
+  }
 
   const openSubmitModal = () => {
     // No-op: submit modal placeholder
@@ -117,6 +123,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         setSettingsOpenAction={setSettingsOpen}
         settingsView={settingsView}
         setSettingsViewAction={setSettingsView}
+        setToDefaultCategory={setToDefaultCategory}
       />
 
       <main className="max-w-7xl mx-auto w-full px-4 pt-2 flex flex-col gap-4">
@@ -132,6 +139,8 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
           isSettingsOpen={isSettingsOpen}
           setSettingsViewAction={setSettingsView}
           settingsView={settingsView}
+          selectedCategory={selectedCategory}
+          selectCategory={selectCategory}
         />
 
         {/* <FilteredSignals */}

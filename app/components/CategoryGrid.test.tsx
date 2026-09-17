@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { useState } from 'react'
+import type { ComponentProps } from 'react'
 import type { TokenWithHashtags, TokenCategory } from '@/shared/types'
+import { categories } from '../lib/categories'
 
 vi.mock('@/lib/supabase/client', () => ({
   supabase: {
@@ -17,6 +20,17 @@ vi.mock('@/lib/supabase/client', () => ({
 }))
 
 import CategoryGrid from './CategoryGrid'
+
+function StatefulCategoryGrid(props: Omit<ComponentProps<typeof CategoryGrid>, 'selectedCategory' | 'selectCategory'>) {
+  const [selectedCategory, selectCategory] = useState(categories[0].id)
+  return (
+    <CategoryGrid
+      {...props}
+      selectedCategory={selectedCategory}
+      selectCategory={selectCategory}
+    />
+  )
+}
 
 vi.mock('./CategoryContainer', () => ({
   default: ({ category, tokenCount, tokens, onMobileTokenClick }: {
@@ -123,19 +137,19 @@ const getOverlay = () => screen.queryByTestId('mobile-overlay')
 describe('CategoryGrid', () => {
   it('renders all 4 category containers', () => {
     render(
-      <CategoryGrid
-        tokens={mockTokens}
-        loading={false}
-        selectedToken={null}
-        setSelectedToken={() => {}}
-        activeFilter={null}
-        sortBy="default"
-        setIsMobileOverlayOpen={() => {}}
-        setSettingsOpenAction={() => {}}
-        isSettingsOpen={false}
-        setSettingsViewAction={() => {}}
-        settingsView=""
-      />
+        <StatefulCategoryGrid
+          tokens={mockTokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
+          setSettingsOpenAction={() => {}}
+          isSettingsOpen={false}
+          setSettingsViewAction={() => {}}
+          settingsView=""
+        />
     )
 
     // Categories appear twice (desktop + mobile layouts)
@@ -147,7 +161,7 @@ describe('CategoryGrid', () => {
 
   it('passes correct tokens to each category', () => {
     render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={mockTokens}
         loading={false}
         selectedToken={null}
@@ -171,7 +185,7 @@ describe('CategoryGrid', () => {
 
   it('handles empty tokens array', () => {
     render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={[]}
         loading={false}
         selectedToken={null}
@@ -194,7 +208,7 @@ describe('CategoryGrid', () => {
 
   it('passes correct token counts to categories', () => {
     render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={mockTokens}
         loading={false}
         selectedToken={null}
@@ -218,7 +232,7 @@ describe('CategoryGrid', () => {
 
   it('renders loading state', () => {
     render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={mockTokens}
         loading={true}
         selectedToken={null}
@@ -238,7 +252,7 @@ describe('CategoryGrid', () => {
 
   it('hides grid when active filter is set', () => {
     const { container } = render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={mockTokens}
         loading={false}
         selectedToken={null}
@@ -260,7 +274,7 @@ describe('CategoryGrid', () => {
 
   it('filters tokens by category', () => {
     render(
-      <CategoryGrid
+      <StatefulCategoryGrid
         tokens={mockTokens}
         loading={false}
         selectedToken={null}
@@ -286,7 +300,7 @@ describe('CategoryGrid', () => {
   describe('mobile overlay', () => {
     it('opens TokenTerminal overlay when clicking a token on mobile', () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -313,7 +327,7 @@ describe('CategoryGrid', () => {
 
     it('navigates to next token on swipe left', async () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -349,7 +363,7 @@ describe('CategoryGrid', () => {
 
     it('navigates to previous token on swipe right', async () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -385,7 +399,7 @@ describe('CategoryGrid', () => {
 
     it('does not navigate past last token on swipe left', async () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -421,7 +435,7 @@ describe('CategoryGrid', () => {
 
     it('does not navigate past first token on swipe right', async () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -458,7 +472,7 @@ describe('CategoryGrid', () => {
     it('closes overlay when switching categories', async () => {
       const setSettingsOpenAction = vi.fn()
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -497,7 +511,7 @@ describe('CategoryGrid', () => {
   describe('settings overlay', () => {
     it('renders MobileSettingsMenu when isSettingsOpen and settingsView are set', () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -519,7 +533,7 @@ describe('CategoryGrid', () => {
 
     it('does not render settings overlay when isSettingsOpen is false', () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}
@@ -541,7 +555,7 @@ describe('CategoryGrid', () => {
 
     it('does not render settings overlay when settingsView is empty', () => {
       render(
-        <CategoryGrid
+        <StatefulCategoryGrid
           tokens={mockTokens}
           loading={false}
           selectedToken={null}

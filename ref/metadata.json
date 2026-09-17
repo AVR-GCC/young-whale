@@ -1,6 +1,0 @@
-{
-  "name": "youngwhale.io",
-  "description": "A highly curated, frictionless Web3 daily directory representing the sports-elegant OS of next-gen tokens on the sonar radar.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

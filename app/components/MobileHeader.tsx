@@ -13,11 +13,15 @@ export default function MobileHeader({
   setSettingsOpenAction,
   settingsView,
   setSettingsViewAction,
+  setToDefaultCategory
 }: HeaderProps) {
   const isInviteModalOpen = settingsView === 'invite' && isSettingsOpen
 
   const title = (
-    <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-60' : 'translate-x-5'}`}>
+    <div
+      className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? '-translate-x-60' : 'translate-x-5'}`}
+      onClick={setToDefaultCategory}
+    >
       <HeaderTitle isMobile isMobileOverlayOpen={isMobileOverlayOpen} />
     </div>
   );

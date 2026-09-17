@@ -29,6 +29,7 @@ export interface HeaderProps {
   setSettingsOpenAction: (val: boolean) => void
   settingsView: string
   setSettingsViewAction: (view: string) => void
+  setToDefaultCategory: () => void
 }
 
 export function WhaleIcon({
@@ -193,7 +194,7 @@ export function HeaderTitle({
           isMobile ? 'text-[10px]' : 'text-xl'
         }`}
       >
-        YoungWhale.io
+        YoungWhale
       </Link>
     </div>
   )

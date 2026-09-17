@@ -21,6 +21,8 @@ interface CategoryGridProps {
   isSettingsOpen: boolean
   setSettingsViewAction: (view: string) => void
   settingsView: string
+  selectedCategory: string
+  selectCategory: (categoryId: string) => void
 }
 
 export default function CategoryGrid({
@@ -34,9 +36,10 @@ export default function CategoryGrid({
   setSettingsOpenAction,
   isSettingsOpen,
   setSettingsViewAction,
-  settingsView
+  settingsView,
+  selectedCategory,
+  selectCategory
 }: CategoryGridProps) {
-  const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [mobileOverlayOpen, setMobileOverlayOpen] = useState(false)
   const [mobileOverlayTokenIndex, setMobileOverlayTokenIndex] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)
