@@ -184,7 +184,7 @@ describe('HomePage Integration', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
 
     // Header (both desktop and mobile versions render in DOM)
-    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('YoungWhale').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
 
     // Categories
@@ -222,7 +222,7 @@ describe('HomePage Integration', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
 
     // Header (both desktop and mobile versions render in DOM)
-    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('YoungWhale').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
 
     // Mobile shows a single category without a title (renderTitle=false)
@@ -251,7 +251,7 @@ describe('HomePage Integration', () => {
   it('renders with empty tokens', () => {
     render(<HomePage tokens={[]} loading={false} />)
 
-    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('YoungWhale').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)
   })
 
@@ -259,7 +259,7 @@ describe('HomePage Integration', () => {
     render(<HomePage tokens={mockTokens} loading={true} />)
 
     // Header still renders (both desktop and mobile versions)
-    expect(screen.getAllByText('YoungWhale.io').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('YoungWhale').length).toBeGreaterThanOrEqual(1)
 
     // Categories still render (with skeletons inside)
     expect(screen.getAllByTestId('category-Tech').length).toBeGreaterThanOrEqual(1)

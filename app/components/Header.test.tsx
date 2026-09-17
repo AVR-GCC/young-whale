@@ -28,13 +28,14 @@ const defaultProps = {
   setSettingsOpenAction: () => {},
   settingsView: '',
   setSettingsViewAction: () => {},
+  setToDefaultCategory: () => {},
 }
 
 describe('Header', () => {
   it('renders logo', () => {
     render(<Header {...defaultProps} />)
     // Logo appears in both desktop and mobile headers
-    const logos = screen.getAllByText('YoungWhale.io')
+    const logos = screen.getAllByText('YoungWhale')
     expect(logos.length).toBeGreaterThanOrEqual(1)
   })
 
@@ -161,7 +162,7 @@ describe('Header', () => {
 describe('DesktopHeader', () => {
   it('renders desktop logo', () => {
     render(<DesktopHeader {...defaultProps} />)
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    expect(screen.getByText('YoungWhale')).toBeDefined()
   })
 
   it('renders desktop timer with tagline', () => {
@@ -226,7 +227,7 @@ describe('DesktopHeader', () => {
 describe('MobileHeader', () => {
   it('renders mobile logo', () => {
     render(<MobileHeader {...defaultProps} />)
-    expect(screen.getByText('YoungWhale.io')).toBeDefined()
+    expect(screen.getByText('YoungWhale')).toBeDefined()
   })
 
   it('renders mobile timer', () => {
