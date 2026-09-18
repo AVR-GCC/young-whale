@@ -25,6 +25,9 @@ interface CategoryGridProps {
   selectCategory: (categoryId: string) => void
 }
 
+const bottomClass = 'bottom-[146px]';
+const topClass = 'top-[54px]';
+
 export default function CategoryGrid({
   tokens,
   loading,
@@ -224,7 +227,7 @@ export default function CategoryGrid({
       {isSettingsOpen && settingsView && (
         <div
           data-testid="mobile-overlay"
-          className="fixed inset-x-0 bottom-[146px] top-[54px] z-31 flex flex-col bg-[#0B0F19] lg:hidden"
+          className={`fixed inset-x-0 ${bottomClass} ${topClass} z-31 flex flex-col bg-[#0B0F19] lg:hidden`}
         >
           <div className="flex-1 overflow-y-auto">
             <MobileSettingsMenu view={settingsView} setView={setSettingsViewAction} />
@@ -236,7 +239,7 @@ export default function CategoryGrid({
       {mobileOverlayOpen && currentOverlayToken && (
         <div
           data-testid="mobile-overlay"
-          className="fixed inset-x-0 bottom-[146px] top-[54px] z-30 flex flex-col bg-[#0B0F19] lg:hidden"
+          className={`fixed inset-x-0 ${bottomClass} ${topClass} z-30 flex flex-col bg-[#0B0F19] lg:hidden`}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
