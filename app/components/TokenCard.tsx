@@ -182,7 +182,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   let timeLabel;
   if (isPromoted) {
-    timeLabel = <>FEATURED</>;
+    timeLabel = <>PROMOTED</>;
   } else if (!isExpired) {
     timeLabel = <>TODAY</>;
   } else if (isPresale) {
@@ -217,7 +217,7 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   const timeLabelWrapper = (
     <div
-      className="w-[42px] text-center md:text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0 ml-1"
+      className="w-[54px] sm:w-[42px] text-center md:text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0 ml-1"
       style={{
         color: (!isPromoted && !isExpired) ? themeColor : '#94A3B8'
       }}
