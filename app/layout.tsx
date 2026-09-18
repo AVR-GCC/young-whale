@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Outfit, Oxanium, JetBrains_Mono, Space_Mono } from 'next/font/google'
 import Script from 'next/script'
 import './index.css'
-import { YMYLTrustSignals } from './components/YMYLTrustSignals'
+import { YMYLTrustSignalsServer } from './components/YMYLTrustSignalsServer'
 
 const outfit = Outfit({
   variable: '--font-outfit',
@@ -66,11 +66,11 @@ export default function RootLayout({
         `}
       </Script>
       <body className="min-h-full flex flex-col">
-        <div className="order-1 sm:order-2 flex-1 flex flex-col">
-          {children}
+        <div className="hidden sm:flex">
+          <YMYLTrustSignalsServer />
         </div>
-        <div className="order-2 sm:order-1">
-          <YMYLTrustSignals />
+        <div className="flex-1 flex flex-col">
+          {children}
         </div>
       </body>
     </html>

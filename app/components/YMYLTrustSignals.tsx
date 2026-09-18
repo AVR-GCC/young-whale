@@ -1,8 +1,6 @@
-import { getLastPublishedAt } from '@/lib/sitemap-utils'
+'use client'
 
-export async function YMYLTrustSignals() {
-  const lastPublishedAt = await getLastPublishedAt()
-
+export function YMYLTrustSignals({ lastPublishedAt }: { lastPublishedAt: Date | null }) {
   const formattedDateTime = lastPublishedAt
     ? lastPublishedAt.toLocaleString('en-US', {
         year: 'numeric',

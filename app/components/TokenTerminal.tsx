@@ -6,6 +6,7 @@ import { TokenIcon } from './TokenCard'
 import { CustomTooltip } from './CustomTooltip'
 import { Compass, Zap } from 'lucide-react'
 import RatingBadge from './RatingBadge'
+import { YMYLTrustSignals } from './YMYLTrustSignals'
 
 const CopyButton = ({ address }: { address: string }) => {
   const [copied, setCopied] = useState(false);
@@ -163,29 +164,29 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
             </div>
           </div>
 
-          <div className="max-sm:overflow-x-clip max-sm:overflow-y-auto max-sm:flex-1">
+          <div className="max-sm:overflow-x-clip max-sm:overflow-y-auto max-sm:flex-1 max-sm:flex max-sm:flex-col">
 
-          {/* Token Header */}
-          <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
-            <div className="flex-wrap text-[20px] sm:text-[22px] font-bold tracking-wide truncate flex items-center gap-2">
-              <span className="text-[#E2E8F0] hidden sm:inline">{token.name}</span>
-              <span style={{ color: themeColor }} className="text-[17px] hidden sm:inline">${symbol}</span>
-              <span className="px-1.5 py-0.5 rounded uppercase text-[10px] sm:text-[11px] font-bold tracking-wider bg-white/10 text-white/70 ml-2 hidden sm:inline-block">
-                {token.chain}
-              </span>
-            </div>
-            <div className="mt-2 text-left">
-              <div className="text-[13px] sm:text-[11px] tracking-widest uppercase flex items-center gap-2 mb-3 text-white/50 bg-white/5 inline-flex px-2 py-0.5 rounded">
-                <Compass className="w-3.5 h-3.5" />
-                WHALE INTELLIGENCE BRIEF
+            {/* Token Header */}
+            <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
+              <div className="flex-wrap text-[20px] sm:text-[22px] font-bold tracking-wide truncate flex items-center gap-2">
+                <span className="text-[#E2E8F0] hidden sm:inline">{token.name}</span>
+                <span style={{ color: themeColor }} className="text-[17px] hidden sm:inline">${symbol}</span>
+                <span className="px-1.5 py-0.5 rounded uppercase text-[10px] sm:text-[11px] font-bold tracking-wider bg-white/10 text-white/70 ml-2 hidden sm:inline-block">
+                  {token.chain}
+                </span>
               </div>
-              <div className="text-[14px] sm:text-[15px] text-white/90 tracking-wide leading-[1.7] text-justify">
-                {token.full_description || token.short_description || 'No description available.'}
+              <div className="mt-2 text-left">
+                <div className="text-[13px] sm:text-[11px] tracking-widest uppercase flex items-center gap-2 mb-3 text-white/50 bg-white/5 inline-flex px-2 py-0.5 rounded">
+                  <Compass className="w-3.5 h-3.5" />
+                  WHALE INTELLIGENCE BRIEF
+                </div>
+                <div className="text-[14px] sm:text-[15px] text-white/90 tracking-wide leading-[1.7] text-justify">
+                  {token.full_description || token.short_description || 'No description available.'}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Shell */}
+            {/* Shell */}
             <div className="p-4 sm:p-6 pt-0 flex flex-col gap-2.5 font-mono">
               {/* Socials Section */}
               {(token.website_url || socials.twitter || socials.telegram || socials.discord || socials.facebook) && (
@@ -312,6 +313,10 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
                   {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
                 </div>
               </div>
+            </div>
+            {/* Trust signal */}
+            <div className="max-sm:mt-auto">
+              <YMYLTrustSignals lastPublishedAt={token.published_at ? new Date(token.published_at) : null} />
             </div>
           </div>
         </div>
