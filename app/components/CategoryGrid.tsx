@@ -25,7 +25,7 @@ interface CategoryGridProps {
   selectCategory: (categoryId: string) => void
 }
 
-const bottomClass = 'bottom-[146px]';
+const bottomClass = 'bottom-[138px]';
 const topClass = 'top-[54px]';
 
 export default function CategoryGrid({

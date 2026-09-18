@@ -28,7 +28,7 @@ export default function MobileCategoryFooter({ selectedCategory, selectCategory 
             <button
               key={category.id}
               onClick={() => selectCategory(category.id)}
-              className="flex flex-col items-center gap-1 py-1 px-2 rounded-lg transition-colors"
+              className="flex flex-col items-center gap-1 py-0.3 px-2 rounded-lg transition-colors"
               style={{
                 color: isActive ? category.color : '#64748B',
               }}
