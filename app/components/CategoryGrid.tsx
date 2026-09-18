@@ -174,7 +174,7 @@ export default function CategoryGrid({
     return new Date(token.created_at) < oneDayAgo
   }
 
-  const renderCategory = (category: typeof categories[0], renderTitle: boolean = true) => {
+  const renderCategory = (category: typeof categories[0], isMobile: boolean = true) => {
     const categoryTokens = tokens
       .filter((token) => token.category === category.id)
       .sort((a, b) => {
@@ -198,7 +198,7 @@ export default function CategoryGrid({
         selectedToken={selectedToken}
         setSelectedTokenAction={setSelectedToken}
         loading={loading}
-        renderTitle={renderTitle}
+        isMobile={isMobile}
         onMobileTokenClick={handleMobileTokenClick}
         chainIcons={chainIcons}
       />
@@ -209,14 +209,14 @@ export default function CategoryGrid({
     <>
       {/* Desktop Category Layout — grid ensures equal row heights */}
       <div className={`hidden lg:grid lg:grid-cols-2 gap-x-6 gap-y-3 w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 relative'}`}>
-        {categories.map(cat => renderCategory(cat, true))}
+        {categories.map(cat => renderCategory(cat, false))}
       </div>
 
       {/* Mobile Category Layout — single category full screen with footer */}
       <div className={`flex lg:hidden flex-col w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 absolute inset-x-0 bottom-0 top-[80px]'}`}>
         {/* Active Category Content */}
         <div className="flex-1 overflow-y-auto">
-          {renderCategory(categories.find(c => c.id === selectedCategory) || categories[0], false)}
+          {renderCategory(categories.find(c => c.id === selectedCategory) || categories[0], true)}
         </div>
 
         {/* Mobile Category Footer */}

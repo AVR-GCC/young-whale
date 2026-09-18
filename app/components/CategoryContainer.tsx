@@ -14,7 +14,7 @@ interface CategoryContainerProps {
   selectedToken: string | null
   setSelectedTokenAction: (st: string | null) => void
   loading: boolean
-  renderTitle: boolean
+  isMobile: boolean
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
   chainIcons: Record<string, string>
 }
@@ -157,7 +157,7 @@ function ExpandCollapseSeparator({
 }
 
 export default function CategoryContainer({
-  renderTitle,
+  isMobile,
   category,
   tokens,
   selectedToken,
@@ -185,11 +185,13 @@ export default function CategoryContainer({
 
   const promotedList = sortedTokens.filter(st => st.is_promoted)
   const unpromotedList = sortedTokens.filter(st => !st.is_promoted)
-  const sliced = unpromotedList.slice(0, limit)
+  const sliced = isMobile
+    ? [...unpromotedList.slice(0, 5), ...promotedList, ...unpromotedList.slice(5)]
+    : unpromotedList.slice(0, limit)
 
   return (
     <div className="flex flex-col bg-[#0B0F19] rounded-xl overflow-hidden border border-[#1E293B]/40 transition-colors break-inside-avoid">
-      {renderTitle && (
+      {!isMobile && (
         <Title category={category} />
       )}
 
@@ -211,24 +213,28 @@ export default function CategoryContainer({
                 />
               </div>
 
-              {/* Expand/Collapse Separator */}
-              <ExpandCollapseSeparator
-                tokens={tokens}
-                category={category}
-                limit={limit}
-                handleScanDeeper={handleScanDeeper}
-                handleSurface={handleSurface}
-              />
+                {!isMobile && (
+                  <>
+                    {/* Expand/Collapse Separator */}
+                    <ExpandCollapseSeparator
+                      tokens={tokens}
+                      category={category}
+                      limit={limit}
+                      handleScanDeeper={handleScanDeeper}
+                      handleSurface={handleSurface}
+                    />
 
-              {/* Promoted List (not inside the scrollable container) */}
-              <TokenList
-                tokens={promotedList}
-                category={category}
-                selectedToken={selectedToken}
-                setSelectedTokenAction={setSelectedTokenAction}
-                onMobileTokenClick={onMobileTokenClick}
-                chainIcons={chainIcons}
-              />
+                    {/* Promoted List (not inside the scrollable container) */}
+                    <TokenList
+                      tokens={promotedList}
+                      category={category}
+                      selectedToken={selectedToken}
+                      setSelectedTokenAction={setSelectedTokenAction}
+                      onMobileTokenClick={onMobileTokenClick}
+                      chainIcons={chainIcons}
+                    />
+                  </>
+                )}
             </>
           ) : (
             <div className="p-8 text-center font-mono text-xs text-slate-500 bg-[#070A10]/10 border-b border-[#1E293B]">

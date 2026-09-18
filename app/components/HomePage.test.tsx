@@ -19,9 +19,9 @@ vi.mock('@/lib/supabase/client', () => ({
 }))
 
 vi.mock('./CategoryContainer', () => ({
-  default: ({ category, tokenCount, tokens, renderTitle }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[]; renderTitle?: boolean }) => (
+  default: ({ category, tokenCount, tokens, isMobile }: { category: { id: string; title: string }; tokenCount: number; tokens: TokenWithHashtags[]; isMobile?: boolean }) => (
     <div data-testid={`category-${category.id}`} data-layout={category.id}>
-      {renderTitle !== false && <h3>{category.title}</h3>}
+      {!isMobile && <h3>{category.title}</h3>}
       <span>{tokenCount} tokens</span>
       <div data-testid="token-list">
         {tokens.map((token: TokenWithHashtags) => (
@@ -225,7 +225,7 @@ describe('HomePage Integration', () => {
     expect(screen.getAllByText('YoungWhale').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
 
-    // Mobile shows a single category without a title (renderTitle=false)
+    // Mobile shows a single category without a title (isMobile=true)
     const allCategories = screen.getAllByTestId(/category-/)
     const categoriesWithoutTitle = allCategories.filter(cat => !cat.querySelector('h3'))
     expect(categoriesWithoutTitle.length).toBe(1)

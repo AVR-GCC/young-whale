@@ -236,6 +236,34 @@ const mockTokens: TokenWithHashtags[] = [
   },
 ]
 
+// 8 unpromoted tokens (newest first) plus 2 promoted tokens, so the
+// created_at sort order is predictable: Norm1..Norm8, PromoA, PromoB.
+const makeTokensWithPromoted = (): TokenWithHashtags[] => {
+  const unpromoted = Array.from({ length: 8 }, (_, i) => ({
+    ...mockTokens[0],
+    id: `norm-${i + 1}`,
+    name: `Norm${i + 1}`,
+    display_name: `Norm${i + 1}`,
+    symbol: `N${i + 1}`,
+    slug: `norm-${i + 1}`,
+    short_description: `Unpromoted token ${i + 1}`,
+    is_promoted: false,
+    created_at: `2024-06-${String(20 - i).padStart(2, '0')}T10:00:00Z`,
+  }))
+  const promoted = ['A', 'B'].map((suffix, i) => ({
+    ...mockTokens[0],
+    id: `promo-${suffix.toLowerCase()}`,
+    name: `Promo${suffix}`,
+    display_name: `Promo${suffix}`,
+    symbol: `P${suffix}`,
+    slug: `promo-${suffix.toLowerCase()}`,
+    short_description: `Promoted token ${suffix}`,
+    is_promoted: true,
+    created_at: `2024-06-${String(12 - i).padStart(2, '0')}T10:00:00Z`,
+  }))
+  return [...unpromoted, ...promoted]
+}
+
 describe('CategoryContainer', () => {
   it('renders category title', () => {
     render(
@@ -246,14 +274,14 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
   })
 
-  it('does not render category title when renderTitle is false', () => {
+  it('does not render category title when isMobile is true', () => {
     render(
       <CategoryContainer
         category={categories[0]}
@@ -262,7 +290,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={false}
+        isMobile={true}
         chainIcons={chainIcons}
       />
     )
@@ -278,7 +306,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
@@ -296,7 +324,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
@@ -314,7 +342,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
@@ -340,7 +368,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={false}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
@@ -363,7 +391,7 @@ describe('CategoryContainer', () => {
           selectedToken={null}
           setSelectedTokenAction={mockSetSelectedToken}
           loading={false}
-          renderTitle={true}
+          isMobile={false}
           chainIcons={chainIcons}
         />
       )
@@ -381,7 +409,7 @@ describe('CategoryContainer', () => {
         selectedToken={null}
         setSelectedTokenAction={mockSetSelectedToken}
         loading={true}
-        renderTitle={true}
+        isMobile={false}
         chainIcons={chainIcons}
       />
     )
@@ -389,5 +417,72 @@ describe('CategoryContainer', () => {
     expect(screen.queryByText('Token1')).toBeNull()
     // Skeleton rows should be present (animate-pulse class indicates skeleton)
     expect(document.querySelectorAll('.animate-pulse').length).toBe(5)
+  })
+
+  it('on mobile, hides the title and separator and shows all tokens', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={10}
+        tokens={makeTokensWithPromoted()}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={true}
+        chainIcons={chainIcons}
+      />
+    )
+    expect(screen.queryByText(categories[0].title)).toBeNull()
+    expect(screen.queryByText('+')).toBeNull()
+    expect(screen.queryByText('−')).toBeNull()
+    // All tokens are shown, including those beyond the desktop limit of 5
+    expect(screen.getAllByText('Norm8').length).toBeGreaterThan(0)
+  })
+
+  it('on mobile, places promoted tokens after the fifth non-promoted token', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={10}
+        tokens={makeTokensWithPromoted()}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={true}
+        chainIcons={chainIcons}
+      />
+    )
+    const norm5 = screen.getAllByText('Norm5')[0]
+    const promoA = screen.getAllByText('PromoA')[0]
+    const promoB = screen.getAllByText('PromoB')[0]
+    const norm6 = screen.getAllByText('Norm6')[0]
+    expect(norm5.compareDocumentPosition(promoA) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(promoA.compareDocumentPosition(promoB) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(promoB.compareDocumentPosition(norm6) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('renders promoted tokens after the separator when not isMobile', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={10}
+        tokens={makeTokensWithPromoted()}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={false}
+        chainIcons={chainIcons}
+      />
+    )
+    expect(screen.getByText('+')).toBeDefined()
+    // Unpromoted tokens beyond the desktop limit of 5 stay hidden
+    expect(screen.queryByText('Norm6')).toBeNull()
+    const plus = screen.getByText('+')
+    const norm5 = screen.getAllByText('Norm5')[0]
+    const promoA = screen.getAllByText('PromoA')[0]
+    const promoB = screen.getAllByText('PromoB')[0]
+    expect(plus.compareDocumentPosition(norm5) & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy()
+    expect(plus.compareDocumentPosition(promoA) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(promoA.compareDocumentPosition(promoB) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })
