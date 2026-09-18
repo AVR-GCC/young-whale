@@ -28,6 +28,31 @@ interface CategoryGridProps {
 const bottomClass = 'bottom-[73px]';
 const topClass = 'top-[54px]';
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+const sortTokens = (tokens: TokenWithHashtags[]) => {
+  const now = Date.now()
+  return [...tokens].sort((a, b) => {
+    // if (sortBy === 'score') {
+    //   return (b.rating || 0) - (a.rating || 0)
+    // }
+    // if (sortBy === 'hashtag') {
+    //   const tagA = a.hashtags?.[0]?.name || ''
+    //   const tagB = b.hashtags?.[0]?.name || ''
+    //   if (tagA !== tagB) return tagA.localeCompare(tagB)
+    // }
+    // Default: tokens published within the last 24 hours sort by rating, older tokens by published_at (newest first)
+    if (!a.published_at || !b.published_at) return 1
+    const aPublished = new Date(a.published_at).getTime()
+    const bPublished = new Date(b.published_at).getTime()
+    const aFresh = now - aPublished < DAY_MS
+    const bFresh = now - bPublished < DAY_MS
+    if (aFresh !== bFresh) return aFresh ? -1 : 1
+    if (aFresh) return (b.rating || 0) - (a.rating || 0)
+    return bPublished - aPublished
+  })
+}
+
 export default function CategoryGrid({
   tokens,
   loading,
@@ -95,21 +120,9 @@ export default function CategoryGrid({
   const minSwipeDistance = 50
 
   const getCategoryTokens = useCallback((categoryId: string) => {
-    return tokens
-      .filter((token) => token.category === categoryId)
-      .sort((a, b) => {
-        if (sortBy === 'score') {
-          return (b.rating || 0) - (a.rating || 0)
-        }
-        if (sortBy === 'hashtag') {
-          const tagA = a.hashtags?.[0]?.name || ''
-          const tagB = b.hashtags?.[0]?.name || ''
-          if (tagA !== tagB) return tagA.localeCompare(tagB)
-        }
-        // Default: sort by created_at desc (newest first)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      })
-  }, [tokens, sortBy])
+    const filtered = tokens.filter((token) => token.category === categoryId)
+    return sortTokens(filtered)
+  }, [tokens])
 
   const handleMobileTokenClick = useCallback((tokenId: string, categoryId: string) => {
     const categoryTokens = getCategoryTokens(categoryId)
@@ -175,20 +188,7 @@ export default function CategoryGrid({
   }
 
   const renderCategory = (category: typeof categories[0], isMobile: boolean = true) => {
-    const categoryTokens = tokens
-      .filter((token) => token.category === category.id)
-      .sort((a, b) => {
-        if (sortBy === 'score') {
-          return (b.rating || 0) - (a.rating || 0)
-        }
-        if (sortBy === 'hashtag') {
-          const tagA = a.hashtags?.[0]?.name || ''
-          const tagB = b.hashtags?.[0]?.name || ''
-          if (tagA !== tagB) return tagA.localeCompare(tagB)
-        }
-        // Default: sort by created_at desc (newest first)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      })
+    const categoryTokens = getCategoryTokens(category.id)
     return (
       <CategoryContainer
         key={category.id}

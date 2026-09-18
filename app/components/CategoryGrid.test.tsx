@@ -86,7 +86,14 @@ vi.mock('./MobileCategoryFooter', () => ({
   ),
 }))
 
-const createMockToken = (id: string, name: string, category: TokenCategory, createdAt: string): TokenWithHashtags => ({
+const createMockToken = (
+  id: string,
+  name: string,
+  category: TokenCategory,
+  createdAt: string,
+  publishedAt: string = createdAt,
+  rating = 0
+): TokenWithHashtags => ({
   id,
   name,
   display_name: name,
@@ -114,11 +121,11 @@ const createMockToken = (id: string, name: string, category: TokenCategory, crea
   is_verified: false,
   presale_status: null,
   main_hashtag: null,
-  rating: 0,
+  rating,
   supply: 1000000,
   created_at: createdAt,
   updated_at: createdAt,
-  published_at: null,
+  published_at: publishedAt,
   hashtags: [],
 })
 
@@ -294,6 +301,42 @@ describe('CategoryGrid', () => {
     techCategories.forEach(cat => {
       expect(cat.textContent).toContain('TechToken1')
       expect(cat.textContent).not.toContain('MemeToken1')
+    })
+  })
+
+  describe('default sorting', () => {
+    const hoursAgo = (h: number) => new Date(Date.now() - h * 60 * 60 * 1000).toISOString()
+
+    it('sorts tokens updated within 24h by rating, older tokens by updated_at', () => {
+      const tokens: TokenWithHashtags[] = [
+        createMockToken('stale-high', 'StaleHigh', 'Tech', hoursAgo(72), hoursAgo(72), 100),
+        createMockToken('stale-new', 'StaleNew', 'Tech', hoursAgo(48), hoursAgo(25)),
+        createMockToken('stale-old', 'StaleOld', 'Tech', hoursAgo(96), hoursAgo(96)),
+        createMockToken('fresh-low', 'FreshLow', 'Tech', hoursAgo(2), hoursAgo(2), 10),
+        createMockToken('fresh-high', 'FreshHigh', 'Tech', hoursAgo(5), hoursAgo(1), 90),
+      ]
+
+      render(
+        <StatefulCategoryGrid
+          tokens={tokens}
+          loading={false}
+          selectedToken={null}
+          setSelectedToken={() => {}}
+          activeFilter={null}
+          sortBy="default"
+          setIsMobileOverlayOpen={() => {}}
+          setSettingsOpenAction={() => {}}
+          isSettingsOpen={false}
+          setSettingsViewAction={() => {}}
+          settingsView=""
+        />
+      )
+
+      const techCategory = screen.getAllByTestId('category-Tech')[0]
+      const order = Array.from(techCategory.querySelectorAll('button[data-testid^="token-"]')).map(
+        (el) => el.textContent
+      )
+      expect(order).toEqual(['FreshHigh', 'FreshLow', 'StaleNew', 'StaleHigh', 'StaleOld'])
     })
   })
 

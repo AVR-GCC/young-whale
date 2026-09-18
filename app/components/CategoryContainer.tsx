@@ -176,15 +176,8 @@ export default function CategoryContainer({
     setLimit((prev) => prev + LIMIT_STEP)
   }, [])
 
-  // Sort all tokens by rating (highest first) — homolog of CategoryBlock's scoreValue sort.
-  const sortedTokens = [...tokens].sort((a, b) => {
-    const dateA = new Date(a.created_at).getTime() ?? 0
-    const dateB = new Date(b.created_at).getTime() ?? 0
-    return dateB - dateA
-  })
-
-  const promotedList = sortedTokens.filter(st => st.is_promoted)
-  const unpromotedList = sortedTokens.filter(st => !st.is_promoted)
+  const promotedList = tokens.filter(st => st.is_promoted)
+  const unpromotedList = tokens.filter(st => !st.is_promoted)
   const sliced = isMobile
     ? [...unpromotedList.slice(0, 5), ...promotedList, ...unpromotedList.slice(5)]
     : unpromotedList.slice(0, limit)
