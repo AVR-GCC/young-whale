@@ -202,6 +202,7 @@ export default function CategoryGrid({
         loading={loading}
         isMobile={isMobile}
         onMobileTokenClick={handleMobileTokenClick}
+        closeTerminalAction={closeOverlay}
         chainIcons={chainIcons}
       />
     )

@@ -101,6 +101,7 @@ export default function TokenTerminal({
           className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Xwitter icon */}
           {/* <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 fill-white/50 group-hover:fill-white transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg> */}
           <Share2 className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
         </a>
@@ -155,7 +156,7 @@ export default function TokenTerminal({
 
             {/* Mobile layout */}
             <div className="flex sm:hidden items-center justify-between w-full">
-                <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={80} chainIcons={chainIcons} />
+              <TokenIcon name={token.name} logoUrl={token.logo_url} chain={token.chain} size={80} chainIcons={chainIcons} />
               <div className="flex flex-col flex-1 items-center">
                 <span
                   className="text-white text-[26px] sm:text-[102px] font-bold tracking-tight leading-none"
@@ -343,7 +344,7 @@ export default function TokenTerminal({
               </div>
             </div>
             {/* Trust signal */}
-            <div className="max-sm:mt-auto">
+            <div className="sm:hidden max-sm:mt-auto">
               <YMYLTrustSignals lastPublishedAt={token.published_at ? new Date(token.published_at) : null} />
             </div>
           </div>

@@ -140,7 +140,21 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
   )
 }
 
-export default function TokenCard({ token, themeColor, isExpanded, setIsExpandedAction, onMobileClick, chainIcons }: { token: TokenWithHashtags, themeColor: string, isExpanded: boolean, setIsExpandedAction: (expanded: boolean) => void, onMobileClick?: () => void, chainIcons: Record<string, string> }) {
+export default function TokenCard({
+  token,
+  themeColor,
+  isExpanded,
+  setIsExpandedAction,
+  onMobileClickAction,
+  chainIcons
+}: {
+  token: TokenWithHashtags,
+  themeColor: string,
+  isExpanded: boolean,
+  setIsExpandedAction: (expanded: boolean) => void,
+  onMobileClickAction?: () => void,
+  chainIcons: Record<string, string>
+}) {
   const [isHovered, setIsHovered] = useState(false)
 
   const toggle = useCallback(() => {
@@ -149,13 +163,13 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
 
   const handleClick = useCallback(() => {
     if (window.innerWidth < 768) {
-      if (onMobileClick) {
-        onMobileClick()
+      if (onMobileClickAction) {
+        onMobileClickAction()
       }
     } else {
       toggle()
     }
-  }, [toggle, onMobileClick])
+  }, [toggle, onMobileClickAction])
 
   // const expand = useCallback(() => {
   //   setIsExpanded(true);
@@ -263,8 +277,8 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
             // On mobile, prevent navigation and open overlay instead
             // On desktop, prevent navigation since card expands inline
             e.preventDefault();
-            if (window.innerWidth < 768 && onMobileClick) {
-              onMobileClick();
+            if (window.innerWidth < 768 && onMobileClickAction) {
+              onMobileClickAction();
             } else if (window.innerWidth >= 768) {
               toggle();
             }
@@ -331,7 +345,14 @@ export default function TokenCard({ token, themeColor, isExpanded, setIsExpanded
         </div>
       </div>
 
-      <TokenTerminal token={token} themeColor={themeColor} isExpired={isExpired} isExpanded={isExpanded} chainIcons={chainIcons} />
+      <TokenTerminal
+        token={token}
+        themeColor={themeColor}
+        isExpired={isExpired}
+        isExpanded={isExpanded}
+        chainIcons={chainIcons}
+        closeTerminalAction={() => setIsExpandedAction(false)}
+      />
       <div className="h-px w-full bg-[#1E293B] pointer-events-none flex-shrink-0 my-[2px]" />
     </div>
   )
