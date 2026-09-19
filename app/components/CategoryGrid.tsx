@@ -99,14 +99,16 @@ export default function CategoryGrid({
     fetchChains()
   }, [])
 
+  const closeOverlay = useCallback(() => {
+    setMobileOverlayOpen(false)
+    setIsMobileOverlayOpen(false)
+    setSettingsOpenAction(false)
+  }, [setMobileOverlayOpen, setIsMobileOverlayOpen, setSettingsOpenAction])
+
   // Close overlay when switching categories
   useEffect(() => {
-    setTimeout(() => {
-      setMobileOverlayOpen(false)
-      setIsMobileOverlayOpen(false)
-      setSettingsOpenAction(false)
-    })
-  }, [selectedCategory, setIsMobileOverlayOpen, setSettingsOpenAction])
+    setTimeout(closeOverlay)
+  }, [selectedCategory, closeOverlay])
 
   useEffect(() => {
     if (mobileOverlayOpen) {
@@ -258,6 +260,7 @@ export default function CategoryGrid({
                     isExpired={isExpired(prevToken)}
                     isExpanded={true}
                     chainIcons={chainIcons}
+                    closeTerminalAction={closeOverlay}
                   />
                 ) : (
                   <div className="w-full h-full" />
@@ -272,6 +275,7 @@ export default function CategoryGrid({
                   isExpired={isExpired(currentOverlayToken)}
                   isExpanded={true}
                   chainIcons={chainIcons}
+                  closeTerminalAction={closeOverlay}
                 />
               </div>
 
@@ -284,6 +288,7 @@ export default function CategoryGrid({
                     isExpired={isExpired(nextToken)}
                     isExpanded={true}
                     chainIcons={chainIcons}
+                    closeTerminalAction={closeOverlay}
                   />
                 ) : (
                   <div className="w-full h-full" />

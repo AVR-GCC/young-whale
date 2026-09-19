@@ -4,7 +4,7 @@ import { useState } from 'react'
 import type { TokenWithHashtags } from '@/shared/types'
 import { TokenIcon } from './TokenCard'
 import { CustomTooltip } from './CustomTooltip'
-import { Compass, Zap } from 'lucide-react'
+import { Compass, X, Share2 } from 'lucide-react'
 import RatingBadge from './RatingBadge'
 import { YMYLTrustSignals } from './YMYLTrustSignals'
 
@@ -54,7 +54,21 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
-export default function TokenTerminal({ token, themeColor, isExpired, isExpanded, chainIcons }: { token: TokenWithHashtags, themeColor: string, isExpired: boolean, isExpanded: boolean, chainIcons: Record<string, string> }) {
+export default function TokenTerminal({
+  token,
+  themeColor,
+  isExpired,
+  isExpanded,
+  chainIcons,
+  closeTerminalAction
+}: {
+  token: TokenWithHashtags,
+  themeColor: string,
+  isExpired: boolean,
+  isExpanded: boolean,
+  chainIcons: Record<string, string>,
+  closeTerminalAction: () => void
+}) {
   const isPresale = token.category === 'Presale';
   const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
@@ -78,6 +92,7 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
 
   const buttons = (
     <>
+      {/* Share */}
       <CustomTooltip content="Share to X" position="bottom" borderColor={themeColor}>
         <a
           href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${token.name} on The Next Wave!\n\n#${token.chain.replace(/\s+/g,'')} #${(token.main_hashtag || 'Crypto').replace(/\s+/g,'')}`)}`}
@@ -86,21 +101,34 @@ export default function TokenTerminal({ token, themeColor, isExpired, isExpanded
           className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
           onClick={(e) => e.stopPropagation()}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 fill-white/50 group-hover:fill-white transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+          {/* <svg viewBox="0 0 24 24" aria-hidden="true" className="w-3.5 h-3.5 fill-white/50 group-hover:fill-white transition-colors"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg> */}
+          <Share2 className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
         </a>
       </CustomTooltip>
 
-      <CustomTooltip content="Token creator or early backer? Promote this project in the homepage featured zone for 30 days." position="bottom-end" borderColor={themeColor}>
-        <div
-          className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
-          onClick={(e) => {
-            e.stopPropagation();
-            alert('Promote sequence initiated. Gateway connection pending...');
-          }}
-        >
-          <Zap className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-        </div>
-      </CustomTooltip>
+      {/* Promote */}
+      {/* <CustomTooltip content="Token creator or early backer? Promote this project in the homepage featured zone for 30 days." position="bottom-end" borderColor={themeColor}> */}
+      {/*   <div */}
+      {/*     className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10" */}
+      {/*     onClick={(e) => { */}
+      {/*       e.stopPropagation(); */}
+      {/*       alert('Promote sequence initiated. Gateway connection pending...'); */}
+      {/*     }} */}
+      {/*   > */}
+      {/*     <Zap className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" /> */}
+      {/*   </div> */}
+      {/* </CustomTooltip> */}
+
+      {/* Close */}
+      <div
+        className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
+        onClick={(e) => {
+          e.stopPropagation();
+          closeTerminalAction();
+        }}
+      >
+        <X className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+      </div>
     </>
   );
 
