@@ -16,8 +16,8 @@ export default function RatingBadge({ isPresale, isPromoted, isExpired, isHovere
         id="pin-holder"
         className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
         style={{
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          color: 'rgba(255, 255, 255, 0.3)',
+          borderColor: 'rgba(255, 255, 255, 0.8)',
+          color: 'rgba(255, 255, 255, 0.9)',
           boxShadow: 'none',
         }}
       >
@@ -32,8 +32,8 @@ export default function RatingBadge({ isPresale, isPromoted, isExpired, isHovere
         id="hourglass-holder"
         className="w-7 h-7 rounded-full flex items-center justify-center bg-slate-950/50 font-oxanium text-[14px] font-extrabold select-none border-2 border-solid transition-all duration-300"
         style={{
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-          color: 'rgba(255, 255, 255, 0.3)',
+          borderColor: 'rgba(255, 255, 255, 0.8)',
+          color: 'rgba(255, 255, 255, 0.9)',
           boxShadow: 'none',
         }}
       >

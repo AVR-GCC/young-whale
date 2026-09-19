@@ -59,7 +59,7 @@ export default function CategoryGrid({
   selectedToken,
   setSelectedToken,
   activeFilter,
-  sortBy,
+  // sortBy,
   setIsMobileOverlayOpen,
   setSettingsOpenAction,
   isSettingsOpen,
