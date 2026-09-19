@@ -306,7 +306,19 @@ export default function TokenCard({
           {/* Mobile: Name above Description */}
           <div className="md:hidden flex flex-col flex-grow min-w-0">
             <span className="font-outfit text-[13px] font-semibold tracking-wide text-[#E2E8F0] truncate">
-              {token.name}
+              <div style={{ display: 'flex' }}>
+                {token.name}
+                {token.main_hashtag && (
+                  <div className="ml-3 mt-[1px]">
+                    <div
+                      key="main-hashtag"
+                      className="text-[9px] font-mono font-semibold tracking-wider uppercase text-[#94A3B8] bg-[#2A3441] rounded-[4px] px-1.5 py-0.5 truncate transition-colors focus:outline-none"
+                    >
+                      #{displayHashtag}
+                    </div>
+                  </div>
+                )}
+              </div>
             </span>
             <div
               className="text-[11px] text-[#CBD5E1] font-normal truncate text-left"
