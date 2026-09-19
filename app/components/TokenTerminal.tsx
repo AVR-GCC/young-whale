@@ -57,7 +57,7 @@ function getPairsList(exchangeLinks: string[]) {
 function LineLabel({ field, themeColor }: { field: string, themeColor: string }) {
   const keyStyle = { color: `${themeColor}99`, textShadow: `0 0 12px ${themeColor}1a` };
   return (
-    <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+    <div className="flex shrink-0 sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
       <div className="flex items-center">
         {/* <span>${symbol.toUpperCase()}</span> */}
         {/* <span>@</span> */}
@@ -288,7 +288,7 @@ export default function TokenTerminal({
                   />
                   <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     <span className="text-[14px] font-mono text-white/90">
-                      [ {explorer.label} ]
+                      {explorer.label}
                     </span>
                     <CopyButton address={explorer.rawAddress} />
                   </div>
@@ -311,7 +311,7 @@ export default function TokenTerminal({
               )}
 
               {/* Cursor */}
-              <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
+              <div className="flex items-start px-1 leading-snug transition-colors relative mt-2 font-mono">
                 <LineLabel
                   field="Sonar Score"
                   themeColor={themeColor}
@@ -319,14 +319,14 @@ export default function TokenTerminal({
 
                 <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                   {isExpired ? (
-                    <span className="text-[14px] font-mono tracking-wide text-slate-400 whitespace-nowrap">
-                      [ SIGNAL EXPIRED ]
+                    <span className="text-[14px] ml-2 font-mono tracking-wide text-slate-400 whitespace-nowrap">
+                      SIGNAL EXPIRED
                     </span>
                   ) : (
-                      <span className="text-[14px] font-mono tracking-wide text-white/90">
-                        {`${token.rating}/10`}
-                      </span>
-                    )}
+                    <span className="text-[14px] font-mono tracking-wide text-white/90">
+                      {`${token.rating}/10`}
+                    </span>
+                  )}
                   {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
                 </div>
               </div>
