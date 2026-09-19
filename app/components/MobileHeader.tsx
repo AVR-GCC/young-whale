@@ -1,6 +1,6 @@
 'use client'
 
-import { HeaderProps, formatCountdown, WhaleIcon, SettingsButton, SearchButton, TerminalPill, HeaderTitle } from './HeaderShared'
+import { HeaderProps, formatCountdown, WhaleIcon, SettingsButton, SearchButton, TerminalPill, HeaderTitle, counterColor } from './HeaderShared'
 
 export default function MobileHeader({
   secondsLeft,
@@ -30,7 +30,7 @@ export default function MobileHeader({
     <div className={`fixed left-0 transition-all duration-1000 ease-out ${isMobileOverlayOpen ? 'translate-x-[calc(-10rem_-_50%)]' : 'translate-x-[calc(50vw_-_50%)]'}`}>
       <div className="py-1 px-2.5 flex-1 flex flex-col items-center transition-all duration-1000 ease-in-out">
         <span className="font-oxanium text-[11px] font-bold text-[#FFFFFF] uppercase">NEXT WAVE</span>
-        <span className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest leading-none">
+        <span className={`font-oxanium text-xs font-semibold ${counterColor} tracking-widest leading-none`}>
           {formatCountdown(secondsLeft)}
         </span>
       </div>

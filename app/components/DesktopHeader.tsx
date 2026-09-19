@@ -1,6 +1,6 @@
 'use client'
 
-import { HeaderProps, formatCountdown, SearchButton, HeaderTitle } from './HeaderShared'
+import { HeaderProps, formatCountdown, SearchButton, HeaderTitle, counterColor } from './HeaderShared'
 
 export default function DesktopHeader({
   secondsLeft,
@@ -28,7 +28,7 @@ export default function DesktopHeader({
             </div>
             <div className="w-[1px] h-4 bg-[#1E293B]/80" />
             <span
-              className="font-oxanium text-xs font-semibold text-[#F8FAFC] tracking-widest block transition-all leading-none"
+              className={`font-oxanium text-xs font-semibold ${counterColor} tracking-widest block transition-all leading-none`}
               style={{ textShadow: '0 0 8px rgba(81, 201, 226, 0.25)' }}
             >
               {formatCountdown(secondsLeft)}

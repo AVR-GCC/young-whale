@@ -32,6 +32,8 @@ export interface HeaderProps {
   setToDefaultCategory: () => void
 }
 
+export const counterColor = 'text-[#22D3EE]';
+
 export function WhaleIcon({
   isInviteModalOpen,
   onClickAction,
