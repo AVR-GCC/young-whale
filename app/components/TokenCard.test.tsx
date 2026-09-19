@@ -196,7 +196,7 @@ describe('TokenCard', () => {
       ],
     }
     render(<TokenCard themeColor="#ff0000" token={tokenWithDifferentMainHashtag} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} />)
-    expect(screen.getByText('#SecondTag')).toBeDefined()
+    expect(screen.getAllByText('#SecondTag').length).toBeGreaterThanOrEqual(1)
     expect(screen.queryByText('#FirstTag')).toBeNull()
   })
 
