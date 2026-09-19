@@ -54,6 +54,20 @@ function getPairsList(exchangeLinks: string[]) {
   })
 }
 
+function LineLabel({ field, themeColor }: { field: string, themeColor: string }) {
+  const keyStyle = { color: `${themeColor}99`, textShadow: `0 0 12px ${themeColor}1a` };
+  return (
+    <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
+      <div className="flex items-center">
+        {/* <span>${symbol.toUpperCase()}</span> */}
+        {/* <span>@</span> */}
+        <span className="tracking-wide font-bold">{field}</span>
+        <span className="mr-1 font-bold">:</span>
+      </div>
+    </div>
+  )
+}
+
 export default function TokenTerminal({
   token,
   themeColor,
@@ -74,7 +88,6 @@ export default function TokenTerminal({
   const symbol = token.symbol;
   const pairs = getPairsList(token.exchange_links);
   const socials = token.social_links;
-  const keyStyle = { color: `${themeColor}99`, textShadow: `0 0 12px ${themeColor}1a` };
 
   const labelAndLiveIndicator = (
     <div className="flex flex-wrap items-center gap-2">
@@ -138,16 +151,10 @@ export default function TokenTerminal({
       className={`w-full transition-all duration-300 ease-in-out relative max-sm:h-full ${isExpanded ? 'max-h-[800px] opacity-100 py-0 sm:py-3 pb-0 sm:pb-6 bg-transparent border-transparent sm:border-t sm:border-dashed sm:border-[#1E293B]/30' : 'max-h-0 opacity-0 overflow-hidden border-transparent'}`}
     >
       <div className="px-0 sm:px-5 pb-0 sm:pb-2 max-sm:h-full">
-          <div
-            className="bg-[#0F1624] max-sm:bg-black rounded-none sm:rounded-xl sm:overflow-hidden font-mono w-full relative max-sm:flex max-sm:flex-col max-sm:h-full"
-            style={{ boxShadow: `0 0 0 1px ${themeColor}10, 0 8px 32px -8px ${themeColor}20` }}
-          >
-          {/* Noise overlay */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
-          />
-
+        <div
+          className="bg-[#0F1624] max-sm:bg-black rounded-none sm:rounded-xl sm:overflow-hidden font-mono w-full relative max-sm:flex max-sm:flex-col max-sm:h-full"
+          style={{ boxShadow: `0 0 0 1px ${themeColor}10, 0 8px 32px -8px ${themeColor}20` }}
+        >
           {/* Title bar */}
           <div className="py-2.5 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 gap-2 sm:gap-0 z-10 relative max-sm:shrink-0">
             <div className="hidden sm:block">
@@ -194,7 +201,6 @@ export default function TokenTerminal({
           </div>
 
           <div className="max-sm:overflow-x-clip max-sm:overflow-y-auto max-sm:flex-1 max-sm:flex max-sm:flex-col">
-
             {/* Token Header */}
             <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
               <div className="flex-wrap text-[20px] sm:text-[22px] font-bold tracking-wide truncate flex items-center gap-2">
@@ -220,14 +226,10 @@ export default function TokenTerminal({
               {/* Socials Section */}
               {(token.website_url || socials.twitter || socials.telegram || socials.discord || socials.facebook) && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative">
-                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                    <div className="flex items-center">
-                      <span>${symbol.toUpperCase()}</span>
-                      <span>@</span>
-                      <span className="tracking-wide font-bold">socials</span>
-                      <span className="mr-1 font-bold">:</span>
-                    </div>
-                  </div>
+                  <LineLabel
+                    field="socials"
+                    themeColor={themeColor}
+                  />
 
                   <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     {token.website_url && (
@@ -262,14 +264,11 @@ export default function TokenTerminal({
               {/* Trade Row */}
               {pairs.length > 0 && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                    <div className="flex items-center">
-                      <span>${symbol.toUpperCase()}</span>
-                      <span>@</span>
-                      <span className="tracking-wide font-bold">{isPresale ? 'participate' : 'trade'}</span>
-                      <span className="mr-1 font-bold">:</span>
-                    </div>
-                  </div>
+                  <LineLabel
+                    // symbol={symbol}
+                    field={isPresale ? 'participate' : 'trade'}
+                    themeColor={themeColor}
+                  />
                   <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     {pairs.slice(0, 2).map((pair, idx) => (
                       <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
@@ -283,14 +282,10 @@ export default function TokenTerminal({
               {/* Contract Row */}
               {explorer.rawAddress && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                    <div className="flex items-center">
-                      <span>${symbol.toUpperCase()}</span>
-                      <span>@</span>
-                      <span className="tracking-wide font-bold">contract</span>
-                      <span className="mr-1 font-bold">:</span>
-                    </div>
-                  </div>
+                  <LineLabel
+                    field="contract"
+                    themeColor={themeColor}
+                  />
                   <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     <span className="text-[14px] font-mono text-white/90">
                       [ {explorer.label} ]
@@ -303,14 +298,10 @@ export default function TokenTerminal({
               {/* Supply Row */}
               {token.supply && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
-                  <div className="flex shrink-0 w-full sm:min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                    <div className="flex items-center">
-                      <span>${symbol.toUpperCase()}</span>
-                      <span>@</span>
-                      <span className="tracking-wide font-bold">supply</span>
-                      <span className="mr-1 font-bold">:</span>
-                    </div>
-                  </div>
+                  <LineLabel
+                    field="supply"
+                    themeColor={themeColor}
+                  />
                   <div className="flex-1 flex items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     <span className="text-[14px] font-mono text-white/90">
                       {token.supply} {symbol.toUpperCase()}
@@ -321,14 +312,11 @@ export default function TokenTerminal({
 
               {/* Cursor */}
               <div className="flex items-start px-1 leading-snug transition-colors group relative mt-2 font-mono">
-                <div className="flex shrink-0 min-w-[198px] sm:w-40 sm:mr-1 mb-1 sm:mb-0 pt-0.5 text-[14px] font-medium text-left max-sm:!text-[rgb(139,148,158)]" style={keyStyle}>
-                  <div className="flex items-center">
-                    <span>${symbol.toUpperCase()}</span>
-                    <span>@</span>
-                    <span className="tracking-wide font-bold">Sonar Score</span>
-                    <span className="mr-1 font-bold">:</span>
-                  </div>
-                </div>
+                <LineLabel
+                  field="Sonar Score"
+                  themeColor={themeColor}
+                />
+
                 <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                   {isExpired ? (
                     <span className="text-[14px] font-mono tracking-wide text-slate-400 whitespace-nowrap">
