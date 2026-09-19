@@ -13,7 +13,6 @@ interface CategoryContainerProps {
   tokens: TokenWithHashtags[]
   selectedToken: string | null
   setSelectedTokenAction: (st: string | null) => void
-  closeTerminalAction: () => void
   loading: boolean
   isMobile: boolean
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
@@ -67,7 +66,6 @@ function TokenList({
   selectedToken,
   setSelectedTokenAction,
   onMobileTokenClick,
-  closeTerminalAction,
   chainIcons
 }: {
   tokens: TokenWithHashtags[],
@@ -75,7 +73,6 @@ function TokenList({
   selectedToken: string | null
   setSelectedTokenAction: (st: string | null) => void
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
-  closeTerminalAction: () => void
   chainIcons: Record<string, string>
 }) {
   return tokens.map((token) => (
@@ -86,7 +83,6 @@ function TokenList({
       isExpanded={selectedToken === token.id}
       setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
       onMobileClickAction={() => onMobileTokenClick?.(token.id, category.id)}
-      closeTerminalAction={closeTerminalAction}
       chainIcons={chainIcons}
     />
   ))
@@ -168,7 +164,6 @@ export default function CategoryContainer({
   loading,
   setSelectedTokenAction,
   onMobileTokenClick,
-  closeTerminalAction,
   chainIcons
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
@@ -207,7 +202,6 @@ export default function CategoryContainer({
                   selectedToken={selectedToken}
                   setSelectedTokenAction={setSelectedTokenAction}
                   onMobileTokenClick={onMobileTokenClick}
-                  closeTerminalAction={closeTerminalAction}
                   chainIcons={chainIcons}
                 />
               </div>
@@ -230,7 +224,6 @@ export default function CategoryContainer({
                       selectedToken={selectedToken}
                       setSelectedTokenAction={setSelectedTokenAction}
                       onMobileTokenClick={onMobileTokenClick}
-                      closeTerminalAction={closeTerminalAction}
                       chainIcons={chainIcons}
                     />
                   </>

@@ -81,7 +81,7 @@ export default function TokenTerminal({
   isExpired: boolean,
   isExpanded: boolean,
   chainIcons: Record<string, string>,
-  closeTerminalAction: () => void
+  closeTerminalAction?: () => void
 }) {
   const isPresale = token.category === 'Presale';
   const explorer = getExplorerLink(token.chain, token.contract_address);
@@ -134,15 +134,17 @@ export default function TokenTerminal({
       {/* </CustomTooltip> */}
 
       {/* Close */}
-      <div
-        className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
-        onClick={(e) => {
-          e.stopPropagation();
-          closeTerminalAction();
-        }}
-      >
-        <X className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
-      </div>
+      {!!closeTerminalAction && (
+        <div
+          className="group relative flex items-center justify-center transition-all duration-300 cursor-pointer p-1.5 rounded-md hover:bg-white/10"
+          onClick={(e) => {
+            e.stopPropagation();
+            closeTerminalAction();
+          }}
+        >
+          <X className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
+        </div>
+      )}
     </>
   );
 
