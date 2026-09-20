@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import CategoryContainer from './CategoryContainer'
 import { categories } from '../lib/categories'
 import type { TokenWithHashtags } from '@/shared/types'
@@ -30,6 +30,8 @@ const bottomClass = 'bottom-[73px]';
 const topClass = 'top-[54px]';
 
 const DAY_MS = 24 * 60 * 60 * 1000
+
+const SWIPE_HINT_SHOWN_KEY = 'swipe-hint-shown'
 
 const sortTokens = (tokens: TokenWithHashtags[]) => {
   const now = Date.now()
@@ -77,6 +79,12 @@ export default function CategoryGrid({
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [slideOffset, setSlideOffset] = useState(-100)
   const [chainIcons, setChainIcons] = useState<Record<string, string>>({})
+  const [showSwipeHint, setShowSwipeHint] = useState(false)
+  const swipeHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => () => {
+    if (swipeHintTimerRef.current) clearTimeout(swipeHintTimerRef.current)
+  }, [])
 
   useEffect(() => {
     async function fetchChains() {
@@ -135,6 +143,12 @@ export default function CategoryGrid({
       setMobileOverlayTokenIndex(index)
       setMobileOverlayOpen(true)
       setIsMobileOverlayOpen(true)
+      if (!localStorage.getItem(SWIPE_HINT_SHOWN_KEY)) {
+        localStorage.setItem(SWIPE_HINT_SHOWN_KEY, 'true')
+        setShowSwipeHint(true)
+        if (swipeHintTimerRef.current) clearTimeout(swipeHintTimerRef.current)
+        swipeHintTimerRef.current = setTimeout(() => setShowSwipeHint(false), 4000)
+      }
     }
   }, [getCategoryTokens, setIsMobileOverlayOpen])
 
@@ -237,6 +251,16 @@ export default function CategoryGrid({
           <div className="flex-1 overflow-y-auto">
             <MobileSettingsMenu view={settingsView} setView={setSettingsViewAction} />
           </div>
+        </div>
+      )}
+
+      {/* Swipe hint toast - shown once on first mobile token selection */}
+      {showSwipeHint && (
+        <div
+          role="status"
+          className="fixed bottom-[85px] left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium text-center bg-[#1E293B] text-[#F8FAFC] border border-[#00E5D2]/40 lg:hidden"
+        >
+          Swipe left or right to view the next or previous token
         </div>
       )}
 

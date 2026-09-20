@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useState } from 'react'
 import type { ComponentProps } from 'react'
@@ -547,6 +547,58 @@ describe('CategoryGrid', () => {
       // Settings should also be closed
       await waitFor(() => {
         expect(setSettingsOpenAction).toHaveBeenCalledWith(false)
+      })
+    })
+
+    describe('swipe hint toast', () => {
+      beforeEach(() => {
+        localStorage.clear()
+      })
+
+      it('shows swipe hint toast on first mobile token click', () => {
+        render(
+          <StatefulCategoryGrid
+            tokens={mockTokens}
+            loading={false}
+            selectedToken={null}
+            setSelectedToken={() => {}}
+            activeFilter={null}
+            sortBy="default"
+            setIsMobileOverlayOpen={() => {}}
+            setSettingsOpenAction={() => {}}
+            isSettingsOpen={false}
+            setSettingsViewAction={() => {}}
+            settingsView=""
+          />
+        )
+
+        fireEvent.click(screen.getAllByTestId('token-1')[0])
+
+        expect(screen.getByText(/swipe left or right/i)).toBeTruthy()
+        expect(localStorage.getItem('swipe-hint-shown')).toBe('true')
+      })
+
+      it('does not show swipe hint toast again once it has been shown', () => {
+        localStorage.setItem('swipe-hint-shown', 'true')
+        render(
+          <StatefulCategoryGrid
+            tokens={mockTokens}
+            loading={false}
+            selectedToken={null}
+            setSelectedToken={() => {}}
+            activeFilter={null}
+            sortBy="default"
+            setIsMobileOverlayOpen={() => {}}
+            setSettingsOpenAction={() => {}}
+            isSettingsOpen={false}
+            setSettingsViewAction={() => {}}
+            settingsView=""
+          />
+        )
+
+        fireEvent.click(screen.getAllByTestId('token-1')[0])
+
+        expect(screen.queryByText(/swipe left or right/i)).toBeNull()
       })
     })
   })
