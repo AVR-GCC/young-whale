@@ -304,4 +304,33 @@ describe('TokenCard', () => {
     })
   })
 
+  it('does not glow by default', () => {
+    const { container } = render(
+      <TokenCard
+        themeColor="#ff0000"
+        token={mockToken}
+        isExpanded={false}
+        setIsExpandedAction={mockSetIsExpanded}
+        chainIcons={chainIcons}
+      />
+    )
+    expect(container.querySelector('.token-card-new')).toBeNull()
+  })
+
+  it('applies the glow animation class when isNew', () => {
+    const { container } = render(
+      <TokenCard
+        themeColor="#ff0000"
+        token={mockToken}
+        isExpanded={false}
+        setIsExpandedAction={mockSetIsExpanded}
+        chainIcons={chainIcons}
+        isNew
+      />
+    )
+    const card = container.querySelector('.token-card-new')
+    expect(card).not.toBeNull()
+    expect((card as HTMLElement).style.getPropertyValue('--new-glow')).toBe('#ff000066')
+  })
+
 })

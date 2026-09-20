@@ -17,6 +17,7 @@ interface CategoryContainerProps {
   isMobile: boolean
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
   chainIcons: Record<string, string>
+  newTokenIds?: ReadonlySet<string>
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
@@ -66,7 +67,8 @@ function TokenList({
   selectedToken,
   setSelectedTokenAction,
   onMobileTokenClick,
-  chainIcons
+  chainIcons,
+  newTokenIds
 }: {
   tokens: TokenWithHashtags[],
   category: CategoryType,
@@ -74,6 +76,7 @@ function TokenList({
   setSelectedTokenAction: (st: string | null) => void
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
   chainIcons: Record<string, string>
+  newTokenIds?: ReadonlySet<string>
 }) {
   return tokens.map((token) => (
     <TokenCard
@@ -84,6 +87,7 @@ function TokenList({
       setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
       onMobileClickAction={() => onMobileTokenClick?.(token.id, category.id)}
       chainIcons={chainIcons}
+      isNew={newTokenIds?.has(token.id) ?? false}
     />
   ))
 }
@@ -164,7 +168,8 @@ export default function CategoryContainer({
   loading,
   setSelectedTokenAction,
   onMobileTokenClick,
-  chainIcons
+  chainIcons,
+  newTokenIds
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
 
@@ -203,6 +208,7 @@ export default function CategoryContainer({
                   setSelectedTokenAction={setSelectedTokenAction}
                   onMobileTokenClick={onMobileTokenClick}
                   chainIcons={chainIcons}
+                  newTokenIds={newTokenIds}
                 />
               </div>
 
@@ -225,6 +231,7 @@ export default function CategoryContainer({
                       setSelectedTokenAction={setSelectedTokenAction}
                       onMobileTokenClick={onMobileTokenClick}
                       chainIcons={chainIcons}
+                      newTokenIds={newTokenIds}
                     />
                   </>
                 )}

@@ -14,6 +14,7 @@ import { ContactFormModal } from './ContactForm'
 interface HomePageProps {
   tokens: TokenWithHashtags[]
   loading: boolean
+  newTokenIds?: ReadonlySet<string>
 }
 
 // --- Hardcoded values for example-app features with no current-app equivalent ---
@@ -28,7 +29,7 @@ const now = new Date()
 const oneDayAgo = new Date(now.getTime() - ONE_DAY)
 const twoDayAgo = new Date(now.getTime() - ONE_DAY * 2)
 
-export default function HomePage({ tokens, loading }: HomePageProps) {
+export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
   const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [secondsLeft, setSecondsLeft] = useState(0)
@@ -130,6 +131,7 @@ export default function HomePage({ tokens, loading }: HomePageProps) {
         <CategoryGrid
           tokens={sortedTokens}
           loading={loading}
+          newTokenIds={newTokenIds}
           selectedToken={selectedToken}
           setSelectedToken={setSelectedToken}
           activeFilter={null}

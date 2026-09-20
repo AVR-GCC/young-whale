@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase/client'
 interface CategoryGridProps {
   tokens: TokenWithHashtags[]
   loading: boolean
+  newTokenIds?: ReadonlySet<string>
   selectedToken: string | null
   setSelectedToken: (token: string | null) => void
   activeFilter: string | null
@@ -56,6 +57,7 @@ const sortTokens = (tokens: TokenWithHashtags[]) => {
 export default function CategoryGrid({
   tokens,
   loading,
+  newTokenIds,
   selectedToken,
   setSelectedToken,
   activeFilter,
@@ -203,6 +205,7 @@ export default function CategoryGrid({
         isMobile={isMobile}
         onMobileTokenClick={handleMobileTokenClick}
         chainIcons={chainIcons}
+        newTokenIds={newTokenIds}
       />
     )
   }

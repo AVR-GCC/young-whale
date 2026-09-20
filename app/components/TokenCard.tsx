@@ -146,14 +146,16 @@ export default function TokenCard({
   isExpanded,
   setIsExpandedAction,
   onMobileClickAction,
-  chainIcons
+  chainIcons,
+  isNew = false
 }: {
   token: TokenWithHashtags,
   themeColor: string,
   isExpanded: boolean,
   setIsExpandedAction: (expanded: boolean) => void,
   onMobileClickAction?: () => void,
-  chainIcons: Record<string, string>
+  chainIcons: Record<string, string>,
+  isNew?: boolean
 }) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -245,13 +247,15 @@ export default function TokenCard({
       className={`
         relative w-full cursor-pointer select-none flex flex-col rounded mb-1 border border-transparent
         transition-all duration-300 ease-in-out scroll-mt-[64px]
+        ${isNew ? 'token-card-new' : ''}
       `}
       style={{
         backgroundColor: isExpanded || isHovered
           ? 'rgba(255, 255, 255, 0.06)'
           : 'rgba(255, 255, 255, 0.03)',
-        borderColor: (isExpanded || isHovered) ? `${themeColor}20` : 'transparent',
-        boxShadow: (isExpanded || isHovered) ? `0 0 15px ${themeColor}10` : 'none'
+        borderColor: isNew ? `${themeColor}80` : (isExpanded || isHovered) ? `${themeColor}20` : 'transparent',
+        boxShadow: !isNew && (isExpanded || isHovered) ? `0 0 15px ${themeColor}10` : 'none',
+        ...(isNew ? ({ '--new-glow': `${themeColor}66` } as React.CSSProperties) : {}),
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -261,7 +265,7 @@ export default function TokenCard({
       <div
         className="absolute left-0 top-0 bottom-0 w-0.5 z-10"
         style={{
-          opacity: isHovered ? 1 : 0,
+          opacity: isHovered || isNew ? 1 : 0,
           backgroundColor: themeColor
         }}
       />
