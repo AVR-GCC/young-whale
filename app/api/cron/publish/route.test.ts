@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { GET } from './route'
+import { revalidatePath } from 'next/cache'
 import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
+
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}))
 
 vi.mock('@/lib/supabase/service', () => ({
   supabaseService: {
@@ -95,6 +100,30 @@ describe('GET /api/cron/publish', () => {
     )
     expect(mockEq).toHaveBeenCalledWith('status', 'approved')
     expect(mockIs).toHaveBeenCalledWith('published_at', null)
+
+    expect(revalidatePath).toHaveBeenCalledWith('/api/tokens/public')
+  })
+
+  it('does not revalidate when no tokens were published', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    const mockSelect = vi.fn().mockResolvedValue({ data: [], error: null })
+    const mockIs = vi.fn(() => ({ select: mockSelect }))
+    const mockEq = vi.fn(() => ({ is: mockIs }))
+    const mockUpdate = vi.fn(() => ({ eq: mockEq }))
+
+    vi.mocked(supabaseService.from).mockReturnValue({
+      update: mockUpdate,
+    } as unknown as ReturnType<typeof supabaseService.from>)
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.published).toBe(0)
+    expect(json.message).toBe('Published 0 token(s)')
+
+    expect(revalidatePath).not.toHaveBeenCalled()
   })
 
   it('returns 0 when no tokens need publishing', async () => {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { supabaseService } from '@/lib/supabase/service'
 import { verifyCronRequest } from '@/lib/cron/verify'
 
@@ -23,6 +24,10 @@ export async function GET(request: Request) {
     }
 
     const publishedCount = data?.length ?? 0
+
+    if (publishedCount > 0) {
+      revalidatePath('/api/tokens/public')
+    }
 
     return NextResponse.json({
       published: publishedCount,
