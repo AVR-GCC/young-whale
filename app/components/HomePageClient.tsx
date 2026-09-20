@@ -9,6 +9,7 @@ export default function HomePageClient() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    console.log('loading', new Date());
     fetch('/api/tokens/public')
       .then((res) => res.json())
       .then((data) => {
