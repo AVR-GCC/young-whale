@@ -44,6 +44,13 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [settingsView, setSettingsView] = useState('directory');
 
+  const toggleSearchOpen = (open) => {
+    if (isSearchOpen && !open) {
+      setSearchQuery('')
+    }
+    setIsSearchOpen(open)
+  }
+
 
   const setToDefaultCategory = () => {
     selectCategory(categories[0].id);
@@ -112,7 +119,7 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
       <Header
         secondsLeft={secondsLeft}
         isSearchOpen={isSearchOpen}
-        setIsSearchOpenAction={setIsSearchOpen}
+        setIsSearchOpenAction={toggleSearchOpen}
         searchQuery={searchQuery}
         setSearchQueryAction={setSearchQuery}
         timeFilter={timeFilter}
