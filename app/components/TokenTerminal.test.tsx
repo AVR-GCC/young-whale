@@ -134,15 +134,15 @@ describe('TokenTerminal', () => {
 
   it('displays social links', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText(/x.com/)).toBeDefined()
-    expect(screen.getByText(/t.me/)).toBeDefined()
-    expect(screen.getByText('discord')).toBeDefined()
-    expect(screen.getByText('facebook')).toBeDefined()
+    expect(screen.getByText('[X]')).toBeDefined()
+    expect(screen.getByText('[TELEGRAM]')).toBeDefined()
+    expect(screen.getByText('[DISCORD]')).toBeDefined()
+    expect(screen.getByText('[FACEBOOK]')).toBeDefined()
   })
 
   it('displays website url', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('testtoken.example')).toBeDefined()
+    expect(screen.getByText('[testtoken.example]')).toBeDefined()
   })
 
   it('does not display social links when empty', () => {
