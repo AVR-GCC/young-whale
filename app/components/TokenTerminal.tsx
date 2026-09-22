@@ -143,7 +143,7 @@ export default function TokenTerminal({
   const linkAProps = {
     target: "_blank",
     rel: "noopener noreferrer",
-    onClick: (e: Event) => e.stopPropagation(),
+    onClick: (e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation(),
     className: "text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit"
   }
 
