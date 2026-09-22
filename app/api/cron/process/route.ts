@@ -258,7 +258,7 @@ async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
 
     const urls = data.pairs
       .sort((a, b) => b.marketCap - a.marketCap)
-      .map((pair) => `${pair.baseToken.symbol}_${pair.quoteToken.symbol}_${pair.url}`)
+      .map((pair) => pair.url)
     return [...new Set(urls)]
   } catch {
     return []
