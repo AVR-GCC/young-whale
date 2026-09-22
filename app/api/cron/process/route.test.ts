@@ -360,8 +360,8 @@ describe('GET /api/cron/process', () => {
 
     const dexScreenerResponse = {
       pairs: [
-        { url: 'https://dexscreener.com/ethereum/0xabc', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'WETH' }, marketCap: 1000000 },
-        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 2000000 },
+        { url: 'https://dexscreener.com/ethereum/0xabc', marketCap: 1000000 },
+        { url: 'https://dexscreener.com/ethereum/0xdef', marketCap: 2000000 },
       ],
     }
 
@@ -436,10 +436,10 @@ describe('GET /api/cron/process', () => {
     )
     expect(tokenUpsertData).not.toBeNull()
     expect(tokenUpsertData!.exchange_links).toEqual([
-      'TEST_USDC_https://dexscreener.com/ethereum/0xdef',
-      'TEST_WETH_https://dexscreener.com/ethereum/0xabc',
+      'https://dexscreener.com/ethereum/0xdef',
+      'https://dexscreener.com/ethereum/0xabc',
     ])
-    expect(tokenUpsertData!.preferred_exchange).toBe('TEST_USDC_https://dexscreener.com/ethereum/0xdef')
+    expect(tokenUpsertData!.preferred_exchange).toBe('https://dexscreener.com/ethereum/0xdef')
   })
 
   it('sorts DexScreener links by marketCap, prefixes with token symbols, and deduplicates', async () => {
@@ -451,13 +451,13 @@ describe('GET /api/cron/process', () => {
     const dexScreenerResponse = {
       pairs: [
         // Lower market cap - should come last
-        { url: 'https://dexscreener.com/ethereum/0xabc', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'WETH' }, marketCap: 1000000 },
+        { url: 'https://dexscreener.com/ethereum/0xabc', marketCap: 1000000 },
         // Higher market cap - should come first
-        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 5000000 },
+        { url: 'https://dexscreener.com/ethereum/0xdef', marketCap: 5000000 },
         // Medium market cap - should come second
-        { url: 'https://dexscreener.com/ethereum/0xghi', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'DAI' }, marketCap: 3000000 },
+        { url: 'https://dexscreener.com/ethereum/0xghi', marketCap: 3000000 },
         // Duplicate URL - should be deduplicated
-        { url: 'https://dexscreener.com/ethereum/0xdef', baseToken: { symbol: 'TEST' }, quoteToken: { symbol: 'USDC' }, marketCap: 6000000 },
+        { url: 'https://dexscreener.com/ethereum/0xdef', marketCap: 6000000 },
       ],
     }
 
@@ -530,11 +530,11 @@ describe('GET /api/cron/process', () => {
     expect(tokenUpsertData).not.toBeNull()
     // Should be sorted by marketCap descending, deduplicated, and prefixed with symbols
     expect(tokenUpsertData!.exchange_links).toEqual([
-      'TEST_USDC_https://dexscreener.com/ethereum/0xdef',
-      'TEST_DAI_https://dexscreener.com/ethereum/0xghi',
-      'TEST_WETH_https://dexscreener.com/ethereum/0xabc',
+      'https://dexscreener.com/ethereum/0xdef',
+      'https://dexscreener.com/ethereum/0xghi',
+      'https://dexscreener.com/ethereum/0xabc',
     ])
-    expect(tokenUpsertData!.preferred_exchange).toBe('TEST_USDC_https://dexscreener.com/ethereum/0xdef')
+    expect(tokenUpsertData!.preferred_exchange).toBe('https://dexscreener.com/ethereum/0xdef')
   })
 
   it('processes a job successfully end-to-end', async () => {
