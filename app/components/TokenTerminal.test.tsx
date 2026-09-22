@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import TokenTerminal from './TokenTerminal'
+import TokenTerminal, { getExchangeName } from './TokenTerminal'
 import type { TokenWithHashtags } from '@/shared/types'
 
 const chainIcons: Record<string, string> = {
@@ -35,8 +35,8 @@ const mockToken: TokenWithHashtags = {
     discord: 'https://discord.gg/testtoken',
     facebook: 'https://facebook.com/testtoken',
   },
-  exchange_links: ['ETH_USDT_https://uniswap.org', 'TEST_BNB_https://binance.com'],
-  preferred_exchange: 'Uniswap',
+  exchange_links: ['https://uniswap.org', 'https://binance.com'],
+  preferred_exchange: 'https://uniswap.org',
   start_date: null,
   end_date: null,
   source_type: 'dex',
@@ -95,6 +95,23 @@ const mockTokenNoOptional: TokenWithHashtags = {
   hashtags: [],
 }
 
+describe('getExchangeName', () => {
+  it('extracts exchange name from urls', () => {
+    expect(getExchangeName('https://www.gate.com/trade/JPMON_USDT')).toBe('GATE')
+    expect(getExchangeName('https://app.uniswap.org/explore/tokens/robinhood/0x6662060b16b61ba3f83bca6ccc796eb3acdf7777')).toBe('UNISWAP')
+    expect(getExchangeName('https://dex.coinmarketcap.com/token/bsc/0x8D345658a86B5Bd145d5b522B80939ef8c8AaE10/')).toBe('COINMARKETCAP')
+    expect(getExchangeName('https://swap.pump.fun/?input=aTUfRuPj3tp7FEpzAXLjs4VnQgAFbExD5JHGTyvpump')).toBe('PUMP')
+    expect(getExchangeName('https://pro.kraken.com/app/trade/usdsm-usd')).toBe('KRAKEN')
+    expect(getExchangeName('https://exchange.coinbase.com/trade/ALIGN-USD')).toBe('COINBASE')
+    expect(getExchangeName('lbank.com/en-US/trade/xyz_usdt/')).toBe('LBANK')
+    expect(getExchangeName('https://pancakeswap.finance/swap?chain=eth')).toBe('PANCAKESWAP')
+  })
+
+  it('returns input unchanged when no domain matches', () => {
+    expect(getExchangeName('Uniswap')).toBe('Uniswap')
+  })
+})
+
 describe('TokenTerminal', () => {
   it('renders terminal title', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
@@ -151,10 +168,9 @@ describe('TokenTerminal', () => {
     expect(screen.queryByText(/t.me/)).toBeNull()
   })
 
-  it('displays exchange links', () => {
+  it('displays exchange link', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('[ETH/USDT]')).toBeDefined()
-    expect(screen.getByText('[TEST/BNB]')).toBeDefined()
+    expect(screen.getByText('[UNISWAP]')).toBeDefined()
   })
 
   it('hides trade row when exchange links are empty', () => {
@@ -238,6 +254,12 @@ describe('TokenTerminal', () => {
     expect(closeIcon).toBeDefined()
     fireEvent.click(closeIcon as Element)
     expect(closeTerminalAction).toHaveBeenCalledTimes(1)
+  })
+
+  it('displays exchange name extracted from preferred_exchange url', () => {
+    const gateToken = { ...mockToken, preferred_exchange: 'https://www.gate.com/trade/JPMON_USDT' }
+    render(<TokenTerminal themeColor="#ff0000" token={gateToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
+    expect(screen.getByText('[GATE]')).toBeDefined()
   })
 
   it('is hidden when not expanded', () => {

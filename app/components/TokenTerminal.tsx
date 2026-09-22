@@ -42,16 +42,9 @@ function getExplorerLink(chain: string, address: string | null) {
   }
 }
 
-function getPairsList(exchangeLinks: string[]) {
-  return exchangeLinks.map(str => {
-    try {
-      const [base, quote, url] = str.split('_');
-      const name = `${base}/${quote}`;
-      return { url, name }
-    } catch {
-      return { url: str, name: 'Exchange' }
-    }
-  })
+export function getExchangeName(url: string) {
+  const match = url.match(/^(?:https?:\/\/)?(?:[^/?#]+\.)*([a-z0-9-]+)\.[a-z]{2,}(?:[/?#]|$)/i)
+  return match ? match[1].toUpperCase() : url
 }
 
 function LineLabel({ field, themeColor }: { field: string, themeColor: string }) {
@@ -86,7 +79,6 @@ export default function TokenTerminal({
   const isPresale = token.category === 'Presale';
   const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
-  const pairs = getPairsList(token.exchange_links);
   const socials = token.social_links;
 
   const labelAndLiveIndicator = (
@@ -147,6 +139,13 @@ export default function TokenTerminal({
       )}
     </>
   );
+
+  const linkAProps = {
+    target: "_blank",
+    rel: "noopener noreferrer",
+    onClick: (e: Event) => e.stopPropagation(),
+    className: "text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit"
+  }
 
   return (
     <div
@@ -240,22 +239,22 @@ export default function TokenTerminal({
                       </a>
                     )}
                     {socials.twitter && (
-                      <a href={socials.twitter} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                      <a href={socials.twitter} { ...linkAProps }>
                         [X]
                       </a>
                     )}
                     {socials.telegram && (
-                      <a href={socials.telegram} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                      <a href={socials.telegram} { ...linkAProps }>
                         [TELEGRAM]
                       </a>
                     )}
                     {socials.discord && (
-                      <a href={socials.discord} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                      <a href={socials.discord} { ...linkAProps }>
                         [DISCORD]
                       </a>
                     )}
                     {socials.facebook && (
-                      <a href={socials.facebook} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
+                      <a href={socials.facebook} { ...linkAProps }>
                         [FACEBOOK]
                       </a>
                     )}
@@ -264,19 +263,17 @@ export default function TokenTerminal({
               )}
 
               {/* Trade Row */}
-              {pairs.length > 0 && (
+              {!!token.preferred_exchange && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
                   <LineLabel
                     // symbol={symbol}
                     field={isPresale ? 'participate' : 'trade'}
                     themeColor={themeColor}
                   />
-                  <div className="flex-1 flex flex-wrap gap-x-6 gap-y-1.5 text-white/90 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                    {pairs.slice(0, 2).map((pair, idx) => (
-                      <a key={idx} href={pair.url} target="_blank" rel="noopener noreferrer" className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit" onClick={(e) => e.stopPropagation()}>
-                        [{pair.name}]
-                      </a>
-                    ))}
+                  <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    <a href={token.preferred_exchange} { ...linkAProps }>
+                      [{getExchangeName(token.preferred_exchange)}]
+                    </a>
                   </div>
                 </div>
               )}
