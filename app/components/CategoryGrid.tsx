@@ -230,12 +230,19 @@ export default function CategoryGrid({
       />
     )
   }
+  const leftCategories = categories.filter((_, i) => i % 2 === 0);
+  const rightCategories = categories.filter((_, i) => i % 2 === 1);
 
   return (
     <>
-      {/* Desktop Category Layout — grid ensures equal row heights */}
+      {/* Desktop Category Layout — two independent columns so expanded rows don't affect the other column */}
       <div className={`hidden lg:grid lg:grid-cols-2 gap-x-6 gap-y-3 w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 relative'}`}>
-        {categories.map(cat => renderCategory(cat, false))}
+        <div className="flex flex-1 flex-col gap-y-3 w-1/2">
+          {leftCategories.map(cat => renderCategory(cat, false))}
+        </div>
+        <div className="flex flex-1 flex-col gap-y-3 w-1/2">
+          {rightCategories.map(cat => renderCategory(cat, false))}
+        </div>
       </div>
 
       {/* Mobile Category Layout — single category full screen with footer */}
