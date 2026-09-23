@@ -44,13 +44,12 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [settingsView, setSettingsView] = useState('directory');
 
-  const toggleSearchOpen = (open) => {
+  const toggleSearchOpen = (open: boolean) => {
     if (isSearchOpen && !open) {
       setSearchQuery('')
     }
     setIsSearchOpen(open)
   }
-
 
   const setToDefaultCategory = () => {
     selectCategory(categories[0].id);
