@@ -17,6 +17,7 @@ interface CategoryContainerProps {
   isMobile: boolean
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
   chainIcons: Record<string, string>
+  chainExplorers: Record<string, string>
   newTokenIds?: ReadonlySet<string>
 }
 
@@ -68,6 +69,7 @@ function TokenList({
   setSelectedTokenAction,
   onMobileTokenClick,
   chainIcons,
+  chainExplorers,
   newTokenIds
 }: {
   tokens: TokenWithHashtags[],
@@ -76,6 +78,7 @@ function TokenList({
   setSelectedTokenAction: (st: string | null) => void
   onMobileTokenClick?: (tokenId: string, categoryId: string) => void
   chainIcons: Record<string, string>
+  chainExplorers: Record<string, string>
   newTokenIds?: ReadonlySet<string>
 }) {
   return tokens.map((token) => (
@@ -87,6 +90,7 @@ function TokenList({
       setIsExpandedAction={expanded => setSelectedTokenAction(expanded ? token.id : null)}
       onMobileClickAction={() => onMobileTokenClick?.(token.id, category.id)}
       chainIcons={chainIcons}
+      chainExplorers={chainExplorers}
       isNew={newTokenIds?.has(token.id) ?? false}
     />
   ))
@@ -169,6 +173,7 @@ export default function CategoryContainer({
   setSelectedTokenAction,
   onMobileTokenClick,
   chainIcons,
+  chainExplorers,
   newTokenIds
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
@@ -208,6 +213,7 @@ export default function CategoryContainer({
                   setSelectedTokenAction={setSelectedTokenAction}
                   onMobileTokenClick={onMobileTokenClick}
                   chainIcons={chainIcons}
+                  chainExplorers={chainExplorers}
                   newTokenIds={newTokenIds}
                 />
               </div>
@@ -231,6 +237,7 @@ export default function CategoryContainer({
                       setSelectedTokenAction={setSelectedTokenAction}
                       onMobileTokenClick={onMobileTokenClick}
                       chainIcons={chainIcons}
+                      chainExplorers={chainExplorers}
                       newTokenIds={newTokenIds}
                     />
                   </>

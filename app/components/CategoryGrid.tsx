@@ -79,6 +79,7 @@ export default function CategoryGrid({
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [slideOffset, setSlideOffset] = useState(-100)
   const [chainIcons, setChainIcons] = useState<Record<string, string>>({})
+  const [chainExplorers, setChainExplorers] = useState<Record<string, string>>({})
   const [showSwipeHint, setShowSwipeHint] = useState(false)
   const swipeHintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -90,7 +91,7 @@ export default function CategoryGrid({
     async function fetchChains() {
       const { data, error } = await supabase
         .from('chains')
-        .select('id, icon')
+        .select('id, icon, explorer_prefix')
 
       if (error) {
         console.error('Error fetching chains:', error.message)
@@ -98,12 +99,17 @@ export default function CategoryGrid({
       }
 
       const icons: Record<string, string> = {}
-      data?.forEach((chain: { id: string; icon: string | null }) => {
+      const explorers: Record<string, string> = {}
+      data?.forEach((chain: { id: string; icon: string | null; explorer_prefix: string | null }) => {
         if (chain.icon) {
           icons[chain.id] = chain.icon
         }
+        if (chain.explorer_prefix) {
+          explorers[chain.id] = chain.explorer_prefix
+        }
       })
       setChainIcons(icons)
+      setChainExplorers(explorers)
     }
 
     fetchChains()
@@ -219,6 +225,7 @@ export default function CategoryGrid({
         isMobile={isMobile}
         onMobileTokenClick={handleMobileTokenClick}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
         newTokenIds={newTokenIds}
       />
     )
@@ -287,6 +294,7 @@ export default function CategoryGrid({
                     isExpired={isExpired(prevToken)}
                     isExpanded={true}
                     chainIcons={chainIcons}
+                    chainExplorers={chainExplorers}
                     closeTerminalAction={closeOverlay}
                   />
                 ) : (
@@ -302,6 +310,7 @@ export default function CategoryGrid({
                   isExpired={isExpired(currentOverlayToken)}
                   isExpanded={true}
                   chainIcons={chainIcons}
+                  chainExplorers={chainExplorers}
                   closeTerminalAction={closeOverlay}
                 />
               </div>
@@ -315,6 +324,7 @@ export default function CategoryGrid({
                     isExpired={isExpired(nextToken)}
                     isExpanded={true}
                     chainIcons={chainIcons}
+                    chainExplorers={chainExplorers}
                     closeTerminalAction={closeOverlay}
                   />
                 ) : (

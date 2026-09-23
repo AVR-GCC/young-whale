@@ -147,6 +147,7 @@ export default function TokenCard({
   setIsExpandedAction,
   onMobileClickAction,
   chainIcons,
+  chainExplorers,
   isNew = false
 }: {
   token: TokenWithHashtags,
@@ -155,6 +156,7 @@ export default function TokenCard({
   setIsExpandedAction: (expanded: boolean) => void,
   onMobileClickAction?: () => void,
   chainIcons: Record<string, string>,
+  chainExplorers: Record<string, string>,
   isNew?: boolean
 }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -367,6 +369,7 @@ export default function TokenCard({
         isExpired={isExpired}
         isExpanded={isExpanded}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
         closeTerminalAction={() => setIsExpandedAction(false)}
       />
       <div className="h-px w-full bg-[#1E293B] pointer-events-none flex-shrink-0 my-[2px]" />

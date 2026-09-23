@@ -5,23 +5,27 @@ import TokenTerminal from '@/app/components/TokenTerminal'
 import { categories } from '@/app/lib/categories'
 import type { TokenWithHashtags } from '@/shared/types'
 
-async function getChainIcons(): Promise<Record<string, string>> {
+async function getChains(): Promise<{ chainIcons: Record<string, string>, chainExplorers: Record<string, string> }> {
   const { data, error } = await supabaseService
     .from('chains')
-    .select('id, icon')
+    .select('id, icon, explorer_prefix')
 
   if (error) {
     console.error('Error fetching chains:', error.message)
-    return {}
+    return { chainIcons: {}, chainExplorers: {} }
   }
 
-  const icons: Record<string, string> = {}
-  data?.forEach((chain: { id: string; icon: string | null }) => {
+  const chainIcons: Record<string, string> = {}
+  const chainExplorers: Record<string, string> = {}
+  data?.forEach((chain: { id: string; icon: string | null; explorer_prefix: string | null }) => {
     if (chain.icon) {
-      icons[chain.id] = chain.icon
+      chainIcons[chain.id] = chain.icon
+    }
+    if (chain.explorer_prefix) {
+      chainExplorers[chain.id] = chain.explorer_prefix
     }
   })
-  return icons
+  return { chainIcons, chainExplorers }
 }
 
 interface TokenPageProps {
@@ -95,7 +99,7 @@ export default async function TokenPage({ params }: TokenPageProps) {
     notFound()
   }
 
-  const chainIcons = await getChainIcons()
+  const { chainIcons, chainExplorers } = await getChains()
   const category = categories.find((c) => c.id === token.category)
   const themeColor = category?.color ?? '#22D3EE'
 
@@ -132,6 +136,7 @@ export default async function TokenPage({ params }: TokenPageProps) {
         isExpired={isExpired}
         isExpanded={true}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     </>
   )

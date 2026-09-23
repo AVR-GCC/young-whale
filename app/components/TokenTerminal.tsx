@@ -23,25 +23,6 @@ const CopyButton = ({ address }: { address: string }) => {
   );
 };
 
-function getExplorerLink(chain: string, address: string | null) {
-  const explorers: Record<string, string> = {
-    'Ethereum': 'etherscan.io',
-    'BSC': 'bscscan.com',
-    'Polygon': 'polygonscan.com',
-    'Arbitrum': 'arbiscan.io',
-    'Optimism': 'optimistic.etherscan.io',
-    'Base': 'basescan.org',
-    'Solana': 'solscan.io',
-    'Avalanche': 'snowtrace.io',
-  }
-  const domain = explorers[chain] || 'etherscan.io'
-  return {
-    label: address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'N/A',
-    rawAddress: address || '',
-    url: address ? `https://${domain}/token/${address}` : '#'
-  }
-}
-
 export function getExchangeName(url: string) {
   const match = url.match(/^(?:https?:\/\/)?(?:[^/?#]+\.)*([a-z0-9-]+)\.[a-z]{2,}(?:[/?#]|$)/i)
   return match ? match[1].toUpperCase() : url
@@ -67,6 +48,7 @@ export default function TokenTerminal({
   isExpired,
   isExpanded,
   chainIcons,
+  chainExplorers,
   closeTerminalAction
 }: {
   token: TokenWithHashtags,
@@ -74,10 +56,10 @@ export default function TokenTerminal({
   isExpired: boolean,
   isExpanded: boolean,
   chainIcons: Record<string, string>,
+  chainExplorers: Record<string, string>,
   closeTerminalAction?: () => void
 }) {
   const isPresale = token.category === 'Presale';
-  const explorer = getExplorerLink(token.chain, token.contract_address);
   const symbol = token.symbol;
   const socials = token.social_links;
 
@@ -146,6 +128,8 @@ export default function TokenTerminal({
     onClick: (e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation(),
     className: "text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit"
   }
+
+  const displayContractAddress = token.contract_address ? `${token.contract_address.slice(0, 6)}...${token.contract_address.slice(-4)}` : null
 
   return (
     <div
@@ -279,17 +263,23 @@ export default function TokenTerminal({
               )}
 
               {/* Contract Row */}
-              {explorer.rawAddress && (
+              {!!token.contract_address && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
                   <LineLabel
                     field="contract"
                     themeColor={themeColor}
                   />
                   <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                    <span className="text-[14px] font-mono text-white/90">
-                      {explorer.label}
-                    </span>
-                    <CopyButton address={explorer.rawAddress} />
+                    {!!chainExplorers[token.chain] ? (
+                      <a href={`${chainExplorers[token.chain]}${token.contract_address}`} { ...linkAProps }>
+                        {displayContractAddress}
+                      </a>
+                    ) : (
+                      <span className="text-[14px] font-mono text-white/90">
+                        {displayContractAddress}
+                      </span>
+                    )}
+                    <CopyButton address={token.contract_address} />
                   </div>
                 </div>
               )}

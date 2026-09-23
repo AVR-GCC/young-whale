@@ -23,6 +23,11 @@ const chainIcons: Record<string, string> = {
   AnubisChain: 'anubis-chain.webp'
 }
 
+const chainExplorers: Record<string, string> = {
+  Ethereum: 'https://etherscan.io/token/',
+  Solana: 'https://solscan.io/token/',
+}
+
 const mockTokens: TokenWithHashtags[] = [
   {
     id: '1',
@@ -276,6 +281,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.getByText(categories[0].title)).toBeDefined()
@@ -292,6 +298,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={true}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.queryByText(categories[0].title)).toBeNull()
@@ -308,6 +315,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(
@@ -326,6 +334,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
@@ -344,6 +353,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.queryByText('+')).toBeNull()
@@ -370,6 +380,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
 
@@ -393,6 +404,7 @@ describe('CategoryContainer', () => {
           loading={false}
           isMobile={false}
           chainIcons={chainIcons}
+          chainExplorers={chainExplorers}
         />
       )
       expect(screen.getByText(category.title)).toBeDefined()
@@ -411,6 +423,7 @@ describe('CategoryContainer', () => {
         loading={true}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     // Token names should not be visible while loading
@@ -430,6 +443,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={true}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.queryByText(categories[0].title)).toBeNull()
@@ -450,6 +464,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={true}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     const norm5 = screen.getAllByText('Norm5')[0]
@@ -472,6 +487,7 @@ describe('CategoryContainer', () => {
         loading={false}
         isMobile={false}
         chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
       />
     )
     expect(screen.getByText('+')).toBeDefined()
