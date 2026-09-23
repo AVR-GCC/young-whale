@@ -235,27 +235,27 @@ export default function TokenTerminal({
                   <div className="flex-1 flex flex-col sm:flex-row flex-wrap gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     {token.website_url && (
                       <a href={token.website_url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[14px] font-mono text-white/90 hover:text-cyan-400 hover:underline hover:underline-offset-2 transition-colors truncate w-fit">
-                        [{token.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, '')}]
+                        {token.website_url.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/.*$/, '')}
                       </a>
                     )}
                     {socials.twitter && (
                       <a href={socials.twitter} { ...linkAProps }>
-                        [X]
+                        X
                       </a>
                     )}
                     {socials.telegram && (
                       <a href={socials.telegram} { ...linkAProps }>
-                        [TELEGRAM]
+                        TELEGRAM
                       </a>
                     )}
                     {socials.discord && (
                       <a href={socials.discord} { ...linkAProps }>
-                        [DISCORD]
+                        DISCORD
                       </a>
                     )}
                     {socials.facebook && (
                       <a href={socials.facebook} { ...linkAProps }>
-                        [FACEBOOK]
+                        FACEBOOK
                       </a>
                     )}
                   </div>
@@ -272,7 +272,7 @@ export default function TokenTerminal({
                   />
                   <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-1.5 mt-0.5 pl-0 sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     <a href={token.preferred_exchange} { ...linkAProps }>
-                      [{getExchangeName(token.preferred_exchange)}]
+                      {getExchangeName(token.preferred_exchange)}
                     </a>
                   </div>
                 </div>

@@ -151,15 +151,15 @@ describe('TokenTerminal', () => {
 
   it('displays social links', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('[X]')).toBeDefined()
-    expect(screen.getByText('[TELEGRAM]')).toBeDefined()
-    expect(screen.getByText('[DISCORD]')).toBeDefined()
-    expect(screen.getByText('[FACEBOOK]')).toBeDefined()
+    expect(screen.getByText('X')).toBeDefined()
+    expect(screen.getByText('TELEGRAM')).toBeDefined()
+    expect(screen.getByText('DISCORD')).toBeDefined()
+    expect(screen.getByText('FACEBOOK')).toBeDefined()
   })
 
   it('displays website url', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('[testtoken.example]')).toBeDefined()
+    expect(screen.getByText('testtoken.example')).toBeDefined()
   })
 
   it('does not display social links when empty', () => {
@@ -170,12 +170,12 @@ describe('TokenTerminal', () => {
 
   it('displays exchange link', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('[UNISWAP]')).toBeDefined()
+    expect(screen.getByText('UNISWAP')).toBeDefined()
   })
 
   it('hides trade row when exchange links are empty', () => {
     render(<TokenTerminal themeColor="#ff0000" token={mockTokenNoOptional} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.queryByText('[NO PAIRS FOUND]')).toBeNull()
+    expect(screen.queryByText('NO PAIRS FOUND')).toBeNull()
   })
 
   it('displays supply', () => {
@@ -259,7 +259,7 @@ describe('TokenTerminal', () => {
   it('displays exchange name extracted from preferred_exchange url', () => {
     const gateToken = { ...mockToken, preferred_exchange: 'https://www.gate.com/trade/JPMON_USDT' }
     render(<TokenTerminal themeColor="#ff0000" token={gateToken} isExpired={false} isExpanded={true} chainIcons={chainIcons} closeTerminalAction={vi.fn()} />)
-    expect(screen.getByText('[GATE]')).toBeDefined()
+    expect(screen.getByText('GATE')).toBeDefined()
   })
 
   it('is hidden when not expanded', () => {
