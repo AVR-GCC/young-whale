@@ -9,23 +9,33 @@ vi.mock('@/lib/sitemap-utils', () => ({
 
 describe('YMYLTrustSignals', () => {
   it('renders last updated timestamp', () => {
-    render(<YMYLTrustSignals lastPublishedAt={new Date('2024-01-15T14:30:00Z')} />)
-    expect(screen.getByText(/LAST UPDATED:/)).toBeDefined()
+    render(
+      <YMYLTrustSignals
+        lastPublishedAt={new Date('2024-01-15T14:30:00Z')}
+        updatedEntity="token"
+      />
+    )
+    expect(screen.getByText(/TOKEN LAST UPDATED:/)).toBeDefined()
     expect(screen.getByText(/Jan 15, 2024/)).toBeDefined()
   })
 
   it('renders em dash when no timestamp', () => {
-    render(<YMYLTrustSignals lastPublishedAt={null} />)
-    expect(screen.getByText(/LAST UPDATED: —/)).toBeDefined()
+    render(<YMYLTrustSignals lastPublishedAt={null} updatedEntity="token" />)
+    expect(screen.getByText(/TOKEN LAST UPDATED: —/)).toBeDefined()
+  })
+
+  it('renders updated entity in uppercase', () => {
+    render(<YMYLTrustSignals lastPublishedAt={null} updatedEntity="exchange" />)
+    expect(screen.getByText(/EXCHANGE LAST UPDATED:/)).toBeDefined()
   })
 
   it('renders data source attribution', () => {
-    render(<YMYLTrustSignals lastPublishedAt={null} />)
+    render(<YMYLTrustSignals lastPublishedAt={null} updatedEntity="token" />)
     expect(screen.getByText(/DATA: On-Chain & Public Web/)).toBeDefined()
   })
 
   it('renders financial disclaimer', () => {
-    render(<YMYLTrustSignals lastPublishedAt={null} />)
+    render(<YMYLTrustSignals lastPublishedAt={null} updatedEntity="token" />)
     expect(
       screen.getByText(/Not financial advice\. Cryptocurrency assets involve high risk\./)
     ).toBeDefined()
@@ -35,7 +45,7 @@ describe('YMYLTrustSignals', () => {
 describe('YMYLTrustSignalsServer', () => {
   it('fetches last published date and renders it', async () => {
     render(await YMYLTrustSignalsServer())
-    expect(screen.getByText(/LAST UPDATED:/)).toBeDefined()
+    expect(screen.getByText(/SITE LAST UPDATED:/)).toBeDefined()
     expect(screen.getByText(/Jan 15, 2024/)).toBeDefined()
   })
 
@@ -43,6 +53,6 @@ describe('YMYLTrustSignalsServer', () => {
     const { getLastPublishedAt } = await import('@/lib/sitemap-utils')
     vi.mocked(getLastPublishedAt).mockResolvedValueOnce(null)
     render(await YMYLTrustSignalsServer())
-    expect(screen.getByText(/LAST UPDATED: —/)).toBeDefined()
+    expect(screen.getByText(/SITE LAST UPDATED: —/)).toBeDefined()
   })
 })

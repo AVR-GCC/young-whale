@@ -66,11 +66,11 @@ export default function RootLayout({
         `}
       </Script>
       <body className="min-h-full flex flex-col">
-        <div className="hidden sm:flex">
-          <YMYLTrustSignalsServer />
-        </div>
         <div className="flex-1 flex flex-col">
           {children}
+        </div>
+        <div className="hidden sm:flex">
+          <YMYLTrustSignalsServer />
         </div>
       </body>
     </html>

@@ -4,5 +4,5 @@ import { YMYLTrustSignals } from './YMYLTrustSignals'
 export async function YMYLTrustSignalsServer() {
   const lastPublishedAt = await getLastPublishedAt()
 
-  return <YMYLTrustSignals lastPublishedAt={lastPublishedAt} />
+  return <YMYLTrustSignals updatedEntity="site" lastPublishedAt={lastPublishedAt} />
 }

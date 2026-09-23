@@ -1,6 +1,6 @@
 'use client'
 
-export function YMYLTrustSignals({ lastPublishedAt }: { lastPublishedAt: Date | null }) {
+export function YMYLTrustSignals({ lastPublishedAt, updatedEntity }: { lastPublishedAt: Date | null, updatedEntity: string }) {
   const formattedDateTime = lastPublishedAt
     ? lastPublishedAt.toLocaleString('en-US', {
         year: 'numeric',
@@ -17,7 +17,7 @@ export function YMYLTrustSignals({ lastPublishedAt }: { lastPublishedAt: Date | 
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-1 sm:gap-2 text-center sm:text-left text-xs text-slate-400/60">
         <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-4">
           <span className="font-mono text-[10px] tracking-wider">
-            LAST UPDATED: {formattedDateTime}
+            {updatedEntity.toUpperCase()} LAST UPDATED: {formattedDateTime}
           </span>
           <span className="hidden sm:inline text-slate-600">|</span>
           <span className="text-[10px] tracking-wider">

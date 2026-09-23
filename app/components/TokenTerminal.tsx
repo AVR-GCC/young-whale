@@ -322,7 +322,7 @@ export default function TokenTerminal({
             </div>
             {/* Trust signal */}
             <div className="sm:hidden max-sm:mt-auto">
-              <YMYLTrustSignals lastPublishedAt={token.published_at ? new Date(token.published_at) : null} />
+              <YMYLTrustSignals updatedEntity="token" lastPublishedAt={token.published_at ? new Date(token.published_at) : null} />
             </div>
           </div>
         </div>
