@@ -286,6 +286,24 @@ describe('HomePage Integration', () => {
     expect(screen.getAllByRole('button', { name: /toggle search/i }).length).toBeGreaterThanOrEqual(1)
   })
 
+  it('toggles desktop footer via settings button', () => {
+    render(<HomePage tokens={mockTokens} loading={false} />)
+
+    const toggle = screen.getByRole('button', { name: /toggle footer settings/i })
+    const panel = document.getElementById('desktop-footer-panel')
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(panel?.className).toContain('grid-rows-[0fr]')
+
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(panel?.className).toContain('grid-rows-[1fr]')
+
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect(panel?.className).toContain('grid-rows-[0fr]')
+  })
+
   it('renders footer links', () => {
     render(<HomePage tokens={mockTokens} loading={false} />)
     expect(screen.getByText('[ SUBMIT TOKEN ]')).toBeDefined()

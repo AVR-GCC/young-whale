@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Settings } from 'lucide-react'
 import Header from './Header'
 import CategoryGrid from './CategoryGrid'
 // import FilteredSignals from './FilteredSignals'
@@ -41,6 +42,7 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [legalModalTab, setLegalModalTab] = useState<LegalTab | null>(null)
   const [isMobileOverlayOpen, setIsMobileOverlayOpen] = useState(false)
+  const [isFooterOpen, setIsFooterOpen] = useState(false)
   const [isSettingsOpen, setSettingsOpen] = useState(false);
   const [settingsView, setSettingsView] = useState('directory');
 
@@ -160,13 +162,37 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
       </main>
 
       <div className="hidden md:block pb-10" data-testid="desktop-footer-container">
-        <SubscriptionTerminal />
+        <div className="flex justify-center pt-6">
+          <button
+            type="button"
+            onClick={() => setIsFooterOpen((v) => !v)}
+            aria-expanded={isFooterOpen}
+            aria-controls="desktop-footer-panel"
+            aria-label="Toggle footer settings"
+            className="p-2 rounded-md border border-slate-700 bg-black/40 text-slate-500 hover:text-cyan-400 hover:border-cyan-400/40 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.5)] transition-all duration-[120ms] cursor-pointer"
+          >
+            <Settings
+              className={`w-4 h-4 transition-transform duration-300 ${isFooterOpen ? 'rotate-90' : ''}`}
+            />
+          </button>
+        </div>
 
-        <Footer
-          openSubmitModal={openSubmitModal}
-          setIsContactModalOpen={setIsContactModalOpen}
-          setLegalModalTab={setLegalModalTab}
-        />
+        <div
+          id="desktop-footer-panel"
+          className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+            isFooterOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <SubscriptionTerminal />
+
+            <Footer
+              openSubmitModal={openSubmitModal}
+              setIsContactModalOpen={setIsContactModalOpen}
+              setLegalModalTab={setLegalModalTab}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Mobile SEO Footer - always rendered but visually hidden, ensuring crawlers see the links in initial HTML */}
