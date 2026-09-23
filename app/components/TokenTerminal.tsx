@@ -285,7 +285,7 @@ export default function TokenTerminal({
               )}
 
               {/* Supply Row */}
-              {token.supply && (
+              {!!token.supply && (
                 <div className="flex flex-col sm:flex-row items-start px-1 leading-snug transition-colors group relative mt-2">
                   <LineLabel
                     field="supply"
