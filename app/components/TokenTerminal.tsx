@@ -137,7 +137,7 @@ export default function TokenTerminal({
     >
       <div className="px-0 sm:px-5 pb-0 sm:pb-2 max-sm:h-full">
         <div
-          className="bg-[#0F1624] max-sm:bg-black rounded-none sm:rounded-xl sm:overflow-hidden font-mono w-full relative max-sm:flex max-sm:flex-col max-sm:h-full"
+          className="bg-black rounded-none sm:rounded-xl sm:overflow-hidden font-mono w-full relative max-sm:flex max-sm:flex-col max-sm:h-full"
           style={{ boxShadow: `0 0 0 1px ${themeColor}10, 0 8px 32px -8px ${themeColor}20` }}
         >
           {/* Title bar */}
