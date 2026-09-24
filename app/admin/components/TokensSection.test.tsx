@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import TokensSection from './TokensSection'
+import TokensSection, { extractTwitterUsername } from './TokensSection'
 
 const mockFetch = vi.fn()
 global.fetch = mockFetch
@@ -306,5 +306,133 @@ describe('TokensSection', () => {
     await waitFor(() => {
       expect(screen.getByTestId('token-drawer')).toBeDefined()
     })
+  })
+
+  it('exports twitter usernames of recently expired tokens as csv', async () => {
+    let capturedBlob: Blob | undefined
+    const createObjectURLMock = vi.fn((blob: Blob) => {
+      capturedBlob = blob
+      return 'blob:mock-url'
+    })
+    const revokeObjectURLMock = vi.fn()
+    window.URL.createObjectURL = createObjectURLMock
+    window.URL.revokeObjectURL = revokeObjectURLMock
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {})
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/admin/tokens/stats')) {
+        return Promise.resolve({ ok: true, json: async () => mockStats })
+      }
+      if (url.includes('published_after')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            tokens: [
+              { ...mockToken, id: 't1', social_links: { twitter: 'https://x.com/alpha' } },
+              { ...mockToken, id: 't2', social_links: { twitter: 'https://twitter.com/beta' } },
+              { ...mockToken, id: 't3', social_links: { twitter: 'https://x.com/alpha' } },
+              { ...mockToken, id: 't4', social_links: {} },
+            ],
+            pagination: { page: 1, pageSize: 100, total: 4, totalPages: 1 },
+          }),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          tokens: [mockToken],
+          pagination: { page: 1, pageSize: 25, total: 1, totalPages: 1 },
+        }),
+      })
+    })
+
+    render(<TokensSection />)
+
+    await waitFor(() => {
+      expect(screen.getByText('TEST')).toBeDefined()
+    })
+
+    fireEvent.click(screen.getByText('Export Expired X Usernames'))
+
+    await waitFor(() => {
+      expect(createObjectURLMock).toHaveBeenCalled()
+    })
+
+    const exportCall = mockFetch.mock.calls.find((call) =>
+      String(call[0]).includes('published_after')
+    )
+    expect(exportCall).toBeDefined()
+    const exportUrl = String(exportCall![0])
+    expect(exportUrl).toContain('published_after=')
+    expect(exportUrl).toContain('published_before=')
+    expect(exportUrl).toContain('pageSize=100')
+
+    const csv = await capturedBlob!.text()
+    expect(csv).toBe('username\nalpha\nbeta')
+
+    expect(clickSpy).toHaveBeenCalled()
+    expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:mock-url')
+
+    await waitFor(() => {
+      expect(screen.getByText('Exported 2 username(s)')).toBeDefined()
+    })
+
+    clickSpy.mockRestore()
+  })
+
+  it('shows error toast when export fetch fails', async () => {
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/api/admin/tokens/stats')) {
+        return Promise.resolve({ ok: true, json: async () => mockStats })
+      }
+      if (url.includes('published_after')) {
+        return Promise.resolve({
+          ok: false,
+          json: async () => ({ error: 'Failed to fetch expired tokens' }),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          tokens: [mockToken],
+          pagination: { page: 1, pageSize: 25, total: 1, totalPages: 1 },
+        }),
+      })
+    })
+
+    render(<TokensSection />)
+
+    await waitFor(() => {
+      expect(screen.getByText('TEST')).toBeDefined()
+    })
+
+    fireEvent.click(screen.getByText('Export Expired X Usernames'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Failed to fetch expired tokens')).toBeDefined()
+    })
+  })
+})
+
+describe('extractTwitterUsername', () => {
+  it('extracts username from twitter and x links', () => {
+    expect(extractTwitterUsername('https://twitter.com/someuser')).toBe('someuser')
+    expect(extractTwitterUsername('https://x.com/someuser')).toBe('someuser')
+    expect(extractTwitterUsername('https://x.com/@someuser')).toBe('someuser')
+    expect(extractTwitterUsername('https://x.com/someuser/')).toBe('someuser')
+    expect(extractTwitterUsername('https://x.com/someuser?lang=en')).toBe('someuser')
+  })
+
+  it('handles plain usernames', () => {
+    expect(extractTwitterUsername('someuser')).toBe('someuser')
+    expect(extractTwitterUsername('@someuser')).toBe('someuser')
+  })
+
+  it('returns null for invalid input', () => {
+    expect(extractTwitterUsername('')).toBeNull()
+    expect(extractTwitterUsername('   ')).toBeNull()
+    expect(extractTwitterUsername('https://t.me/someuser')).toBeNull()
   })
 })

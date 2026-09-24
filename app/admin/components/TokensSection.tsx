@@ -103,6 +103,15 @@ function useDebounce<T>(value: T, delay: number): T {
   return debounced
 }
 
+export function extractTwitterUsername(link: string): string | null {
+  const trimmed = link.trim()
+  if (!trimmed) return null
+  const match = trimmed.match(/(?:twitter\.com|x\.com)\/(@?[A-Za-z0-9_]+)/i)
+  if (match) return match[1].replace(/^@/, '')
+  if (!trimmed.includes('/')) return trimmed.replace(/^@/, '') || null
+  return null
+}
+
 export default function TokensSection() {
   const router = useRouter()
   const pathname = usePathname()
@@ -125,6 +134,7 @@ export default function TokensSection() {
   const [pendingReviewIds, setPendingReviewIds] = useState<string[]>([])
   const [currentPendingIndex, setCurrentPendingIndex] = useState(0)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [exporting, setExporting] = useState(false)
   const [showConfirm, setShowConfirm] = useState<{
     action: string
     ids: string[]
@@ -444,6 +454,61 @@ export default function TokensSection() {
     return new Date(date).toLocaleDateString()
   }
 
+  const hour = 60 * 60 * 1000
+
+  const handleExportExpiredUsernames = async () => {
+    setExporting(true)
+    try {
+      const now = Date.now()
+      const publishedAfter = new Date(now - 48 * hour).toISOString()
+      const publishedBefore = new Date(now - 24 * hour).toISOString()
+
+      const expiredTokens: TokenWithHashtags[] = []
+      let currentPage = 1
+      let totalPages = 1
+      do {
+        const params = new URLSearchParams()
+        params.set('page', String(currentPage))
+        params.set('pageSize', '100')
+        params.set('published_after', publishedAfter)
+        params.set('published_before', publishedBefore)
+
+        const res = await fetch(`/api/admin/tokens?${params.toString()}`)
+        const data = await res.json()
+        if (!res.ok) {
+          showToast(data.error || 'Failed to fetch expired tokens', 'error')
+          return
+        }
+        expiredTokens.push(...data.tokens)
+        totalPages = data.pagination.totalPages
+        currentPage++
+      } while (currentPage <= totalPages)
+
+      const usernames = new Set<string>()
+      for (const token of expiredTokens) {
+        const twitter = token.social_links?.twitter
+        if (!twitter) continue
+        const username = extractTwitterUsername(twitter)
+        if (username) usernames.add(username)
+      }
+
+      const csv = ['username', ...usernames].join('\n')
+      const blob = new Blob([csv], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'twitter-usernames.csv'
+      a.click()
+      URL.revokeObjectURL(url)
+
+      showToast(`Exported ${usernames.size} username(s)`, 'success')
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Export failed', 'error')
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
       <div className="px-6 py-4 bg-zinc-100 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
@@ -469,6 +534,13 @@ export default function TokensSection() {
               }`}
             >
               {filters.review_queue ? 'Exit Review Queue' : 'Review Queue'}
+            </button>
+            <button
+              onClick={handleExportExpiredUsernames}
+              disabled={exporting}
+              className="px-3 py-1.5 bg-zinc-200 text-zinc-700 rounded text-sm hover:bg-zinc-300 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 transition-colors disabled:opacity-50"
+            >
+              {exporting ? 'Exporting...' : 'Export Expired X Usernames'}
             </button>
             <button
               onClick={fetchTokens}

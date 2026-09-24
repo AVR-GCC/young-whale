@@ -14,6 +14,8 @@ interface TokenFilters {
   source_type?: SourceType[]
   created_after?: string
   created_before?: string
+  published_after?: string
+  published_before?: string
   has_issues?: boolean
   review_queue?: boolean
 }
@@ -74,6 +76,14 @@ function buildTokenQuery(
     query = query.lte('created_at', filters.created_before)
   }
 
+  if (filters.published_after) {
+    query = query.gte('published_at', filters.published_after)
+  }
+
+  if (filters.published_before) {
+    query = query.lte('published_at', filters.published_before)
+  }
+
   if (filters.has_issues) {
     query = query.or(
       'short_description.is.null,short_description.eq.,full_description.is.null,full_description.eq.,category.is.null,confidence.eq.low'
@@ -113,6 +123,8 @@ export async function GET(request: Request) {
       source_type: searchParams.getAll('source_type') as SourceType[],
       created_after: searchParams.get('created_after') ?? undefined,
       created_before: searchParams.get('created_before') ?? undefined,
+      published_after: searchParams.get('published_after') ?? undefined,
+      published_before: searchParams.get('published_before') ?? undefined,
       has_issues: searchParams.get('has_issues') === 'true',
       review_queue: searchParams.get('review_queue') === 'true',
     }
