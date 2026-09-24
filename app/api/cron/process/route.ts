@@ -80,17 +80,15 @@ async function processJob(
 
   await logRunMessage(runId, `Processing ${raw.name}`)
 
-  // Extract CMC tags from raw payload
-  const cmcDetails = raw.raw_payload?.cmc_details as Record<string, unknown> | undefined
-  const cmcTags = Array.isArray(cmcDetails?.tags)
-    ? (cmcDetails.tags as string[]).map((t: string) => t.toLowerCase().trim())
-    : []
+  // Extract tags collected at ingest time
+  const rawTags = Array.isArray(raw.tags) ? raw.tags : []
+  const tokenTags = rawTags.map((t: string) => t.toLowerCase().trim())
 
-  const validCmcTags = cmcTags.filter((tag: string) => allowedHashtags.includes(tag))
+  const validTags = tokenTags.filter((tag: string) => allowedHashtags.includes(tag))
 
   let aiResult: AIResult
   try {
-    aiResult = await callAI(raw, validCmcTags, runId)
+    aiResult = await callAI(raw, validTags, runId)
   } catch (aiError) {
     const msg = aiError instanceof Error ? aiError.message : 'AI call failed'
     await markJobFailed(job, msg)
@@ -188,17 +186,17 @@ async function processJob(
 
   await logRunMessage(runId, `Token ${raw.name} saved`)
 
-  if (validCmcTags.length > 0) {
+  if (validTags.length > 0) {
     const { data: hashtagRows } = await supabaseService
       .from('hashtags')
       .select('id, slug')
-      .in('slug', validCmcTags)
+      .in('slug', validTags)
 
     const hashtagMap = new Map(
       (hashtagRows ?? []).map((h: { id: string; slug: string }) => [h.slug, h.id])
     )
 
-    const tokenHashtagRows = validCmcTags
+    const tokenHashtagRows = validTags
       .map((slug) => {
         const id = hashtagMap.get(slug.toLowerCase())
         if (!id) return null
@@ -267,7 +265,7 @@ async function fetchDexScreenerLinks(raw: RawToken): Promise<string[]> {
 
 async function callAI(
   raw: RawToken,
-  cmcTags: string[],
+  tags: string[],
   runId: string
 ): Promise<AIResult> {
   const modelName = (await getConfigString('ai_model')) ?? 'accounts/fireworks/models/gpt-oss-120b'
@@ -296,7 +294,7 @@ async function callAI(
   const prompt = `Analyze this token and return ONLY a JSON object with these exact keys:
 ${JSON.stringify(promptFields, null, 2)}
 
-Available tags for this token: ${cmcTags.join(', ')}
+Available tags for this token: ${tags.join(', ')}
 
 Token data:
 ${rawStr}`

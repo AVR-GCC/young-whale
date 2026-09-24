@@ -193,6 +193,10 @@ function mapToRawTokenCR(
     ? parseFloat(details.supply.total)
     : null
 
+  const tags = (details.tags ?? [])
+    .map((tag) => tag.toLowerCase().replace(/\s+/g, '-').trim())
+    .filter(Boolean)
+
   return {
     name: details.name,
     symbol: details.symbol,
@@ -209,6 +213,7 @@ function mapToRawTokenCR(
       cr_listing: listing,
       cr_details: details,
     },
+    tags,
     status: 'pending' as const,
     supply,
   } as Partial<RawToken>

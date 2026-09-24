@@ -151,6 +151,9 @@ function mapToRawTokenCG(
   const website_url = details.links.homepage?.[0] || null
   const logo_url = details.image?.large || details.image?.small || market.image || null
   const supply = market.total_supply ?? details.market_data?.total_supply ?? 0
+  const tags = (details.categories ?? [])
+    .map((category) => category.toLowerCase().replace(/\s+/g, '-').trim())
+    .filter(Boolean)
 
   return {
     name: details.name,
@@ -168,6 +171,7 @@ function mapToRawTokenCG(
       coingecko_market: market,
       coingecko_details: details,
     },
+    tags,
     status: 'pending' as const,
     supply,
   } as Partial<RawToken>

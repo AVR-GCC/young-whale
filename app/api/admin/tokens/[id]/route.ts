@@ -21,7 +21,7 @@ export async function GET(
         token_hashtags(
           hashtags(id, name, slug)
         ),
-        raw_token:raw_tokens(id, raw_payload)`
+        raw_token:raw_tokens(id, raw_payload, tags)`
       )
       .eq('id', id)
       .single()

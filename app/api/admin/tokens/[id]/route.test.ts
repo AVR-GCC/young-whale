@@ -76,6 +76,7 @@ const mockToken = {
   raw_token: {
     id: 'raw-1',
     raw_payload: { cmc_details: { tags: ['defi', 'ethereum'] } },
+    tags: ['defi', 'ethereum'],
   },
 }
 
@@ -108,7 +109,7 @@ describe('GET /api/admin/tokens/[id]', () => {
     expect(json.hashtags).toHaveLength(1)
     expect(json.hashtags[0].name).toBe('defi')
     expect(json.raw_token).toBeDefined()
-    expect(json.raw_token.raw_payload.cmc_details.tags).toEqual(['defi', 'ethereum'])
+    expect(json.raw_token.tags).toEqual(['defi', 'ethereum'])
   })
 
   it('returns 404 when token not found', async () => {

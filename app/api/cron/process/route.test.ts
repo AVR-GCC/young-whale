@@ -158,6 +158,7 @@ const mockRawToken = {
   source_type: 'coinmarketcap',
   source_url: 'https://coinmarketcap.com',
   raw_payload: null,
+  tags: [],
   status: 'pending',
   retry_count: 0,
   error_message: null,
@@ -706,7 +707,7 @@ describe('GET /api/cron/process', () => {
     })
   })
 
-  it('uses CMC tags for hashtags and stores AI-selected main hashtag', async () => {
+  it('uses raw token tags for hashtags and stores AI-selected main hashtag', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
     vi.mocked(generateText).mockResolvedValue({
       text: JSON.stringify({
@@ -718,13 +719,9 @@ describe('GET /api/cron/process', () => {
       }),
     } as unknown as Awaited<ReturnType<typeof generateText>>)
 
-    const rawTokenWithCmc = {
+    const rawTokenWithTags = {
       ...mockRawToken,
-      raw_payload: {
-        cmc_details: {
-          tags: ['defi', 'ai', 'infrastructure'],
-        },
-      },
+      tags: ['defi', 'ai', 'infrastructure'],
     }
 
     let callCount = 0
@@ -763,7 +760,7 @@ describe('GET /api/cron/process', () => {
       if (table === 'raw_tokens') {
         return createMockQueryBuilder({
           single: vi.fn().mockResolvedValue({
-            data: rawTokenWithCmc,
+            data: rawTokenWithTags,
             error: null,
           }),
         }) as unknown as ReturnType<typeof supabaseService.from>

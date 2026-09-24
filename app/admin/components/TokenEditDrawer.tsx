@@ -15,6 +15,7 @@ interface TokenWithHashtags extends Token {
   raw_token?: {
     id: string
     raw_payload: Record<string, unknown>
+    tags?: string[]
   } | null
 }
 
@@ -113,10 +114,8 @@ export default function TokenEditDrawer({
         setSelectedHashtagIds(data.hashtags?.map((h: Hashtag) => h.id) ?? [])
         if (data.raw_token?.raw_payload) {
           setRawJson(JSON.stringify(data.raw_token.raw_payload, null, 2))
-          const tags =
-            (data.raw_token.raw_payload.cmc_details as Record<string, unknown>)?.tags ?? []
-          setTagsArray(Array.isArray(tags) ? tags : [])
         }
+        setTagsArray(Array.isArray(data.raw_token?.tags) ? data.raw_token.tags : [])
       } else {
         showToast(data.error || 'Failed to load token', 'error')
       }

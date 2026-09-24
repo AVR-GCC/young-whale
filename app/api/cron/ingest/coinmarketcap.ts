@@ -116,6 +116,7 @@ function mapToRawTokenCMC(listing: CMCListing, details: CMCDetails, chains: Arra
 
   const contract_address = primaryContract?.contract_address ?? '';
   const source_url = `https://coinmarketcap.com/currencies/${details.slug}`;
+  const tags = (details.tags ?? []).map((tag) => tag.toLowerCase().trim()).filter(Boolean);
 
   return {
     name: details.name,
@@ -133,6 +134,7 @@ function mapToRawTokenCMC(listing: CMCListing, details: CMCDetails, chains: Arra
       cmc_listing: listing,
       cmc_details: details,
     },
+    tags,
     status: 'pending' as const,
     supply: listing.total_supply,
   } as Partial<RawToken>

@@ -28,6 +28,7 @@ interface TokenWithHashtags extends Token {
   raw_token?: {
     id: string
     raw_payload: Record<string, unknown>
+    tags?: string[]
   } | null
 }
 
@@ -72,6 +73,7 @@ const mockToken: TokenWithHashtags = {
         tags: ['defi', 'ethereum', 'layer-1'],
       },
     },
+    tags: ['defi', 'ethereum', 'layer-1'],
   },
 }
 

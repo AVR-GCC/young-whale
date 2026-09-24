@@ -61,6 +61,7 @@ export interface RawToken {
   source_type: SourceType | null
   source_url: string | null
   raw_payload: Record<string, unknown> | null
+  tags: string[]
   supply: number | null
   status: 'pending' | 'processing' | 'processed' | 'failed'
   retry_count: number
