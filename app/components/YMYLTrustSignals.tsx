@@ -14,7 +14,7 @@ export function YMYLTrustSignals({ lastPublishedAt, updatedEntity }: { lastPubli
 
   return (
     <div className="w-full bg-[#0B0F19]/95 backdrop-blur-sm border-t border-cyan-400/20 sm:border-b sm:border-cyan-400/10 py-2 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] sm:shadow-none">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-1 sm:gap-2 text-center sm:text-left text-xs text-slate-400/60">
+      <div className="max-w-7xl mx-auto flex flex-col items-center justify-center gap-1 text-center text-xs text-slate-400/60">
         <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-4">
           <span className="font-mono text-[10px] tracking-wider">
             {updatedEntity.toUpperCase()} LAST UPDATED: {formattedDateTime}
@@ -24,7 +24,7 @@ export function YMYLTrustSignals({ lastPublishedAt, updatedEntity }: { lastPubli
             DATA: On-Chain &amp; Public Web
           </span>
         </div>
-        <div className="text-[10px] tracking-wider text-amber-400/70 font-medium">
+        <div className="text-[10px] tracking-wider font-medium">
           Not financial advice. Cryptocurrency assets involve high risk.
         </div>
       </div>
