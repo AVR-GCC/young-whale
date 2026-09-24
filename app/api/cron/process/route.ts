@@ -545,8 +545,9 @@ async function runProcessing(runId: string) {
 }
 
 export async function GET(request: Request) {
+  const isCron = verifyCronRequest(request)
   if (process.env.NODE_ENV !== 'development') {
-    if (!verifyCronRequest(request)) {
+    if (!isCron) {
       const authResult = await requireAdminApi()
       if (authResult instanceof NextResponse) return authResult
     }
@@ -559,7 +560,7 @@ export async function GET(request: Request) {
       .eq('status', 'running')
       .maybeSingle()
 
-    if (existingRun) {
+    if (existingRun && !isCron) {
       return NextResponse.json({
         runId: existingRun.id,
         status: 'running',
