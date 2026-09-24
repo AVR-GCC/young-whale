@@ -15,7 +15,7 @@ SET tags = COALESCE(
   '[]'::jsonb
 )
 WHERE source_type = 'coinmarketcap'
-  AND raw_payload->'cmc_details'->'tags' IS NOT NULL;
+  AND jsonb_typeof(raw_payload->'cmc_details'->'tags') = 'array';
 
 UPDATE raw_tokens
 SET tags = COALESCE(
@@ -26,4 +26,4 @@ SET tags = COALESCE(
   '[]'::jsonb
 )
 WHERE source_type = 'coinranking'
-  AND raw_payload->'cr_details'->'tags' IS NOT NULL;
+  AND jsonb_typeof(raw_payload->'cr_details'->'tags') = 'array';
