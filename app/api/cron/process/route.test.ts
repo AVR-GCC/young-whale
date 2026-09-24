@@ -1169,8 +1169,44 @@ describe('GET /api/cron/process', () => {
     expect(json.status).toBe('running')
   })
 
-  it('returns existing running run instead of creating a new one', async () => {
+  it('starts a new run when called as cron even if one is already running', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createMockQueryBuilder(
+          {
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'existing-run-1', message: 'Already processing' },
+              error: null,
+            }),
+            single: vi.fn().mockResolvedValue({
+              data: { id: 'run-1', status: 'running' },
+              error: null,
+            }),
+          },
+          { data: null, error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-1')
+    expect(json.status).toBe('running')
+    expect(json.message).toBe('Processing started')
+  })
+
+  it('returns existing running run instead of creating a new one when called as admin', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
 
     vi.mocked(supabaseService.from).mockImplementation((table: string) => {
       if (table === 'processing_runs') {
@@ -1187,7 +1223,7 @@ describe('GET /api/cron/process', () => {
       return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
     })
 
-    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const response = await GET(createRequest('Bearer admin-token'))
     const json = await response.json()
 
     expect(response.status).toBe(200)
