@@ -237,10 +237,10 @@ export default function CategoryGrid({
     <>
       {/* Desktop Category Layout — two independent columns so expanded rows don't affect the other column */}
       <div className={`hidden lg:grid lg:grid-cols-2 gap-x-6 gap-y-3 w-full transition-opacity duration-300 ${activeFilter ? 'opacity-0 pointer-events-none absolute inset-x-0 top-0' : 'opacity-100 relative'}`}>
-        <div className="flex flex-1 flex-col gap-y-3 w-1/2">
+        <div className="flex flex-1 flex-col gap-y-3">
           {leftCategories.map(cat => renderCategory(cat, false))}
         </div>
-        <div className="flex flex-1 flex-col gap-y-3 w-1/2">
+        <div className="flex flex-1 flex-col gap-y-3">
           {rightCategories.map(cat => renderCategory(cat, false))}
         </div>
       </div>
