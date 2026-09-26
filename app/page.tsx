@@ -5,6 +5,7 @@ const HOMEPAGE_DESCRIPTION =
   'YoungWhale is your daily Crypto Intelligence Terminal for discovering the newest coins'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://youngwhale.io'),
   description: HOMEPAGE_DESCRIPTION,
   openGraph: {
     title: 'Young Whale - New Token Listings',
@@ -19,6 +20,12 @@ export const metadata: Metadata = {
         alt: 'Young Whale - New Token Listings',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Young Whale - New Token Listings',
+    description: 'Explore latest cryptocurrency tokens across: Tech, Meme, Real world assets and Presale',
+    images: ['/public-master.png'],
   },
   alternates: {
     canonical: 'https://youngwhale.io/',
