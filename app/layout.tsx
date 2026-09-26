@@ -35,14 +35,14 @@ export const metadata: Metadata = {
   description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale',
   openGraph: {
     title: 'Young Whale - New Token Listings',
-    description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale',
+    description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale.',
     url: 'https://youngwhale.io',
     siteName: 'Young Whale',
     images: [
       {
         url: '/public-master.png',
-        width: 1200,
-        height: 630,
+        width: 5112,
+        height: 3792,
         alt: 'Young Whale - New Token Listings',
       },
     ],
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Young Whale - New Token Listings',
-    description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale',
+    description: 'Explore latest cryptocurrency tokens across: Tech, Meme, Real world assets and Presale',
     images: ['/public-master.png'],
   },
 }
