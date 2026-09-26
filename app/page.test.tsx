@@ -8,7 +8,7 @@ vi.mock('./components/HomePageClient', () => ({
 
 describe('Homepage SEO', () => {
   const EXPECTED_DESCRIPTION =
-    'YoungWhale is your daily Crypto Intelligence Terminal for discovering the newest coins.'
+    'YoungWhale is your daily Crypto Intelligence Terminal for discovering the newest coins'
 
   it('exports metadata with the exact homepage description', () => {
     expect(metadata.description).toBe(EXPECTED_DESCRIPTION)

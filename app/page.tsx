@@ -2,12 +2,23 @@ import { Metadata } from 'next'
 import HomePageClient from './components/HomePageClient'
 
 const HOMEPAGE_DESCRIPTION =
-  'YoungWhale is your daily Crypto Intelligence Terminal for discovering the newest coins.'
+  'YoungWhale is your daily Crypto Intelligence Terminal for discovering the newest coins'
 
 export const metadata: Metadata = {
   description: HOMEPAGE_DESCRIPTION,
   openGraph: {
+    title: 'Young Whale - New Token Listings',
     description: HOMEPAGE_DESCRIPTION,
+    url: 'https://youngwhale.io',
+    siteName: 'Young Whale',
+    images: [
+      {
+        url: '/public-master.png',
+        width: 5112,
+        height: 3792,
+        alt: 'Young Whale - New Token Listings',
+      },
+    ],
   },
   alternates: {
     canonical: 'https://youngwhale.io/',
