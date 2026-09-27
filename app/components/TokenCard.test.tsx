@@ -152,7 +152,7 @@ describe('TokenCard', () => {
     render(<TokenCard themeColor="#ff0000" token={mockToken} isExpanded={false} setIsExpandedAction={mockSetIsExpanded} chainIcons={chainIcons} chainExplorers={chainExplorers} />)
     const imgs = screen.getAllByAltText('TestToken token logo')
     expect(imgs.length).toBeGreaterThanOrEqual(1)
-    expect(imgs[0].getAttribute('src')).toContain('example.com%2Flogo.png')
+    expect(imgs[0].getAttribute('src')).toBe('https://example.com/logo.png')
   })
 
   it('expands on click', () => {
