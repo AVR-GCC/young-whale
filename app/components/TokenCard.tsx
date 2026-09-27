@@ -110,6 +110,7 @@ export function TokenIcon({ name, logoUrl, chain, className = "w-10 h-10", size 
           height={size}
           className="w-full h-full border-[3px] border-white rounded-full object-cover flex-shrink-0"
           onError={() => setImageError(true)}
+          unoptimized
         />
         {!!chain && (
           <div className={`absolute ${badgePositionClass} ${badgeSizeClass} flex items-center justify-center rounded border-[1.5px] border-white shadow-md z-15 pointer-events-none overflow-hidden ${chainIcons[chain] === 'blue' ? 'bg-[#0000ff]' : 'bg-[#0F1624]'}`}>
