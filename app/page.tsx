@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     siteName: 'Young Whale',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image-v2.jpg',
         width: 1200,
-        height: 890,
+        height: 630,
         alt: 'Young Whale - New Token Listings',
       },
     ],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Young Whale - New Token Listings',
     description: 'Explore latest cryptocurrency tokens across: Tech, Meme, Real world assets and Presale',
-    images: ['/og-image.jpg'],
+    images: ['/og-image-v2.jpg'],
   },
   alternates: {
     canonical: 'https://youngwhale.io/',
