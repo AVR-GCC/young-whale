@@ -52,7 +52,7 @@ describe('Admin page', () => {
     render(Page)
 
     expect(screen.getByText('Young Whale admin')).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Run Process' })).toBeDefined()
+    expect(screen.getByRole('button', { name: 'Run New Process' })).toBeDefined()
   })
 
   it('calls process API and shows success', async () => {
@@ -68,11 +68,11 @@ describe('Admin page', () => {
 
     const Page = await Admin()
     render(Page)
-    const button = screen.getByRole('button', { name: 'Run Process' })
+    const button = screen.getByRole('button', { name: 'Run New Process' })
     fireEvent.click(button)
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/cron/process')
+      expect(mockFetch).toHaveBeenCalledWith('/api/cron/process?mode=new')
     })
 
     vi.advanceTimersByTime(2500)
@@ -94,7 +94,7 @@ describe('Admin page', () => {
 
     const Page = await Admin()
     render(Page)
-    const button = screen.getByRole('button', { name: 'Run Process' })
+    const button = screen.getByRole('button', { name: 'Run New Process' })
     fireEvent.click(button)
 
     await waitFor(() => {
@@ -119,7 +119,7 @@ describe('Admin page', () => {
 
     const Page = await Admin()
     render(Page)
-    const button = screen.getByRole('button', { name: 'Run Process' })
+    const button = screen.getByRole('button', { name: 'Run New Process' })
     fireEvent.click(button)
 
     await waitFor(() => {
@@ -135,7 +135,7 @@ describe('Admin page', () => {
     vi.advanceTimersByTime(2500)
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Run Process' }).hasAttribute('disabled')).toBe(false)
+      expect(screen.getByRole('button', { name: 'Run New Process' }).hasAttribute('disabled')).toBe(false)
     })
   })
 
