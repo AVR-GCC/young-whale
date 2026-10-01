@@ -101,15 +101,19 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
     }, 2000)
   }, [clearPollInterval])
 
-  const runProcess = useCallback(async () => {
+  const startProcessRequest = useCallback(async (mode: 'new' | 'attach') => {
     setProcessLoading(true)
-    setProcessStatus('Starting...')
+    setProcessStatus(mode === 'attach' ? 'Attaching to run...' : 'Starting...')
     try {
-      const res = await fetch('/api/cron/process')
+      const res = await fetch(`/api/cron/process?mode=${mode}`)
       const data = await res.json()
 
       if (!res.ok) {
-        setProcessStatus(`Error: ${data.error || 'Unknown error'}`)
+        setProcessStatus(
+          mode === 'attach' && res.status === 404
+            ? data.error || 'No processing run in progress'
+            : `Error: ${data.error || 'Unknown error'}`
+        )
         setProcessLoading(false)
         return
       }
@@ -125,6 +129,9 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
       setProcessLoading(false)
     }
   }, [pollStatus])
+
+  const runProcess = useCallback(() => startProcessRequest('new'), [startProcessRequest])
+  const attachToRun = useCallback(() => startProcessRequest('attach'), [startProcessRequest])
 
   const runIngest = useCallback(async () => {
     setIngestLoading(true)
@@ -157,13 +164,20 @@ export default function AdminActions({ userEmail }: AdminActionsProps) {
 
   return (
     <div className="flex items-center gap-4">
-      <div className="flex flex-col items-center gap-1 w-80 h-20">
+      <div className="flex flex-col items-center gap-1 w-80 min-h-20">
         <button
           onClick={runProcess}
           disabled={processLoading}
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80%]"
         >
-          {processLoading ? 'Running Process...' : 'Run Process'}
+          {processLoading ? 'Running Process...' : 'Run New Process'}
+        </button>
+        <button
+          onClick={attachToRun}
+          disabled={processLoading}
+          className="px-4 py-1 text-sm bg-zinc-600 text-white rounded hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed w-[80%]"
+        >
+          Attach to Run
         </button>
         {processStatus && (
           <p className={`text-sm text-center whitespace-pre-line ${processStatus.startsWith('Error') ? 'text-red-500' : 'text-green-600'}`}>

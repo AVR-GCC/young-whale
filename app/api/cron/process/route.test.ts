@@ -111,12 +111,12 @@ function createProcessingRunsMock(runId = 'run-1') {
   return builder
 }
 
-function createRequest(authHeader?: string): Request {
+function createRequest(authHeader?: string, query = ''): Request {
   const headers: Record<string, string> = {}
   if (authHeader) {
     headers.Authorization = authHeader
   }
-  return new Request('http://localhost/api/cron/process', { headers })
+  return new Request(`http://localhost/api/cron/process${query}`, { headers })
 }
 
 function createQueueMock(jobs: typeof mockJob[] = [mockJob]) {
@@ -1230,5 +1230,112 @@ describe('GET /api/cron/process', () => {
     expect(json.runId).toBe('existing-run-1')
     expect(json.status).toBe('running')
     expect(json.message).toBe('Already processing')
+  })
+
+  it('attaches to an existing run when mode=attach', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createMockQueryBuilder(
+          {
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'existing-run-1', message: 'Already processing' },
+              error: null,
+            }),
+          },
+          { data: { id: 'existing-run-1', message: 'Already processing' }, error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer admin-token', '?mode=attach'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('existing-run-1')
+    expect(json.status).toBe('running')
+    expect(json.message).toBe('Already processing')
+  })
+
+  it('returns 404 when mode=attach and no run is in progress', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        return createMockQueryBuilder(
+          {
+            maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+          },
+          { data: null, error: null }
+        ) as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer admin-token', '?mode=attach'))
+    const json = await response.json()
+
+    expect(response.status).toBe(404)
+    expect(json.error).toBe('No processing run in progress')
+  })
+
+  it('marks the running run as failed and starts a new run when mode=new', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(false)
+    vi.mocked(requireAdminApi).mockResolvedValue({
+      id: 'admin-1',
+      email: 'admin@test.com',
+      role: 'admin',
+    } as Awaited<ReturnType<typeof requireAdminApi>>)
+
+    const runUpdates: Record<string, unknown>[] = []
+
+    vi.mocked(supabaseService.from).mockImplementation((table: string) => {
+      if (table === 'processing_runs') {
+        const builder = createMockQueryBuilder(
+          {
+            maybeSingle: vi.fn().mockResolvedValue({
+              data: { id: 'existing-run-1', message: 'Already processing' },
+              error: null,
+            }),
+            single: vi.fn().mockResolvedValue({
+              data: { id: 'run-2', status: 'running' },
+              error: null,
+            }),
+          },
+          { data: { id: 'existing-run-1', message: 'Already processing' }, error: null }
+        )
+        builder.update = vi.fn().mockImplementation((data: Record<string, unknown>) => {
+          runUpdates.push(data)
+          return builder
+        })
+        return builder as unknown as ReturnType<typeof supabaseService.from>
+      }
+      return createMockQueryBuilder() as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    const response = await GET(createRequest('Bearer admin-token', '?mode=new'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.runId).toBe('run-2')
+    expect(json.status).toBe('running')
+    expect(runUpdates).toContainEqual(
+      expect.objectContaining({
+        status: 'failed',
+        error_message: 'Superseded by a new processing run',
+      })
+    )
   })
 })

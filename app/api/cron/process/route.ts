@@ -551,6 +551,8 @@ export async function GET(request: Request) {
     }
   }
 
+  const mode = new URL(request.url).searchParams.get('mode')
+
   try {
     const { data: existingRun } = await supabaseService
       .from('processing_runs')
@@ -558,12 +560,37 @@ export async function GET(request: Request) {
       .eq('status', 'running')
       .maybeSingle()
 
-    if (existingRun && !isCron) {
+    if (mode === 'attach') {
+      if (!existingRun) {
+        return NextResponse.json(
+          { error: 'No processing run in progress' },
+          { status: 404 }
+        )
+      }
       return NextResponse.json({
         runId: existingRun.id,
         status: 'running',
         message: existingRun.message,
       })
+    }
+
+    if (existingRun && !isCron && mode !== 'new') {
+      return NextResponse.json({
+        runId: existingRun.id,
+        status: 'running',
+        message: existingRun.message,
+      })
+    }
+
+    if (existingRun && mode === 'new') {
+      await supabaseService
+        .from('processing_runs')
+        .update({
+          status: 'failed',
+          error_message: 'Superseded by a new processing run',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', existingRun.id)
     }
 
     const { data: run, error: insertError } = await supabaseService
