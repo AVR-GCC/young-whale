@@ -28,7 +28,7 @@ describe('MascotTopBar', () => {
     const truncated = `${MASCOT_CONTRACT_ADDRESS.slice(0, 6)}...${MASCOT_CONTRACT_ADDRESS.slice(-4)}`
     const link = screen.getByText(truncated).closest('a')
     expect(link).toBeDefined()
-    expect(link?.getAttribute('href')).toBe(`https://robinhoodchain.blockscout.com/token/${MASCOT_CONTRACT_ADDRESS}`)
+    expect(link?.getAttribute('href')).toBe(`https://robin.etherscan.io/tx/${MASCOT_CONTRACT_ADDRESS}`)
     expect(link?.getAttribute('target')).toBe('_blank')
     expect(link?.getAttribute('rel')).toContain('noopener')
   })

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ArrowUpRight, Copy } from 'lucide-react'
 
-export const MASCOT_CONTRACT_ADDRESS = '0x7f3a9c2e4b8d1f6a5c0e3b7d9f2a4c6e8b1d3f5a'
+export const MASCOT_CONTRACT_ADDRESS = '0xc5cd335c81462804e424cb906cbc7f1f10db867c'
 const TRUNCATED_ADDRESS = `${MASCOT_CONTRACT_ADDRESS.slice(0, 6)}...${MASCOT_CONTRACT_ADDRESS.slice(-4)}`
 
 export default function MascotTopBar() {
@@ -28,7 +28,7 @@ export default function MascotTopBar() {
         <span className="truncate">The YoungWhale mascot</span>
         <span className="hidden sm:inline-flex truncate ml-[-7px]">lives on Robinhood:</span>
         <a
-          href={`https://robinhoodchain.blockscout.com/token/${MASCOT_CONTRACT_ADDRESS}`}
+          href={`https://robin.etherscan.io/tx/${MASCOT_CONTRACT_ADDRESS}`}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 bg-black text-[#22D3EE] rounded-md px-3 py-1 hover:bg-[#0A0F1D] transition-colors"
