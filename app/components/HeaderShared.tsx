@@ -125,9 +125,7 @@ export function SearchButton({
   useEffect(() => {
     if (!isSearchOpen) return
 
-    const timeoutId = setTimeout(() => {
-      inputRef.current?.focus()
-    }, 1000)
+    inputRef.current?.focus()
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement
@@ -138,10 +136,10 @@ export function SearchButton({
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      clearTimeout(timeoutId)
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isSearchOpen, setIsSearchOpenAction])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearchOpen])
 
   return (
     <div id="data-search-container" className={classes}>
