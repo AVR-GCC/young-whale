@@ -238,7 +238,7 @@ export default function TokenCard({
     <div
       className="w-[54px] sm:w-[42px] text-center md:text-right font-mono text-[10px] uppercase tracking-wider flex-shrink-0 ml-1"
       style={{
-        color: (!isPromoted && !isExpired) ? themeColor : '#94A3B8'
+        color: ((!isPromoted && !isExpired) || isPresale) ? themeColor : '#94A3B8'
       }}
     >
       {timeLabel}
