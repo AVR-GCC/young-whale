@@ -19,15 +19,16 @@ describe('MascotTopBar', () => {
 
   it('renders the mascot announcement text', () => {
     render(<MascotTopBar />)
-    expect(screen.getByText(/The YoungWhale mascot lives on Base:/)).toBeDefined()
+    expect(screen.getByText(/The YoungWhale mascot/)).toBeDefined()
+    expect(screen.getByText(/lives on Robinhood:/)).toBeDefined()
   })
 
-  it('renders the truncated contract address with a Base explorer link', () => {
+  it('renders the truncated contract address with a Robinhood explorer link', () => {
     render(<MascotTopBar />)
     const truncated = `${MASCOT_CONTRACT_ADDRESS.slice(0, 6)}...${MASCOT_CONTRACT_ADDRESS.slice(-4)}`
     const link = screen.getByText(truncated).closest('a')
     expect(link).toBeDefined()
-    expect(link?.getAttribute('href')).toBe(`https://basescan.org/address/${MASCOT_CONTRACT_ADDRESS}`)
+    expect(link?.getAttribute('href')).toBe(`https://robinhoodchain.blockscout.com/token/${MASCOT_CONTRACT_ADDRESS}`)
     expect(link?.getAttribute('target')).toBe('_blank')
     expect(link?.getAttribute('rel')).toContain('noopener')
   })
