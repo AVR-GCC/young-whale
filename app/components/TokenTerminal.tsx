@@ -188,7 +188,7 @@ export default function TokenTerminal({
           <div className="max-sm:overflow-x-clip max-sm:overflow-y-auto max-sm:flex-1 max-sm:flex max-sm:flex-col">
             {/* Token Header */}
             <div className="flex flex-col gap-3 p-4 pt-0 sm:p-6 font-mono">
-              <div className="flex-wrap text-[20px] sm:text-[22px] font-bold tracking-wide truncate flex items-center gap-2">
+              <div className="flex-wrap text-[20px] sm:text-[22px] font-bold tracking-wide flex items-center gap-2 break-words">
                 <span className="text-[#E2E8F0] hidden sm:inline">{token.name}</span>
                 <span style={{ color: themeColor }} className="text-[17px] hidden sm:inline">${symbol}</span>
                 <span className="px-1.5 py-0.5 rounded uppercase text-[10px] sm:text-[11px] font-bold tracking-wider bg-white/10 text-white/70 ml-2 hidden sm:inline-block">
