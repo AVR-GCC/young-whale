@@ -190,11 +190,18 @@ export function HeaderTitle({
     >
       <Link
         href="/"
-        className={`font-oxanium font-bold tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-600 ${
-          isMobile ? 'text-[10px]' : 'text-xl'
+        className={`flex items-center font-oxanium font-bold tracking-wide text-slate-50 hover:text-cyan-400 hover:drop-shadow-[0_0_8px_rgba(34,211,238,0.8)] transition-all duration-600 ${
+          isMobile ? 'text-[10px] gap-1' : 'text-xl gap-2'
         }`}
       >
         YoungWhale
+        <span
+          className={`rounded-[3px] border border-[#22D3EE] px-1 font-semibold uppercase tracking-widest text-[#22D3EE] ${
+            isMobile ? 'text-[6px] py-px' : 'text-[9px] py-0.5'
+          }`}
+        >
+          Alpha
+        </span>
       </Link>
     </div>
   )

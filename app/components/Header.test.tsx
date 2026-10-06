@@ -165,6 +165,13 @@ describe('DesktopHeader', () => {
     expect(screen.getByText('YoungWhale')).toBeDefined()
   })
 
+  it('renders alpha indicator next to the logo', () => {
+    render(<DesktopHeader {...defaultProps} />)
+    const badge = screen.getByText('Alpha')
+    expect(badge.className).toContain('uppercase')
+    expect(badge.className).toContain('border-[#22D3EE]')
+  })
+
   it('renders desktop timer with tagline', () => {
     render(<DesktopHeader {...defaultProps} />)
     expect(screen.getByText(/CRYPTO WHALES START HERE/)).toBeDefined()
@@ -228,6 +235,11 @@ describe('MobileHeader', () => {
   it('renders mobile logo', () => {
     render(<MobileHeader {...defaultProps} />)
     expect(screen.getByText('YoungWhale')).toBeDefined()
+  })
+
+  it('renders alpha indicator next to the logo', () => {
+    render(<MobileHeader {...defaultProps} />)
+    expect(screen.getByText('Alpha')).toBeDefined()
   })
 
   it('renders mobile timer', () => {
