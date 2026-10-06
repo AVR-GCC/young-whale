@@ -307,7 +307,7 @@ export default function TokenTerminal({
                     themeColor={themeColor}
                   />
 
-                  <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                  <div className="flex-1 flex items-center mt-0.5 pl-[7px] sm:pl-[14px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
                     {isExpired ? (
                       <span className="text-[14px] ml-2 font-mono tracking-wide text-slate-400 whitespace-nowrap">
                         SIGNAL EXPIRED
