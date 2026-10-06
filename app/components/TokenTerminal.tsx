@@ -300,25 +300,27 @@ export default function TokenTerminal({
               )}
 
               {/* Cursor */}
-              <div className="flex items-start px-1 leading-snug transition-colors relative mt-2 font-mono">
-                <LineLabel
-                  field="Sonar Score"
-                  themeColor={themeColor}
-                />
+              {!isPresale && !token.is_promoted && (
+                <div className="flex items-start px-1 leading-snug transition-colors relative mt-2 font-mono">
+                  <LineLabel
+                    field="Sonar Score"
+                    themeColor={themeColor}
+                  />
 
-                <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
-                  {isExpired ? (
-                    <span className="text-[14px] ml-2 font-mono tracking-wide text-slate-400 whitespace-nowrap">
-                      SIGNAL EXPIRED
-                    </span>
-                  ) : (
-                    <span className="text-[14px] font-mono tracking-wide text-white/90">
-                      {`${token.rating}/10`}
-                    </span>
-                  )}
-                  {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
+                  <div className="flex-1 flex items-center mt-0.5 pl-[7px] border-0 sm:border-l sm:border-white/5 content-start max-sm:text-[rgb(229,231,235)]">
+                    {isExpired ? (
+                      <span className="text-[14px] ml-2 font-mono tracking-wide text-slate-400 whitespace-nowrap">
+                        SIGNAL EXPIRED
+                      </span>
+                    ) : (
+                        <span className="text-[14px] font-mono tracking-wide text-white/90">
+                          {`${token.rating}/10`}
+                        </span>
+                      )}
+                    {!isExpired && <span className="inline-block w-[7px] h-[14px] align-[-2px] ml-1.5 animate-[pulse_1.5s_infinite]" style={{ backgroundColor: `${themeColor}99` }}></span>}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             {/* Trust signal */}
             <div className="sm:hidden max-sm:mt-auto">
