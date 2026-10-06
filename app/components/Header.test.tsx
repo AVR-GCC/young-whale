@@ -11,6 +11,8 @@ vi.mock('./CustomTooltip', () => ({
 vi.mock('lucide-react', () => ({
   Search: () => <svg data-testid="search-icon" />,
   Settings: () => <svg data-testid="settings-icon" />,
+  ArrowUpRight: () => <svg data-testid="arrow-up-right-icon" />,
+  Copy: () => <svg data-testid="copy-icon" />,
 }))
 
 const defaultProps = {
