@@ -47,9 +47,6 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
   const [settingsView, setSettingsView] = useState('directory');
 
   const toggleSearchOpen = (open: boolean) => {
-    if (isSearchOpen && !open) {
-      setSearchQuery('')
-    }
     setIsSearchOpen(open)
   }
 
