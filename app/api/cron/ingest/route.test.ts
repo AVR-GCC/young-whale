@@ -266,6 +266,164 @@ describe('GET /api/cron/ingest', () => {
     expect(json.imported).toBe(1)
   })
 
+  it('stops ingesting when a coinranking contract address already exists in raw_tokens', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    const eqCalls: Array<[string, string]> = []
+
+    vi.mocked(supabaseService.from).mockImplementation(() => {
+      let usedEq = false
+      let hitExisting = false
+      const builder: Record<string, unknown> = {
+        select: vi.fn(() => builder),
+        insert: vi.fn(() => builder),
+        limit: vi.fn(() => builder),
+        eq: vi.fn((col: string, val: string) => {
+          usedEq = true
+          eqCalls.push([col, val])
+          if (col === 'name' && val === 'Token 1') hitExisting = true
+          if (col === 'contract_address' && val === '0xabc') hitExisting = true
+          return builder
+        }),
+        in: vi.fn(() => builder),
+        maybeSingle: vi.fn().mockImplementation(() => {
+          if (!usedEq || hitExisting) {
+            return Promise.resolve({ data: { id: 'existing-id' }, error: null })
+          }
+          return Promise.resolve({ data: null, error: null })
+        }),
+        single: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+        then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
+          Promise.resolve({ data: null, error: null }).then(onfulfilled),
+      }
+      return builder as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/listings/latest')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ data: mockListings.slice(0, 1) }),
+        })
+      }
+      if (url.includes('/coins') && !url.includes('/coin/')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: {
+              coins: [{
+                uuid: 'uuid-cr-1',
+                symbol: 'DIFF',
+                name: 'Different Token',
+                iconUrl: 'https://example.com/icon.png',
+                marketCap: '1000000',
+                price: '1.00',
+                listedAt: Date.now(),
+                tier: 1,
+                change: '0',
+                rank: 1,
+                '24hVolume': '100000',
+                btcPrice: '0.00001',
+                contractAddresses: ['ethereum/0xabc'],
+              }],
+            },
+          }),
+        })
+      }
+      return Promise.resolve({ ok: true, json: async () => ({ data: {} }) })
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.imported).toBe(0)
+    expect(eqCalls).toContainEqual(['contract_address', '0xabc'])
+  })
+
+  it('stops ingesting when a coinmarketcap platform token address already exists in raw_tokens', async () => {
+    vi.mocked(verifyCronRequest).mockReturnValue(true)
+
+    const eqCalls: Array<[string, string]> = []
+
+    vi.mocked(supabaseService.from).mockImplementation(() => {
+      let usedEq = false
+      let hitExisting = false
+      const builder: Record<string, unknown> = {
+        select: vi.fn(() => builder),
+        insert: vi.fn(() => builder),
+        limit: vi.fn(() => builder),
+        eq: vi.fn((col: string, val: string) => {
+          usedEq = true
+          eqCalls.push([col, val])
+          if (col === 'name' && val === 'Token 1') hitExisting = true
+          if (col === 'contract_address' && val === '0xdef') hitExisting = true
+          return builder
+        }),
+        in: vi.fn(() => builder),
+        maybeSingle: vi.fn().mockImplementation(() => {
+          if (!usedEq || hitExisting) {
+            return Promise.resolve({ data: { id: 'existing-id' }, error: null })
+          }
+          return Promise.resolve({ data: null, error: null })
+        }),
+        single: vi.fn().mockResolvedValue({ data: { id: 'test-id' }, error: null }),
+        then: (onfulfilled?: (value: { data: unknown; error: unknown }) => unknown) =>
+          Promise.resolve({ data: null, error: null }).then(onfulfilled),
+      }
+      return builder as unknown as ReturnType<typeof supabaseService.from>
+    })
+
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('/listings/latest')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: [{
+              id: 99,
+              name: 'New Token',
+              symbol: 'NEW',
+              date_added: '2024-01-01',
+              platform: { token_address: '0xdef' },
+            }],
+          }),
+        })
+      }
+      if (url.includes('/coins') && !url.includes('/coin/')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            data: {
+              coins: [{
+                uuid: 'uuid-1',
+                symbol: 'TKN1',
+                name: 'Token 1',
+                iconUrl: 'https://example.com/icon.png',
+                marketCap: '1000000',
+                price: '1.00',
+                listedAt: Date.now(),
+                tier: 1,
+                change: '0',
+                rank: 1,
+                '24hVolume': '100000',
+                btcPrice: '0.00001',
+                contractAddresses: [],
+              }],
+            },
+          }),
+        })
+      }
+      return Promise.resolve({ ok: true, json: async () => ({ data: {} }) })
+    })
+
+    const response = await GET(createRequest('Bearer test-cron-secret'))
+    const json = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(json.imported).toBe(0)
+    expect(eqCalls).toContainEqual(['contract_address', '0xdef'])
+  })
+
   it('adds jobs to processing_queue after ingesting tokens', async () => {
     vi.mocked(verifyCronRequest).mockReturnValue(true)
 

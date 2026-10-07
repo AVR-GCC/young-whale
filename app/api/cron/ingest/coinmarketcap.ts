@@ -9,6 +9,9 @@ export type CMCListing = {
     date_added: string
     quote?: { USD?: { price?: number } }
     total_supply: number
+    platform?: {
+      token_address?: string
+    }
 }
 
 export type CMCDetails = {

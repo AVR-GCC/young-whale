@@ -5,6 +5,7 @@ import { requireAdminApi } from '@/lib/admin-auth'
 import { SourceType } from '@/shared/types'
 import {
   getChains,
+  getListingContractAddress,
   isTokenInRawTokens,
   isRawTokensTableEmpty,
   syncHashtags,
@@ -67,7 +68,11 @@ export async function GET(request: Request) {
           const srcListings = newListings[src.name]
           if (!srcListings) return true
           const newTokens = await Promise.all(srcListings.map(async listing => {
-            const exists = await isTokenInRawTokens(listing.symbol, listing.name)
+            const exists = await isTokenInRawTokens(
+              listing.symbol,
+              listing.name,
+              getListingContractAddress(listing)
+            )
             // console.log(listing.symbol, 'from', src.name, exists ? 'exists' : 'added');
             if (exists) {
               foundSet[src.name] = true

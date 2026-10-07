@@ -86,7 +86,21 @@ export async function getChains() {
   return data ?? []
 }
 
-export async function isTokenInRawTokens(symbol: string, name: string): Promise<boolean> {
+export function getListingContractAddress(listing: Listing): string {
+  if ('contractAddresses' in listing) {
+    const first = listing.contractAddresses?.[0]
+    if (!first) return ''
+    const parts = first.split('/')
+    return parts.length === 2 ? parts[1] : ''
+  }
+  return listing.platform?.token_address ?? ''
+}
+
+export async function isTokenInRawTokens(
+  symbol: string,
+  name: string,
+  contractAddress?: string
+): Promise<boolean> {
   const { data, error } = await supabaseService
     .from('raw_tokens')
     .select('id')
@@ -99,7 +113,22 @@ export async function isTokenInRawTokens(symbol: string, name: string): Promise<
     return false
   }
 
-  return !!data
+  if (data) return true
+
+  if (!contractAddress) return false
+
+  const { data: contractMatch, error: contractError } = await supabaseService
+    .from('raw_tokens')
+    .select('id')
+    .eq('contract_address', contractAddress)
+    .maybeSingle()
+
+  if (contractError) {
+    console.error('Error checking existing token by contract address:', contractError.message)
+    return false
+  }
+
+  return !!contractMatch
 }
 
 export async function isRawTokensTableEmpty(): Promise<boolean> {
