@@ -7,7 +7,7 @@ import { YMYLTrustSignalsServer } from './components/YMYLTrustSignalsServer'
 const outfit = Outfit({
   variable: '--font-outfit',
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+  // weight: ['300', '400', '500', '600', '700'],
 })
 
 const oxanium = Oxanium({
@@ -30,8 +30,30 @@ const spaceMono = Space_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://youngwhale.io'),
   title: 'Young Whale - New Token Listings',
   description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale',
+  openGraph: {
+    title: 'Young Whale - New Token Listings',
+    description: 'Explore latest cryptocurrency tokens across Tech, Meme, Real world assets and Presale.',
+    url: 'https://youngwhale.io',
+    siteName: 'Young Whale',
+    images: [
+      {
+        url: '/public-master.png',
+        width: 5112,
+        height: 3792,
+        alt: 'Young Whale - New Token Listings',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Young Whale - New Token Listings',
+    description: 'Explore latest cryptocurrency tokens across: Tech, Meme, Real world assets and Presale',
+    images: ['/public-master.png'],
+  },
 }
 
 export default function RootLayout({
