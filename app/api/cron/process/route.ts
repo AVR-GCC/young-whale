@@ -341,8 +341,13 @@ ${rawStr}`
         text = result.text
         await logRunMessage(runId, `Querying ${raw.name} with ${currentModelName} - success`)
         break
-      } catch (error: unknown) {
-        const errorCode = (error as { errors: { statusCode: number }[] }).errors?.[0]?.statusCode;
+      } catch (e: unknown) {
+        const error = e as {
+          errors: { statusCode: number }[],
+          statusCode: number,
+          data: { error: { message: string } }
+        };
+        const errorCode = error.errors?.[0]?.statusCode || error?.statusCode;
         if (errorCode === 503) {
           await logRunMessage(runId, `Model ${currentModelName} is overloaded - waiting one minute`)
           await new Promise((resolve) => setTimeout(resolve, 60000))
@@ -355,6 +360,10 @@ ${rawStr}`
           }
           await logRunMessage(runId, `Querying failed with error code 429 and error: ${error}`)
           throw error
+        }
+        if (errorCode === 404) {
+          await logRunMessage(runId, `Querying failed with error: ${error.data.error.message}`)
+          break
         }
         await logRunMessage(runId, `Querying failed with error: ${error}`)
         throw error
