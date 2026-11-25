@@ -522,6 +522,34 @@ describe('CategoryContainer', () => {
     expect(promoB.compareDocumentPosition(norm6) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('renders every promoted token regardless of the unpromoted display limit', () => {
+    const promotedTokens = Array.from({ length: 8 }, (_, index) => ({
+      ...mockTokens[0],
+      id: `promoted-${index}`,
+      name: `Promoted ${index}`,
+      display_name: `Promoted ${index}`,
+      is_promoted: true,
+    }))
+
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={13}
+        tokens={[...mockTokens.slice(0, 5), ...promotedTokens]}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={false}
+        chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
+      />
+    )
+
+    promotedTokens.forEach((token) => {
+      expect(screen.getAllByText(token.name).length).toBeGreaterThan(0)
+    })
+  })
+
   it('renders promoted tokens after the separator when not isMobile', () => {
     render(
       <CategoryContainer

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import type { TokenCategory } from '@/shared/types'
 
 type PostgresChangesCallback = (payload: unknown) => void
+type MockToken = { id: string; name: string; is_promoted?: boolean }
 
 const { subscribeMock, removeChannelMock } = vi.hoisted(() => ({
   subscribeMock: vi.fn(),
@@ -33,7 +34,7 @@ vi.mock('./HomePage', () => ({
     newTokenIds,
     onLoadMore,
   }: {
-    tokens: { id: string; name: string }[]
+    tokens: MockToken[]
     loading: boolean
     newTokenIds?: ReadonlySet<string>
     onLoadMore?: (category: TokenCategory) => Promise<boolean>
@@ -45,7 +46,13 @@ vi.mock('./HomePage', () => ({
       </div>
       <button onClick={() => void onLoadMore?.('Tech')}>Load more Tech</button>
       {tokens.map((token) => (
-        <div key={token.id}>{token.name}</div>
+        <div
+          key={token.id}
+          data-testid={`token-${token.id}`}
+          data-promoted={String(Boolean(token.is_promoted))}
+        >
+          {token.name}
+        </div>
       ))}
     </div>
   ) as ReactNode,
@@ -56,11 +63,11 @@ import HomePageClient from './HomePageClient'
 describe('HomePageClient', () => {
   const fetchMock = vi.fn()
 
-  function createFetchResponse(names: string[], extra: Record<string, unknown> = {}) {
+  function createFetchResponse(tokens: (string | MockToken)[], extra: Record<string, unknown> = {}) {
     return {
       ok: true,
       json: () => Promise.resolve({
-        tokens: names.map((name) => ({ id: name, name })),
+        tokens: tokens.map((token) => typeof token === 'string' ? { id: token, name: token } : token),
         ...extra,
       }),
     }
@@ -130,6 +137,33 @@ describe('HomePageClient', () => {
     })
     expect(screen.getAllByText('New Coin').length).toBeGreaterThan(0)
     expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('reconciles promotion and unpromotion during realtime refreshes', async () => {
+    const promotedToken = { id: 'promoted', name: 'Promoted Coin', is_promoted: true }
+    fetchMock.mockResolvedValueOnce(createFetchResponse([promotedToken]))
+
+    render(<HomePageClient />)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token-promoted').getAttribute('data-promoted')).toBe('true')
+    })
+
+    fetchMock.mockResolvedValueOnce(createFetchResponse([]))
+    postgresChangesCallback!({})
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token-promoted').getAttribute('data-promoted')).toBe('false')
+    })
+
+    fetchMock.mockResolvedValueOnce(createFetchResponse([promotedToken]))
+    postgresChangesCallback!({})
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(screen.getByTestId('token-promoted').getAttribute('data-promoted')).toBe('true')
+    })
   })
 
   it('loads older category pages and preserves them during realtime refreshes', async () => {

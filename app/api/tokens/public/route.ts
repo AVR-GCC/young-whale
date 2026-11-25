@@ -7,6 +7,11 @@ export const revalidate = 60
 const PUBLIC_CATEGORIES = ['Tech', 'Meme', 'RWA', 'Presale'] as const
 const DEFAULT_PAGE_SIZE = 50
 const MAX_PAGE_SIZE = 50
+const PROMOTED_BATCH_SIZE = 1000
+const TOKEN_SELECTION = `*,
+  token_hashtags(
+    hashtags(id, name, slug, is_active, created_at)
+  )`
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
 
@@ -64,6 +69,10 @@ function mapToken(token: TokenRow): TokenWithHashtags {
   }
 }
 
+function getCursorFilter(cursor: Cursor) {
+  return `published_at.lt.${cursor.publishedAt},and(published_at.eq.${cursor.publishedAt},id.lt.${cursor.id})`
+}
+
 async function fetchCategoryPage(
   category: PublicCategory,
   cursor: Cursor | null,
@@ -71,19 +80,12 @@ async function fetchCategoryPage(
 ) {
   let query = supabaseService
     .from('tokens')
-    .select(
-      `*,
-      token_hashtags(
-        hashtags(id, name, slug, is_active, created_at)
-      )`
-    )
+    .select(TOKEN_SELECTION)
     .not('published_at', 'is', null)
     .eq('category', category)
 
   if (cursor) {
-    query = query.or(
-      `published_at.lt.${cursor.publishedAt},and(published_at.eq.${cursor.publishedAt},id.lt.${cursor.id})`
-    )
+    query = query.or(getCursorFilter(cursor))
   }
 
   const { data, error } = await query
@@ -100,6 +102,39 @@ async function fetchCategoryPage(
   return {
     tokens,
     nextCursor: rows.length > pageSize && lastToken ? encodeCursor(lastToken) : null,
+  }
+}
+
+async function fetchPromotedTokens() {
+  const tokens: TokenWithHashtags[] = []
+  let cursor: Cursor | null = null
+
+  while (true) {
+    let query = supabaseService
+      .from('tokens')
+      .select(TOKEN_SELECTION)
+      .not('published_at', 'is', null)
+      .eq('is_promoted', true)
+
+    if (cursor) {
+      query = query.or(getCursorFilter(cursor))
+    }
+
+    const { data, error } = await query
+      .order('published_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(PROMOTED_BATCH_SIZE)
+
+    if (error) throw new Error(error.message)
+
+    const page = ((data ?? []) as TokenRow[]).map(mapToken)
+    tokens.push(...page)
+
+    const lastToken = page.at(-1)
+    if (page.length < PROMOTED_BATCH_SIZE || !lastToken) return tokens
+
+    if (!lastToken.published_at) return tokens
+    cursor = { publishedAt: lastToken.published_at, id: lastToken.id }
   }
 }
 
@@ -132,15 +167,22 @@ export async function GET(request: Request) {
       return NextResponse.json(page)
     }
 
-    const pages = await Promise.all(
-      PUBLIC_CATEGORIES.map((publicCategory) => fetchCategoryPage(publicCategory, null, pageSize))
-    )
+    const [pages, promotedTokens] = await Promise.all([
+      Promise.all(
+        PUBLIC_CATEGORIES.map((publicCategory) => fetchCategoryPage(publicCategory, null, pageSize))
+      ),
+      fetchPromotedTokens(),
+    ])
     const nextCursors = Object.fromEntries(
       PUBLIC_CATEGORIES.map((publicCategory, index) => [publicCategory, pages[index].nextCursor])
     ) as NextCursors
+    const tokensById = new Map(
+      pages.flatMap((page) => page.tokens).map((token) => [token.id, token])
+    )
+    promotedTokens.forEach((token) => tokensById.set(token.id, token))
 
     return NextResponse.json({
-      tokens: pages.flatMap((page) => page.tokens),
+      tokens: [...tokensById.values()],
       nextCursors,
     })
   } catch (error) {

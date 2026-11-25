@@ -42,11 +42,12 @@ function asQueryBuilder(builder: MockQueryBuilder & PromiseLike<QueryResult>) {
 const categories = ['Tech', 'Meme', 'RWA', 'Presale'] as const
 type Category = (typeof categories)[number]
 
-function makeToken(category: Category, index: number, publishedAt?: string) {
+function makeToken(category: Category, index: number, publishedAt?: string, isPromoted = false) {
   return {
     id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
     name: `${category} ${index}`,
     category,
+    is_promoted: isPromoted,
     published_at: publishedAt ?? new Date(Date.UTC(2026, 0, 1, 0, 0, -index)).toISOString(),
     token_hashtags: [
       {
@@ -73,10 +74,13 @@ describe('GET /api/tokens/public', () => {
   })
 
   it('fetches an independent latest page for every category', async () => {
-    const builders = categories.map((category, index) => createMockQueryBuilder({
-      data: [makeToken(category, index + 1)],
-      error: null,
-    }))
+    const builders = [
+      ...categories.map((category, index) => createMockQueryBuilder({
+        data: [makeToken(category, index + 1)],
+        error: null,
+      })),
+      createMockQueryBuilder({ data: [], error: null }),
+    ]
     mockBuilders(builders)
 
     const response = await GET(new Request('http://localhost/api/tokens/public'))
@@ -85,17 +89,20 @@ describe('GET /api/tokens/public', () => {
     expect(response.status).toBe(200)
     expect(json.tokens.map((token: { category: string }) => token.category)).toEqual(categories)
     expect(json.nextCursors).toEqual({ Tech: null, Meme: null, RWA: null, Presale: null })
-    builders.forEach((builder, index) => {
+    builders.slice(0, categories.length).forEach((builder, index) => {
       expect(builder.eq).toHaveBeenCalledWith('category', categories[index])
       expect(builder.limit).toHaveBeenCalledWith(51)
       expect(builder.order).toHaveBeenCalledWith('published_at', { ascending: false })
       expect(builder.order).toHaveBeenCalledWith('id', { ascending: false })
     })
+    expect(builders[4].eq).toHaveBeenCalledWith('is_promoted', true)
+    expect(builders[4].limit).toHaveBeenCalledWith(1000)
   })
 
   it('caps each category independently and returns a cursor when more rows exist', async () => {
     const builders = [
       createMockQueryBuilder({ data: Array.from({ length: 51 }, (_, index) => makeToken('Tech', index + 1)), error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
       createMockQueryBuilder({ data: [], error: null }),
       createMockQueryBuilder({ data: [], error: null }),
       createMockQueryBuilder({ data: [], error: null }),
@@ -110,6 +117,50 @@ describe('GET /api/tokens/public', () => {
     expect(json.nextCursors.Meme).toBeNull()
     expect(json.nextCursors.RWA).toBeNull()
     expect(json.nextCursors.Presale).toBeNull()
+  })
+
+  it('includes older promoted tokens without duplicating those in category pages', async () => {
+    const recentPromoted = makeToken('Tech', 2, undefined, true)
+    const olderPromoted = makeToken('Tech', 100, '2020-01-01T00:00:00.000Z', true)
+    const builders = [
+      createMockQueryBuilder({ data: [makeToken('Tech', 1), recentPromoted], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [recentPromoted, olderPromoted], error: null }),
+    ]
+    mockBuilders(builders)
+
+    const response = await GET(new Request('http://localhost/api/tokens/public'))
+    const json = await response.json()
+    const ids = json.tokens.map((token: { id: string }) => token.id)
+
+    expect(ids).toHaveLength(3)
+    expect(new Set(ids).size).toBe(3)
+    expect(ids).toContain(olderPromoted.id)
+    expect(ids.filter((id: string) => id === recentPromoted.id)).toHaveLength(1)
+  })
+
+  it('fetches subsequent promoted batches with a keyset cursor', async () => {
+    const firstBatch = Array.from({ length: 1000 }, (_, index) => makeToken('Tech', index + 1, undefined, true))
+    const cursorToken = firstBatch[999]
+    const builders = [
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: [], error: null }),
+      createMockQueryBuilder({ data: firstBatch, error: null }),
+      createMockQueryBuilder({ data: [makeToken('Tech', 1001, undefined, true)], error: null }),
+    ]
+    mockBuilders(builders)
+
+    const response = await GET(new Request('http://localhost/api/tokens/public'))
+    const json = await response.json()
+
+    expect(json.tokens).toHaveLength(1001)
+    expect(builders[5].or).toHaveBeenCalledWith(
+      `published_at.lt.${cursorToken.published_at},and(published_at.eq.${cursorToken.published_at},id.lt.${cursorToken.id})`
+    )
   })
 
   it('uses the published_at and id cursor for the next category page', async () => {

@@ -46,9 +46,15 @@ export default function HomePageClient() {
       if (!response.ok) throw new Error('Failed to load tokens')
       const data = (await response.json()) as InitialTokensResponse
       const incoming = data.tokens ?? []
+      const promotedIds = new Set(incoming.filter((token) => token.is_promoted).map((token) => token.id))
       const prevIds = prevIdsRef.current
-      const next = prevIds === null ? incoming : mergeTokens(tokensRef.current, incoming)
-      const freshIds = prevIds === null ? [] : incoming.filter((token) => !prevIds.has(token.id)).map((token) => token.id)
+      const currentTokens = tokensRef.current.map((token) =>
+        token.is_promoted && !promotedIds.has(token.id) ? { ...token, is_promoted: false } : token
+      )
+      const next = prevIds === null ? incoming : mergeTokens(currentTokens, incoming)
+      const freshIds = prevIds === null
+        ? []
+        : incoming.filter((token) => !prevIds.has(token.id)).map((token) => token.id)
 
       tokensRef.current = next
       prevIdsRef.current = new Set(next.map((token) => token.id))
