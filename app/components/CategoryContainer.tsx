@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import type { TokenWithHashtags } from '@/shared/types'
+import type { TokenCategory, TokenWithHashtags } from '@/shared/types'
 import { CustomTooltip } from './CustomTooltip'
 import TokenCard from './TokenCard'
 import { CategoryType } from '../lib/categories'
@@ -19,6 +19,9 @@ interface CategoryContainerProps {
   chainIcons: Record<string, string>
   chainExplorers: Record<string, string>
   newTokenIds?: ReadonlySet<string>
+  hasMore?: boolean
+  loadingMore?: boolean
+  onLoadMore?: (category: TokenCategory) => Promise<boolean>
 }
 
 // --- Constants for CategoryBlock features with no working-app equivalent ---
@@ -100,18 +103,22 @@ function ExpandCollapseSeparator({
   tokens,
   category,
   limit,
-  handleScanDeeper,
-  handleSurface
+  hasMore,
+  loadingMore,
+  handleSurface,
+  handleScanDeeper
 }: {
   tokens: TokenWithHashtags[],
   category: CategoryType,
   limit: number,
+  hasMore: boolean,
+  loadingMore: boolean,
   handleSurface: () => void,
   handleScanDeeper: () => void,
 }) {
   return (
     <>
-      {tokens.length > 5 && (
+      {(tokens.length > 5 || hasMore) && (
         <div className="relative w-full flex items-center justify-center z-30 h-[10px] my-1">
           <div className="absolute w-full h-px bg-[#1E293B] left-0 top-1/2 -translate-y-1/2" />
           <div className="absolute top-1/2 -translate-y-1/2 bg-[#0B0F19] px-2 flex items-center gap-2 rounded-sm border border-[#1E293B]/60 shadow-[0_0_4px_rgba(0,0,0,0.8)] z-10 h-5">
@@ -136,10 +143,11 @@ function ExpandCollapseSeparator({
                 </button>
               </CustomTooltip>
             )}
-            {tokens.length > limit && (
+            {(tokens.length > limit || hasMore) && (
               <CustomTooltip content="Scan deeper" position="top" borderColor={category.color}>
                 <button
                   type="button"
+                  disabled={loadingMore}
                   onClick={(e) => {
                     e.stopPropagation()
                     handleScanDeeper()
@@ -153,7 +161,7 @@ function ExpandCollapseSeparator({
                   onMouseOver={(e) => (e.currentTarget.style.opacity = '1')}
                   onMouseOut={(e) => (e.currentTarget.style.opacity = '0.8')}
                 >
-                  +
+                  {loadingMore ? '…' : '+'}
                 </button>
               </CustomTooltip>
             )}
@@ -174,20 +182,33 @@ export default function CategoryContainer({
   onMobileTokenClick,
   chainIcons,
   chainExplorers,
-  newTokenIds
+  newTokenIds,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
 }: CategoryContainerProps) {
   const [limit, setLimit] = useState(INITIAL_LIMIT)
+  const promotedList = tokens.filter(st => st.is_promoted)
+  const unpromotedList = tokens.filter(st => !st.is_promoted)
 
   const handleSurface = useCallback(() => {
     setLimit(INITIAL_LIMIT)
   }, [])
 
   const handleScanDeeper = useCallback(() => {
-    setLimit((prev) => prev + LIMIT_STEP)
-  }, [])
+    if (unpromotedList.length > limit) {
+      setLimit((prev) => prev + LIMIT_STEP)
+      return
+    }
+    if (!hasMore || loadingMore || !onLoadMore) return
 
-  const promotedList = tokens.filter(st => st.is_promoted)
-  const unpromotedList = tokens.filter(st => !st.is_promoted)
+    const requestedLimit = limit
+    void onLoadMore(category.id).then((loaded) => {
+      if (loaded) {
+        setLimit((prev) => prev === requestedLimit ? prev + LIMIT_STEP : prev)
+      }
+    })
+  }, [unpromotedList.length, limit, hasMore, loadingMore, onLoadMore, category.id])
   const sliced = isMobile
     ? [...unpromotedList.slice(0, 5), ...promotedList, ...unpromotedList.slice(5)]
     : unpromotedList.slice(0, limit)
@@ -222,9 +243,11 @@ export default function CategoryContainer({
                   <>
                     {/* Expand/Collapse Separator */}
                     <ExpandCollapseSeparator
-                      tokens={tokens}
+                      tokens={unpromotedList}
                       category={category}
                       limit={limit}
+                      hasMore={hasMore}
+                      loadingMore={loadingMore}
                       handleScanDeeper={handleScanDeeper}
                       handleSurface={handleSurface}
                     />

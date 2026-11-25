@@ -1,6 +1,7 @@
 'use client'
 
 import { categories } from '../lib/categories'
+import type { TokenCategory } from '@/shared/types'
 
 const categoryIconPaths: Record<string, string> = {
   Tech: '/category-icons/tech.svg',
@@ -16,7 +17,7 @@ const categoryLabels: Record<string, string> = {
   Presale: 'PRESALE\n& AIRDROP',
 }
 
-export default function MobileCategoryFooter({ selectedCategory, selectCategory }: { selectedCategory: string, selectCategory: (category: string) => void }) {
+export default function MobileCategoryFooter({ selectedCategory, selectCategory }: { selectedCategory: TokenCategory, selectCategory: (category: TokenCategory) => void }) {
   return (
     <div className="flex-shrink-0 bg-[#070A10] border-t border-[#1E293B]/60 px-2 py-2">
       <div className="flex items-center justify-around">

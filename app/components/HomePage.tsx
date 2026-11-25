@@ -6,7 +6,7 @@ import Header from './Header'
 import CategoryGrid from './CategoryGrid'
 // import FilteredSignals from './FilteredSignals'
 import Footer from './Footer'
-import type { TokenWithHashtags } from '@/shared/types'
+import type { TokenCategory, TokenWithHashtags } from '@/shared/types'
 import { categories } from '../lib/categories'
 import { SubscriptionTerminal } from './SubscriptionTerminal'
 import { LegalModal, LegalTab } from './LegalModal'
@@ -16,6 +16,9 @@ interface HomePageProps {
   tokens: TokenWithHashtags[]
   loading: boolean
   newTokenIds?: ReadonlySet<string>
+  nextCursors?: Partial<Record<TokenCategory, string | null>>
+  loadingMore?: ReadonlySet<TokenCategory>
+  onLoadMore?: (category: TokenCategory) => Promise<boolean>
 }
 
 // --- Hardcoded values for example-app features with no current-app equivalent ---
@@ -30,7 +33,14 @@ const now = new Date()
 const oneDayAgo = new Date(now.getTime() - ONE_DAY)
 const twoDayAgo = new Date(now.getTime() - ONE_DAY * 2)
 
-export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps) {
+export default function HomePage({
+  tokens,
+  loading,
+  newTokenIds,
+  nextCursors,
+  loadingMore,
+  onLoadMore,
+}: HomePageProps) {
   const [selectedToken, setSelectedToken] = useState<string | null>(null)
   const [selectedCategory, selectCategory] = useState(categories[0].id)
   const [secondsLeft, setSecondsLeft] = useState(0)
@@ -148,6 +158,9 @@ export default function HomePage({ tokens, loading, newTokenIds }: HomePageProps
           settingsView={settingsView}
           selectedCategory={selectedCategory}
           selectCategory={selectCategory}
+          nextCursors={nextCursors}
+          loadingMore={loadingMore}
+          onLoadMore={onLoadMore}
         />
 
         {/* <FilteredSignals */}

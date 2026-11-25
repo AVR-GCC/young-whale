@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import CategoryContainer from './CategoryContainer'
 import type { TokenWithHashtags } from '@/shared/types'
 import { categories } from '../lib/categories'
@@ -390,6 +390,52 @@ describe('CategoryContainer', () => {
 
     // Now expanded past the initial limit, the surface (−) control appears
     expect(screen.getByText('−')).toBeDefined()
+  })
+
+  it('requests the next category page when all loaded rows are visible', async () => {
+    const onLoadMore = vi.fn().mockResolvedValue(true)
+
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={5}
+        tokens={mockTokens.slice(0, 5)}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={false}
+        chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
+        hasMore={true}
+        onLoadMore={onLoadMore}
+      />
+    )
+
+    fireEvent.click(screen.getByText('+'))
+
+    await waitFor(() => {
+      expect(onLoadMore).toHaveBeenCalledWith('Tech')
+    })
+  })
+
+  it('disables the scan-deeper control while loading another page', () => {
+    render(
+      <CategoryContainer
+        category={categories[0]}
+        tokenCount={5}
+        tokens={mockTokens.slice(0, 5)}
+        selectedToken={null}
+        setSelectedTokenAction={mockSetSelectedToken}
+        loading={false}
+        isMobile={false}
+        chainIcons={chainIcons}
+        chainExplorers={chainExplorers}
+        hasMore={true}
+        loadingMore={true}
+      />
+    )
+
+    expect(screen.getByText('…').closest('button')?.disabled).toBe(true)
   })
 
   it('renders for every category', () => {

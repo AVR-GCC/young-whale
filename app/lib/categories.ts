@@ -1,5 +1,7 @@
+import type { TokenCategory } from '@/shared/types'
+
 export type CategoryType = {
-  id: string,
+  id: TokenCategory,
   name: string,
   icon: string,
   title: string,

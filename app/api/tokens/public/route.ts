@@ -1,38 +1,148 @@
 import { NextResponse } from 'next/server'
 import { supabaseService } from '@/lib/supabase/service'
 import type { TokenWithHashtags } from '@/shared/types'
-// import { sleep } from '@/app/lib/utils'
 
-export const revalidate = 60 // Revalidate every 60 seconds
+export const revalidate = 60
 
-export async function GET() {
+const PUBLIC_CATEGORIES = ['Tech', 'Meme', 'RWA', 'Presale'] as const
+const DEFAULT_PAGE_SIZE = 50
+const MAX_PAGE_SIZE = 50
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const TIMESTAMP_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/
+
+type PublicCategory = (typeof PUBLIC_CATEGORIES)[number]
+type NextCursors = Record<PublicCategory, string | null>
+type TokenRow = TokenWithHashtags & {
+  token_hashtags?: {
+    hashtags: TokenWithHashtags['hashtags'][number]
+  }[]
+}
+type Cursor = {
+  publishedAt: string
+  id: string
+}
+
+function isPublicCategory(value: string): value is PublicCategory {
+  return PUBLIC_CATEGORIES.includes(value as PublicCategory)
+}
+
+function parsePageSize(value: string | null) {
+  if (value === null) return DEFAULT_PAGE_SIZE
+  const pageSize = Number(value)
+  if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > MAX_PAGE_SIZE) return null
+  return pageSize
+}
+
+function encodeCursor(token: TokenWithHashtags): string | null {
+  if (!token.published_at) return null
+  const cursor: Cursor = { publishedAt: token.published_at, id: token.id }
+  return Buffer.from(JSON.stringify(cursor)).toString('base64url')
+}
+
+function decodeCursor(value: string): Cursor | null {
   try {
-    const { data, error } = await supabaseService
-      .from('tokens')
-      .select(
-        `*,
-        token_hashtags(
-          hashtags(id, name, slug)
-        )`
-      )
-      .not('published_at', 'is', null)
-      .order('published_at', { ascending: false })
+    const cursor = JSON.parse(Buffer.from(value, 'base64url').toString('utf8')) as Partial<Cursor>
+    if (
+      typeof cursor.publishedAt !== 'string' ||
+      !TIMESTAMP_PATTERN.test(cursor.publishedAt) ||
+      Number.isNaN(Date.parse(cursor.publishedAt)) ||
+      typeof cursor.id !== 'string' ||
+      !UUID_PATTERN.test(cursor.id)
+    ) {
+      return null
+    }
+    return { publishedAt: cursor.publishedAt, id: cursor.id }
+  } catch {
+    return null
+  }
+}
 
-    if (error) {
-      console.error('Failed to fetch public tokens:', error.message)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+function mapToken(token: TokenRow): TokenWithHashtags {
+  return {
+    ...token,
+    hashtags: token.token_hashtags?.map((th) => th.hashtags) ?? [],
+  }
+}
+
+async function fetchCategoryPage(
+  category: PublicCategory,
+  cursor: Cursor | null,
+  pageSize: number
+) {
+  let query = supabaseService
+    .from('tokens')
+    .select(
+      `*,
+      token_hashtags(
+        hashtags(id, name, slug, is_active, created_at)
+      )`
+    )
+    .not('published_at', 'is', null)
+    .eq('category', category)
+
+  if (cursor) {
+    query = query.or(
+      `published_at.lt.${cursor.publishedAt},and(published_at.eq.${cursor.publishedAt},id.lt.${cursor.id})`
+    )
+  }
+
+  const { data, error } = await query
+    .order('published_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(pageSize + 1)
+
+  if (error) throw new Error(error.message)
+
+  const rows = (data ?? []) as TokenRow[]
+  const tokens = rows.slice(0, pageSize).map(mapToken)
+  const lastToken = tokens.at(-1)
+
+  return {
+    tokens,
+    nextCursor: rows.length > pageSize && lastToken ? encodeCursor(lastToken) : null,
+  }
+}
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category')
+    const cursorValue = searchParams.get('cursor')
+    const pageSize = parsePageSize(searchParams.get('limit'))
+
+    if (pageSize === null) {
+      return NextResponse.json({ error: `limit must be between 1 and ${MAX_PAGE_SIZE}` }, { status: 400 })
     }
 
-    const tokens: TokenWithHashtags[] = (data ?? []).map((token) => ({
-      ...token,
-      hashtags:
-        token.token_hashtags?.map(
-          (th: { hashtags: { id: string; name: string; slug: string } }) => th.hashtags
-        ) ?? [],
-    }))
+    if (category !== null && !isPublicCategory(category)) {
+      return NextResponse.json({ error: 'Invalid category' }, { status: 400 })
+    }
 
-    // await sleep(5000)
-    return NextResponse.json({ tokens })
+    if (cursorValue !== null && category === null) {
+      return NextResponse.json({ error: 'cursor requires a category' }, { status: 400 })
+    }
+
+    const cursor = cursorValue === null ? null : decodeCursor(cursorValue)
+    if (cursorValue !== null && cursor === null) {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
+
+    if (category !== null) {
+      const page = await fetchCategoryPage(category, cursor, pageSize)
+      return NextResponse.json(page)
+    }
+
+    const pages = await Promise.all(
+      PUBLIC_CATEGORIES.map((publicCategory) => fetchCategoryPage(publicCategory, null, pageSize))
+    )
+    const nextCursors = Object.fromEntries(
+      PUBLIC_CATEGORIES.map((publicCategory, index) => [publicCategory, pages[index].nextCursor])
+    ) as NextCursors
+
+    return NextResponse.json({
+      tokens: pages.flatMap((page) => page.tokens),
+      nextCursors,
+    })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     console.error('Public tokens GET error:', message)

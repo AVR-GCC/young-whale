@@ -3,7 +3,7 @@
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import CategoryContainer from './CategoryContainer'
 import { categories } from '../lib/categories'
-import type { TokenWithHashtags } from '@/shared/types'
+import type { TokenCategory, TokenWithHashtags } from '@/shared/types'
 import MobileCategoryFooter from './MobileCategoryFooter'
 import TokenTerminal from './TokenTerminal'
 import MobileSettingsMenu from './MobileSettingsMenu'
@@ -22,8 +22,11 @@ interface CategoryGridProps {
   isSettingsOpen: boolean
   setSettingsViewAction: (view: string) => void
   settingsView: string
-  selectedCategory: string
-  selectCategory: (categoryId: string) => void
+  selectedCategory: TokenCategory
+  selectCategory: (categoryId: TokenCategory) => void
+  nextCursors?: Partial<Record<TokenCategory, string | null>>
+  loadingMore?: ReadonlySet<TokenCategory>
+  onLoadMore?: (category: TokenCategory) => Promise<boolean>
 }
 
 const bottomClass = 'bottom-[73px]';
@@ -70,7 +73,10 @@ export default function CategoryGrid({
   setSettingsViewAction,
   settingsView,
   selectedCategory,
-  selectCategory
+  selectCategory,
+  nextCursors,
+  loadingMore,
+  onLoadMore,
 }: CategoryGridProps) {
   const [mobileOverlayOpen, setMobileOverlayOpen] = useState(false)
   const [mobileOverlayTokenIndex, setMobileOverlayTokenIndex] = useState(0)
@@ -227,6 +233,9 @@ export default function CategoryGrid({
         chainIcons={chainIcons}
         chainExplorers={chainExplorers}
         newTokenIds={newTokenIds}
+        hasMore={Boolean(nextCursors?.[category.id])}
+        loadingMore={loadingMore?.has(category.id) ?? false}
+        onLoadMore={onLoadMore}
       />
     )
   }

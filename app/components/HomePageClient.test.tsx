@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor, cleanup } from '@testing-library/react'
+import { render, screen, waitFor, cleanup, fireEvent } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import type { TokenCategory } from '@/shared/types'
 
 type PostgresChangesCallback = (payload: unknown) => void
 
@@ -30,16 +31,19 @@ vi.mock('./HomePage', () => ({
     tokens,
     loading,
     newTokenIds,
+    onLoadMore,
   }: {
     tokens: { id: string; name: string }[]
     loading: boolean
     newTokenIds?: ReadonlySet<string>
+    onLoadMore?: (category: TokenCategory) => Promise<boolean>
   }) => (
     <div>
       <div>{loading ? 'Loading' : `Tokens: ${tokens.length}`}</div>
       <div data-testid="new-token-ids">
         {newTokenIds && newTokenIds.size > 0 ? [...newTokenIds].join(',') : 'none'}
       </div>
+      <button onClick={() => void onLoadMore?.('Tech')}>Load more Tech</button>
       {tokens.map((token) => (
         <div key={token.id}>{token.name}</div>
       ))}
@@ -52,13 +56,18 @@ import HomePageClient from './HomePageClient'
 describe('HomePageClient', () => {
   const fetchMock = vi.fn()
 
+  function createFetchResponse(names: string[], extra: Record<string, unknown> = {}) {
+    return {
+      ok: true,
+      json: () => Promise.resolve({
+        tokens: names.map((name) => ({ id: name, name })),
+        ...extra,
+      }),
+    }
+  }
+
   function mockFetchResponse(names: string[]) {
-    fetchMock.mockResolvedValue({
-      json: () =>
-        Promise.resolve({
-          tokens: names.map((name) => ({ id: name, name })),
-        }),
-    })
+    fetchMock.mockResolvedValue(createFetchResponse(names))
   }
 
   beforeEach(() => {
@@ -121,6 +130,42 @@ describe('HomePageClient', () => {
     })
     expect(screen.getAllByText('New Coin').length).toBeGreaterThan(0)
     expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('loads older category pages and preserves them during realtime refreshes', async () => {
+    fetchMock.mockResolvedValueOnce(createFetchResponse(['Old Coin'], {
+      nextCursors: { Tech: 'cursor-1' },
+    }))
+
+    render(<HomePageClient />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Tokens: 1')).toBeDefined()
+    })
+
+    fetchMock.mockResolvedValueOnce(createFetchResponse(['Older Coin'], { nextCursor: 'cursor-2' }))
+    fireEvent.click(screen.getByText('Load more Tech'))
+
+    await waitFor(() => {
+      expect(screen.getByText('Tokens: 2')).toBeDefined()
+    })
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/tokens/public?category=Tech&cursor=cursor-1&limit=50'
+    )
+    expect(screen.queryByText(/SURFACED/)).toBeNull()
+
+    fetchMock.mockResolvedValueOnce(createFetchResponse(['Old Coin', 'New Coin'], {
+      nextCursors: { Tech: 'refreshed-cursor' },
+    }))
+    postgresChangesCallback!({})
+    await vi.advanceTimersByTimeAsync(1000)
+
+    await waitFor(() => {
+      expect(screen.getByText('Tokens: 3')).toBeDefined()
+    })
+    expect(screen.getByText('Older Coin')).toBeDefined()
+    expect(screen.getAllByText('New Coin').length).toBeGreaterThan(0)
   })
 
   it('celebrates with a whale splash and highlights only newly appeared tokens', async () => {
